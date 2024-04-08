@@ -5,7 +5,7 @@
 1. Start the docker-compose stack
 
    The backend require some middleware, including PostgreSQL, Redis, and Weaviate, which can be started together using `docker-compose`.
-   
+
    ```bash
    cd ../docker
    docker-compose -f docker-compose.middleware.yaml -p dify up -d
@@ -15,9 +15,9 @@
 3. Generate a `SECRET_KEY` in the `.env` file.
 
    ```bash
-   openssl rand -base64 42
+   sed -i "/^SECRET_KEY=/c\SECRET_KEY=$(openssl rand -base64 42)" .env
    ```
-3.5 If you use annaconda, create a new environment and activate it
+3.5 If you use Anaconda, create a new environment and activate it
    ```bash
    conda create --name dify python=3.10
    conda activate dify
@@ -46,7 +46,7 @@
    ```
    pip install -r requirements.txt --upgrade --force-reinstall
    ```
-   
+
 6. Start backend:
    ```bash
    flask run --host 0.0.0.0 --port=5001 --debug

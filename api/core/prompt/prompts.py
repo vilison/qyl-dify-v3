@@ -1,4 +1,4 @@
-# Written by YORKI MINAKO🤡
+# Written by YORKI MINAKO🤡, Edited by Xiaoyi
 CONVERSATION_TITLE_PROMPT = """You need to decompose the user's input into "subject" and "intention" in order to accurately figure out what the user's input language actually is. 
 Notice: the language type user use could be diverse, which can be English, Chinese, Español, Arabic, Japanese, French, and etc.
 MAKE SURE your output is the SAME language as the user's input!
@@ -69,13 +69,15 @@ SUGGESTED_QUESTIONS_AFTER_ANSWER_INSTRUCTION_PROMPT = (
 )
 
 GENERATOR_QA_PROMPT = (
-    'The user will send a long text. Please think step by step.'
+    '<Task> The user will send a long text. Generate a Question and Answer pairs only using the knowledge in the long text. Please think step by step.'
     'Step 1: Understand and summarize the main content of this text.\n'
     'Step 2: What key information or concepts are mentioned in this text?\n'
     'Step 3: Decompose or combine multiple pieces of information and concepts.\n'
-    'Step 4: Generate 20 questions and answers based on these key information and concepts.'
-    'The questions should be clear and detailed, and the answers should be detailed and complete.\n'
-    "Answer MUST according to the the language:{language} and in the following format: Q1:\nA1:\nQ2:\nA2:...\n"
+    'Step 4: Generate questions and answers based on these key information and concepts.\n'
+    '<Constraints> The questions should be clear and detailed, and the answers should be detailed and complete. '
+    'You must answer in {language}, in a style that is clear and detailed in {language}. No language other than {language} should be used. \n'
+    '<Format> Use the following format: Q1:\nA1:\nQ2:\nA2:...\n'
+    '<QA Pairs>'
 )
 
 RULE_CONFIG_GENERATE_TEMPLATE = """Given MY INTENDED AUDIENCES and HOPING TO SOLVE using a language model, please select \
@@ -85,6 +87,21 @@ Only the content enclosed in double curly braces, such as {{variable}}, in the p
 otherwise, it cannot exist as a variable in the variables.
 If you believe revising the original input will result in a better response from the language model, you may \
 suggest revisions.
+
+<<PRINCIPLES OF GOOD PROMPT>>
+Integrate the intended audience in the prompt e.g. the audience is an expert in the field.
+Break down complex tasks into a sequence of simpler prompts in an interactive conversation.
+Implement example-driven prompting (Use few-shot prompting). 
+When formatting your prompt start with Instruction followed by either Example if relevant. \
+Subsequently present your content. Use one or more line breaks to separate instructions examples questions context and input data.
+Incorporate the following phrases: “Your task is” and “You MUST”.
+Incorporate the following phrases: “You will be penalized”.
+Use leading words like writing “think step by step”.
+Add to your prompt the following phrase “Ensure that your answer is unbiased and does not rely on stereotypes”.
+Assign a role to the large language models.
+Use Delimiters.
+To write an essay /text /paragraph /article or any type of text that should be detailed: “Write a detailed [essay/text/paragraph] for me on [topic] in detail by adding all the information necessary”.
+Clearly state the requirements that the model must follow in order to produce content in the form of the keywords regulations hint or instructions
 
 << FORMATTING >>
 Return a markdown code snippet with a JSON object formatted to look like, \
@@ -102,27 +119,18 @@ and fill in variables, with a welcome sentence, and keep TLDR.
 [EXAMPLE A]
 ```json
 {
-  "prompt": "Write a letter about love",
-  "variables": [],
-  "opening_statement": "Hi! I'm your love letter writer AI."
+  "prompt": "I need your help to translate the following {{Input_language}}paper paragraph into {{Target_language}}, in a style similar to a popular science magazine in {{Target_language}}. #### Rules Ensure accurate conveyance of the original text's facts and context during translation. Maintain the original paragraph format and retain technical terms and company abbreviations ",
+  "variables": ["Input_language", "Target_language"],
+  "opening_statement": " Hi. I am your translation assistant. I can help you with any translation and ensure accurate conveyance of information. "
 }
 ```
 
 [EXAMPLE B]
 ```json
 {
-  "prompt": "Translate from {{lanA}} to {{lanB}}",
-  "variables": ["lanA", "lanB"],
-  "opening_statement": "Welcome to use translate app"
-}
-```
-
-[EXAMPLE C]
-```json
-{
-  "prompt": "Write a story about {{topic}}",
-  "variables": ["topic"],
-  "opening_statement": "I'm your story writer"
+  "prompt": "Your task is to review the provided meeting notes and create a concise summary that captures the essential information, focusing on key takeaways and action items assigned to specific individuals or departments during the meeting. Use clear and professional language, and organize the summary in a logical manner using appropriate formatting such as headings, subheadings, and bullet points. Ensure that the summary is easy to understand and provides a comprehensive but succinct overview of the meeting's content, with a particular focus on clearly indicating who is responsible for each action item.",
+  "variables": ["meeting_notes"],
+  "opening_statement": "Hi! I'm your meeting notes summarizer AI. I can help you with any meeting notes and ensure accurate conveyance of information."
 }
 ```
 

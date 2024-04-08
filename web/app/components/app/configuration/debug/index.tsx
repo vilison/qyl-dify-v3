@@ -31,7 +31,7 @@ import { IS_CE_EDITION } from '@/config'
 import type { Inputs } from '@/models/debug'
 import { fetchFileUploadConfig } from '@/service/common'
 import { useDefaultModel } from '@/app/components/header/account-setting/model-provider-page/hooks'
-import { ModelFeatureEnum } from '@/app/components/header/account-setting/model-provider-page/declarations'
+import { ModelFeatureEnum, ModelTypeEnum } from '@/app/components/header/account-setting/model-provider-page/declarations'
 import type { ModelParameterModalProps } from '@/app/components/header/account-setting/model-provider-page/model-parameter-modal'
 import { Plus } from '@/app/components/base/icons/src/vender/line/general'
 import { useEventEmitterContextContext } from '@/context/event-emitter'
@@ -84,7 +84,7 @@ const Debug: FC<IDebug> = ({
     setVisionConfig,
   } = useContext(ConfigContext)
   const { eventEmitter } = useEventEmitterContextContext()
-  const { data: text2speechDefaultModel } = useDefaultModel(5)
+  const { data: text2speechDefaultModel } = useDefaultModel(ModelTypeEnum.textEmbedding)
   const { data: fileUploadConfigResponse } = useSWR({ url: '/files/upload' }, fetchFileUploadConfig)
   useEffect(() => {
     setAutoFreeze(false)
@@ -93,7 +93,7 @@ const Debug: FC<IDebug> = ({
     }
   }, [])
 
-  const [isResponsing, { setTrue: setResponsingTrue, setFalse: setResponsingFalse }] = useBoolean(false)
+  const [isResponding, { setTrue: setRespondingTrue, setFalse: setRespondingFalse }] = useBoolean(false)
   const [isShowFormattingChangeConfirm, setIsShowFormattingChangeConfirm] = useState(false)
   const [isShowCannotQueryDataset, setShowCannotQueryDataset] = useState(false)
 
@@ -130,7 +130,7 @@ const Debug: FC<IDebug> = ({
 
   const { notify } = useContext(ToastContext)
   const logError = useCallback((message: string) => {
-    notify({ type: 'error', message })
+    notify({ type: 'error', message, duration: 3000 })
   }, [notify])
   const [completionFiles, setCompletionFiles] = useState<VisionFile[]>([])
 
@@ -191,7 +191,7 @@ const Debug: FC<IDebug> = ({
   const [messageId, setMessageId] = useState<string | null>(null)
 
   const sendTextCompletion = async () => {
-    if (isResponsing) {
+    if (isResponding) {
       notify({ type: 'info', message: t('appDebug.errorMessage.waitForResponse') })
       return false
     }
@@ -277,7 +277,7 @@ const Debug: FC<IDebug> = ({
     setMessageId('')
     let res: string[] = []
 
-    setResponsingTrue()
+    setRespondingTrue()
     sendCompletionMessage(appId, data, {
       onData: (data: string, _isFirstMessage: boolean, { messageId }) => {
         res.push(data)
@@ -289,10 +289,10 @@ const Debug: FC<IDebug> = ({
         setCompletionRes(res.join(''))
       },
       onCompleted() {
-        setResponsingFalse()
+        setRespondingFalse()
       },
       onError() {
-        setResponsingFalse()
+        setRespondingFalse()
       },
     })
   }
@@ -440,13 +440,13 @@ const Debug: FC<IDebug> = ({
             {mode === AppType.completion && (
               <div className="mt-6 px-6 pb-4">
                 <GroupName name={t('appDebug.result')} />
-                {(completionRes || isResponsing) && (
+                {(completionRes || isResponding) && (
                   <TextGeneration
                     className="mt-2"
                     content={completionRes}
-                    isLoading={!completionRes && isResponsing}
+                    isLoading={!completionRes && isResponding}
                     isShowTextToSpeech={textToSpeechConfig.enabled && !!text2speechDefaultModel}
-                    isResponsing={isResponsing}
+                    isResponding={isResponding}
                     isInstalledApp={false}
                     messageId={messageId}
                     isError={false}
