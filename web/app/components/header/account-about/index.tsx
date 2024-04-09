@@ -1,6 +1,5 @@
 'use client'
 import { useTranslation } from 'react-i18next'
-import classNames from 'classnames'
 import Link from 'next/link'
 import s from './index.module.css'
 import Modal from '@/app/components/base/modal'
@@ -60,7 +59,7 @@ export default function AccountAbout({
                 : t('common.about.nowAvailable', { version: langeniusVersionInfo.latest_version })
             }
           </div>
-          <div className='flex items-center'>
+          {/* <div className='flex items-center'>
             <Link
               className={classNames(buttonClassName, 'mr-2')}
               href={'https://github.com/langgenius/dify/releases'}
@@ -79,7 +78,7 @@ export default function AccountAbout({
                 </Link>
               )
             }
-          </div>
+          </div> */}
         </div>
       </div>
     </Modal>
