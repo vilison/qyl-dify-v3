@@ -8,7 +8,7 @@ from flask_restful import Resource
 
 from constants.languages import languages
 from extensions.ext_database import db
-from libs.oauth import WeChatOAuth, GitHubOAuth, GoogleOAuth, OAuthUserInfo
+from libs.oauth import GitHubOAuth, GoogleOAuth, OAuthUserInfo, WeChatOAuth
 from models.account import Account, AccountStatus
 from services.account_service import AccountService, RegisterService, TenantService
 
@@ -107,7 +107,7 @@ def _generate_account(provider: str, user_info: OAuthUserInfo):
 
     if not account:
         # Create account
-        account_name = user_info.name if user_info.name else 'Dify'
+        account_name = user_info.name if user_info.name else 'Racio'
         account = RegisterService.register(
             email=user_info.email,
             name=account_name,
