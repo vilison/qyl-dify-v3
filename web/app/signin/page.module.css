@@ -1,3 +1,7 @@
+.wechatIcon {
+  background: center/contain url('./assets/wechat.svg');
+}
+
 .githubIcon {
   background: center/contain url('./assets/github.svg');
 }

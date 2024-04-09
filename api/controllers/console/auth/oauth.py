@@ -8,7 +8,7 @@ from flask_restful import Resource
 
 from constants.languages import languages
 from extensions.ext_database import db
-from libs.oauth import GitHubOAuth, GoogleOAuth, OAuthUserInfo
+from libs.oauth import WeChatOAuth, GitHubOAuth, GoogleOAuth, OAuthUserInfo
 from models.account import Account, AccountStatus
 from services.account_service import AccountService, RegisterService, TenantService
 
@@ -17,6 +17,12 @@ from .. import api
 
 def get_oauth_providers():
     with current_app.app_context():
+        wechat_oauth = WeChatOAuth(client_id=current_app.config.get('WECHAT_CLIENT_ID'),
+                                   client_secret=current_app.config.get(
+                                       'WECHAT_CLIENT_SECRET'),
+                                   redirect_uri=current_app.config.get(
+                                       'CONSOLE_API_URL') + '/console/api/oauth/authorize/wechat')
+
         github_oauth = GitHubOAuth(client_id=current_app.config.get('GITHUB_CLIENT_ID'),
                                    client_secret=current_app.config.get(
                                        'GITHUB_CLIENT_SECRET'),
@@ -30,6 +36,7 @@ def get_oauth_providers():
                                        'CONSOLE_API_URL') + '/console/api/oauth/authorize/google')
 
         OAUTH_PROVIDERS = {
+            'wechat': wechat_oauth,
             'github': github_oauth,
             'google': google_oauth
         }

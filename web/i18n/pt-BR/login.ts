@@ -23,6 +23,7 @@ const translation = {
   sendUsMail: 'Envie-nos um e-mail com sua introdução e cuidaremos do pedido de convite.',
   acceptPP: 'Li e aceito a política de privacidade',
   reset: 'Execute o seguinte comando para redefinir sua senha',
+  withWeChat: 'Continuar com o WeChat',
   withGitHub: 'Continuar com o GitHub',
   withGoogle: 'Continuar com o Google',
   rightTitle: 'Desbloqueie todo o potencial do LLM',
