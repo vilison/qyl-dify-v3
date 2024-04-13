@@ -23,6 +23,7 @@ const translation = {
   sendUsMail: '自己紹介をメールで送信し、招待リクエストを処理します。',
   acceptPP: 'プライバシーポリシーを読み、同意します',
   reset: 'パスワードをリセットするには、次のコマンドを実行してください',
+  withWeChat: 'WeChatで続行',
   withGitHub: 'GitHubで続行',
   withGoogle: 'Googleで続行',
   rightTitle: 'LLMのフルポテンシャルを解き放つ',
@@ -41,7 +42,7 @@ const translation = {
     passwordInvalid: 'パスワードは文字と数字を含み、長さは8以上である必要があります',
   },
   license: {
-    tip: 'Dify Community Editionを開始する前に、GitHubの',
+    tip: 'Racio Community Editionを開始する前に、GitHubの',
     link: 'オープンソースライセンス',
   },
   join: '参加する',

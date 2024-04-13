@@ -328,6 +328,8 @@ class CloudEditionConfig(Config):
 
         self.EDITION = "CLOUD"
 
+        self.WECHAT_CLIENT_ID = get_env('WECHAT_CLIENT_ID')
+        self.WECHAT_CLIENT_SECRET = get_env('WECHAT_CLIENT_SECRET')
         self.GITHUB_CLIENT_ID = get_env('GITHUB_CLIENT_ID')
         self.GITHUB_CLIENT_SECRET = get_env('GITHUB_CLIENT_SECRET')
         self.GOOGLE_CLIENT_ID = get_env('GOOGLE_CLIENT_ID')
