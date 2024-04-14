@@ -5,7 +5,6 @@ import s from './index.module.css'
 import Modal from '@/app/components/base/modal'
 import { XClose } from '@/app/components/base/icons/src/vender/line/general'
 import type { LangGeniusVersionResponse } from '@/models/common'
-import { IS_CE_EDITION } from '@/config'
 import LogoSite from '@/app/components/base/logo/logo-site'
 
 type IAccountSettingProps = {
@@ -40,12 +39,10 @@ export default function AccountAbout({
             <div>© 2023 Racio, Inc., Contributors.</div>
             <div className='text-[#1C64F2]'>
               {
-                IS_CE_EDITION
-                  ? <Link href={'https://github.com/langgenius/dify/blob/main/LICENSE'} target='_blank' rel='noopener noreferrer'>Open Source License</Link>
-                  : <>
-                    <Link href='https://www.racio.ai/privacy' target='_blank' rel='noopener noreferrer'>Privacy Policy</Link>,
-                    <Link href='https://www.racio.ai/terms' target='_blank' rel='noopener noreferrer'>Terms of Service</Link>
-                  </>
+                <>
+                  <Link href='https://www.racio.ai/privacy' target='_blank' rel='noopener noreferrer'>Privacy Policy</Link>,
+                  <Link href='https://www.racio.ai/terms' target='_blank' rel='noopener noreferrer'>Terms of Service</Link>
+                </>
               }
             </div>
           </div>
