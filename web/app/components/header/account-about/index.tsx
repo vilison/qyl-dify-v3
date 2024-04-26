@@ -40,8 +40,8 @@ export default function AccountAbout({
             <div className='text-[#1C64F2]'>
               {
                 <>
-                  <Link href='https://www.racio.ai/privacy' target='_blank' rel='noopener noreferrer'>Privacy Policy</Link>,
-                  <Link href='https://www.racio.ai/terms' target='_blank' rel='noopener noreferrer'>Terms of Service</Link>
+                  <Link href='https://www.racio.chat/privacy' target='_blank' rel='noopener noreferrer'>Privacy Policy</Link>,
+                  <Link href='https://www.racio.chat/terms' target='_blank' rel='noopener noreferrer'>Terms of Service</Link>
                 </>
               }
             </div>

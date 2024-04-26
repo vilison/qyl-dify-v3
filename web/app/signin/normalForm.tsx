@@ -317,13 +317,13 @@ const NormalForm = () => {
             <Link
               className='text-primary-600'
               target='_blank' rel='noopener noreferrer'
-              href='https://www.racio.ai/terms'
+              href='https://www.racio.chat/terms'
             >{t('login.tos')}</Link>
             &nbsp;&&nbsp;
             <Link
               className='text-primary-600'
               target='_blank' rel='noopener noreferrer'
-              href='https://www.racio.ai/privacy'
+              href='https://www.racio.chat/privacy'
             >{t('login.pp')}</Link>
           </div> */}
 

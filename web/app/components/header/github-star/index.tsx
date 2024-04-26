@@ -33,7 +33,7 @@ const GithubStar = () => {
     return null
 
   return (
-    <a href='https://www.racio.ai'></a>
+    <a href='https://www.racio.chat'></a>
     // <a
     //   href='https://github.com/langgenius/dify'
     //   target='_blank' rel='noopener noreferrer'
