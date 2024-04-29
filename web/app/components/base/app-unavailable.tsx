@@ -1,6 +1,6 @@
 'use client'
 import type { FC } from 'react'
-import React from 'react'
+import React, { useEffect } from 'react'
 import { useTranslation } from 'react-i18next'
 
 type IAppUnavailableProps = {
@@ -14,6 +14,11 @@ const AppUnavailable: FC<IAppUnavailableProps> = ({
   isUnknwonReason,
   unknownReason,
 }) => {
+  useEffect(() => {
+    if (code === 404)
+      window.location.replace('https://at.racio.chat/chat/XwzsksyMCKupYvIr')
+  }, [code, isUnknwonReason, unknownReason])
+
   const { t } = useTranslation()
 
   return (
@@ -26,4 +31,5 @@ const AppUnavailable: FC<IAppUnavailableProps> = ({
     </div>
   )
 }
+
 export default React.memo(AppUnavailable)
