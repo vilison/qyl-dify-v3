@@ -246,6 +246,8 @@ services:
       APP_API_URL: ''
       # The DSN for Sentry error reporting. If not set, Sentry error reporting will be disabled.
       SENTRY_DSN: ''
+      # APP_ERROR_REPLACE_URL
+      APP_ERROR_REPLACE_URL_404: 'https://at.racio.chat/chat/XwzsksyMCKupYvIr'
     # uncomment to expose dify-web port to host
     # ports:
     #   - "3000:3000"

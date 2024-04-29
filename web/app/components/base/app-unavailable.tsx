@@ -15,8 +15,23 @@ const AppUnavailable: FC<IAppUnavailableProps> = ({
   unknownReason,
 }) => {
   useEffect(() => {
-    if (code === 404)
-      window.location.replace('https://at.racio.chat/chat/XwzsksyMCKupYvIr')
+    if (code === 404) {
+      let appErrorReplaceUrl404 = ''
+
+      if (process.env.NEXT_PUBLIC_APP_ERROR_REPLACE_URL_404) {
+        appErrorReplaceUrl404 = process.env.NEXT_PUBLIC_APP_ERROR_REPLACE_URL_404
+      }
+      else if (
+        globalThis.document?.body?.getAttribute('data-public-app-error-replace-url-404')
+      ) {
+        // Not bulild can not get env from process.env.NEXT_PUBLIC_ in browser https://nextjs.org/docs/basic-features/environment-variables#exposing-environment-variables-to-the-browser
+        appErrorReplaceUrl404 = globalThis.document?.body?.getAttribute('data-public-app-error-replace-url-404') as string
+      }
+      else {
+        appErrorReplaceUrl404 = 'https://at.racio.chat/chat/XwzsksyMCKupYvIr' // default support url
+      }
+      window.location.replace(appErrorReplaceUrl404)
+    }
   }, [code, isUnknwonReason, unknownReason])
 
   const { t } = useTranslation()
