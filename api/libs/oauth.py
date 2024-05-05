@@ -51,7 +51,7 @@ class WeChatOAuth(OAuth):
     _USER_INFO_URL = 'https://api.weixin.qq.com/sns/userinfo'
 
     _EMAIL_INFO_URL = 'https://api.github.com/user/emails'
-    
+    # which will be used when getting userInfo
     _OPEN_ID = ''
 
     def get_authorization_url(self):
@@ -133,7 +133,7 @@ class WeChatOAuth(OAuth):
         }
         headers = {'Accept': 'application/json'}
         response = requests.get(url=f'{self._USER_INFO_URL}?{urllib.parse.urlencode(params)}', headers=headers)
-        # esponse.raise_for_status() returns an HTTPError object if an error has occurred during the process. 
+        # response.raise_for_status() returns an HTTPError object if an error has occurred during the process.
         # It is used for debugging the requests module and is an integral part of Python requests.
         response.raise_for_status()
         user_info = response.json()
@@ -141,10 +141,13 @@ class WeChatOAuth(OAuth):
         return {**user_info}    # unpacking
 
     def _transform_user_info(self, raw_info: dict) -> OAuthUserInfo:
+        email = raw_info.get('email')
+        if not email:
+            email = f"{raw_info['nickname']}.{raw_info['unionid']}.wechat@promptgens.com"
         return OAuthUserInfo(
             id=str(raw_info['unionid']),
             name=raw_info['nickname'],
-            email=None
+            email=email
         )
 
 
