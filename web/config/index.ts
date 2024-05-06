@@ -33,6 +33,9 @@ export const PUBLIC_API_PREFIX: string = publicApiPrefix
 const EDITION = process.env.NEXT_PUBLIC_EDITION || globalThis.document?.body?.getAttribute('data-public-edition') || 'SELF_HOSTED'
 export const IS_CE_EDITION = EDITION === 'SELF_HOSTED'
 
+const DEPLOY_REGION = process.env.NEXT_PUBLIC_DEPLOY_REGION || globalThis.document?.body?.getAttribute('data-public-deploy-region') || 'CHINA'
+export const IS_CN_REGION = DEPLOY_REGION === 'CHINA'
+
 export const TONE_LIST = [
   {
     id: 1,
