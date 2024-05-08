@@ -322,7 +322,8 @@ class OAIAPICompatLargeLanguageModel(_CommonOAI_API_Compat, LargeLanguageModel):
             data["stop"] = stop
 
         if user:
-            data["user"] = user
+            # resolve this error message => user must be less or equal than 32
+            data["user"] = user.replace("-", "")[:32] if user else None
 
         response = requests.post(
             endpoint_url,
