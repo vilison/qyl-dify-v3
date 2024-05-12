@@ -15,7 +15,7 @@ class EnterpriseFeatureService:
     def get_enterprise_features(cls) -> EnterpriseFeatureModel:
         features = EnterpriseFeatureModel()
 
-        if current_app.config['ENTERPRISE_ENABLED']:
+        if current_app.config.get('ENTERPRISE_ENABLED'):
             cls._fulfill_params_from_enterprise(features)
 
         return features

@@ -3,7 +3,7 @@ import logging
 from flask import request
 from flask_login import current_user
 from flask_restful import Resource, fields, inputs, marshal, marshal_with, reqparse
-from werkzeug.exceptions import Unauthorized
+from werkzeug.exceptions import NotFound, Unauthorized
 
 import services
 from controllers.console import api
@@ -106,6 +106,19 @@ class WorkspaceListApi(Resource):
                 }, 200
 
 
+class WorkspaceApi(Resource):
+    @setup_required
+    @admin_required
+    @marshal_with(workspace_fields)
+    def get(self, workspace_id):
+        workspace_id = str(workspace_id)
+        tenant = Tenant.query.filter(Tenant.id == workspace_id).first()
+        if not tenant:
+            raise NotFound(f'Workspace {workspace_id} not found.')
+
+        return tenant, 200
+
+
 class TenantApi(Resource):
     @setup_required
     @login_required
@@ -206,7 +219,8 @@ class WebappLogoWorkspaceApi(Resource):
 
 
 api.add_resource(TenantListApi, '/workspaces')  # GET for getting all tenants
-api.add_resource(WorkspaceListApi, '/all-workspaces')  # GET for getting all tenants
+api.add_resource(WorkspaceListApi, '/all-workspaces')  # GET for getting all tenants via admin
+api.add_resource(WorkspaceApi, '/all-workspaces/<uuid:workspace_id>')  # GET for tenant by id via admin
 api.add_resource(TenantApi, '/workspaces/current', endpoint='workspaces_current')  # GET for getting current tenant info
 api.add_resource(TenantApi, '/info', endpoint='info')  # Deprecated
 api.add_resource(SwitchWorkspaceApi, '/workspaces/switch')  # POST for switching tenant
