@@ -3,10 +3,12 @@ import datetime
 import pytz
 from flask import current_app, request
 from flask_login import current_user
-from flask_restful import Resource, fields, marshal_with, reqparse
+from flask_restful import Resource, fields, marshal, marshal_with, reqparse
+from werkzeug.exceptions import BadRequest, NotFound
 
 from constants.languages import supported_language
 from controllers.console import api
+from controllers.console.admin import admin_required
 from controllers.console.setup import setup_required
 from controllers.console.workspace.error import (
     AccountAlreadyInitedError,
@@ -19,9 +21,49 @@ from extensions.ext_database import db
 from fields.member_fields import account_fields
 from libs.helper import TimestampField, timezone
 from libs.login import login_required
-from models.account import AccountIntegrate, InvitationCode
+from models.account import Account, AccountIntegrate, AccountStatus, InvitationCode
 from services.account_service import AccountService
 from services.errors.account import CurrentPasswordIncorrectError as ServiceCurrentPasswordIncorrectError
+
+
+class AccountsApi(Resource):
+    @setup_required
+    @admin_required
+    def get(self, account_id):
+        account_id = str(account_id)
+        account = Account.query.get(account_id)
+        if not account:
+            raise NotFound(f'Account {account_id} not found.')
+
+        return {'data': marshal(account, account_fields)}, 200
+
+
+class AccountsStatusApi(Resource):
+    @setup_required
+    @admin_required
+    def put(self, account_id):
+        # 400
+        parser = reqparse.RequestParser()
+        parser.add_argument('status', type=AccountStatus, required=True, location='json')
+        args = parser.parse_args()
+        new_status = args['status']
+        if new_status not in AccountStatus:
+            raise BadRequest(f'Invalid status {new_status}')
+
+        # todo: 403
+
+        # 404
+        account_id = str(account_id)
+        account = Account.query.get(account_id)
+        if not account:
+            raise NotFound(f'Account {account_id} not found.')
+
+        try:
+            updated_account = AccountService.update_account(account, status=new_status)
+        except Exception as e:
+            raise ValueError(str(e))
+
+        return {'result': 'success'}, 200
 
 
 class AccountInitApi(Resource):
@@ -246,6 +288,8 @@ class AccountIntegrateApi(Resource):
 
 
 # Register API resources
+api.add_resource(AccountsApi, '/accounts/<uuid:account_id>')  # GET for account by id via admin
+api.add_resource(AccountsStatusApi, '/accounts/<uuid:account_id>/update-status')  # PATCH for account status by id via admin
 api.add_resource(AccountInitApi, '/account/init')
 api.add_resource(AccountProfileApi, '/account/profile')
 api.add_resource(AccountNameApi, '/account/name')

@@ -109,14 +109,13 @@ class WorkspaceListApi(Resource):
 class WorkspaceApi(Resource):
     @setup_required
     @admin_required
-    @marshal_with(workspace_fields)
     def get(self, workspace_id):
         workspace_id = str(workspace_id)
         tenant = Tenant.query.filter(Tenant.id == workspace_id).first()
         if not tenant:
             raise NotFound(f'Workspace {workspace_id} not found.')
 
-        return tenant, 200
+        return {'data': marshal(tenant, workspace_fields)}, 200
 
 
 class TenantApi(Resource):
