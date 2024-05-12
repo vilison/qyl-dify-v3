@@ -262,31 +262,30 @@ const NormalForm = () => {
                     >
                       <span className='cursor-pointer text-primary-600'>{t('login.forget')}</span>
                     </Tooltip> */}
-                  
-                  </label>
-                  <div className="relative mt-1">
-                    <input
-                      id="password"
-                      value={password}
-                      onChange={e => setPassword(e.target.value)}
-                      onKeyDown={(e) => {
-                        if (e.key === 'Enter')
-                          handleEmailPasswordLogin()
-                      }}
-                      type={showPassword ? 'text' : 'password'}
-                      autoComplete="current-password"
-                      placeholder={t('login.passwordPlaceholder') || ''}
-                      className={'appearance-none block w-full rounded-lg pl-[14px] px-3 py-2 border border-gray-200 hover:border-gray-300 hover:shadow-sm focus:outline-none focus:ring-primary-500 focus:border-primary-500 placeholder-gray-400 caret-primary-600 sm:text-sm pr-10'}
-                    />
-                    <div className="absolute inset-y-0 right-0 flex items-center pr-3">
-                      <button
-                        type="button"
-                        onClick={() => setShowPassword(!showPassword)}
-                        className="text-gray-400 hover:text-gray-500 focus:outline-none focus:text-gray-500"
-                      >
-                        {showPassword ? '👀' : '😝'}
-                      </button>
-                    </div>
+
+                </label>
+                <div className="relative mt-1">
+                  <input
+                    id="password"
+                    value={password}
+                    onChange={e => setPassword(e.target.value)}
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter')
+                        handleEmailPasswordLogin()
+                    }}
+                    type={showPassword ? 'text' : 'password'}
+                    autoComplete="current-password"
+                    placeholder={t('login.passwordPlaceholder') || ''}
+                    className={'appearance-none block w-full rounded-lg pl-[14px] px-3 py-2 border border-gray-200 hover:border-gray-300 hover:shadow-sm focus:outline-none focus:ring-primary-500 focus:border-primary-500 placeholder-gray-400 caret-primary-600 sm:text-sm pr-10'}
+                  />
+                  <div className="absolute inset-y-0 right-0 flex items-center pr-3">
+                    <button
+                      type="button"
+                      onClick={() => setShowPassword(!showPassword)}
+                      className="text-gray-400 hover:text-gray-500 focus:outline-none focus:text-gray-500"
+                    >
+                      {showPassword ? '👀' : '😝'}
+                    </button>
                   </div>
                 </div>
               </div>
