@@ -373,4 +373,19 @@ class Config:
         self.TOOL_ICON_CACHE_MAX_AGE = get_env('TOOL_ICON_CACHE_MAX_AGE')
 
         self.KEYWORD_DATA_SOURCE_TYPE = get_env('KEYWORD_DATA_SOURCE_TYPE')
+
+class CloudEditionConfig(Config):
+
+    def __init__(self):
+        super().__init__()
+
+        self.EDITION = "CLOUD"
+
+        self.WECHAT_CLIENT_ID = get_env('WECHAT_CLIENT_ID')
+        self.WECHAT_CLIENT_SECRET = get_env('WECHAT_CLIENT_SECRET')
+        self.GITHUB_CLIENT_ID = get_env('GITHUB_CLIENT_ID')
+        self.GITHUB_CLIENT_SECRET = get_env('GITHUB_CLIENT_SECRET')
+        self.GOOGLE_CLIENT_ID = get_env('GOOGLE_CLIENT_ID')
+        self.GOOGLE_CLIENT_SECRET = get_env('GOOGLE_CLIENT_SECRET')
+        self.OAUTH_REDIRECT_PATH = get_env('OAUTH_REDIRECT_PATH')
         self.ENTERPRISE_ENABLED = get_bool_env('ENTERPRISE_ENABLED')
