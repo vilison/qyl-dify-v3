@@ -5,13 +5,11 @@ import { useRouter } from 'next/navigation'
 import classNames from 'classnames'
 import useSWR from 'swr'
 import Link from 'next/link'
-import { useContext } from 'use-context-selector'
 import Toast from '../components/base/toast'
 import style from './page.module.css'
 import { IS_CE_EDITION, IS_CN_REGION, apiPrefix } from '@/config'
 import Button from '@/app/components/base/button'
 import { login, oauth } from '@/service/common'
-import I18n from '@/context/i18n'
 import { getPurifyHref } from '@/utils'
 const validEmailReg = /^[\w\.-]+@([\w-]+\.)+[\w-]{2,}$/
 
@@ -66,7 +64,6 @@ function reducer(state: IState, action: IAction) {
 const NormalForm = () => {
   const { t } = useTranslation()
   const router = useRouter()
-  const { locale } = useContext(I18n)
 
   const [state, dispatch] = useReducer(reducer, {
     formValid: false,
@@ -98,8 +95,16 @@ const NormalForm = () => {
           remember_me: true,
         },
       })
-      localStorage.setItem('console_token', res.data)
-      router.replace('/apps')
+      if (res.result === 'success') {
+        localStorage.setItem('console_token', res.data)
+        router.replace('/apps')
+      }
+      else {
+        Toast.notify({
+          type: 'error',
+          message: res.data,
+        })
+      }
     }
     finally {
       setIsLoading(false)
@@ -152,7 +157,7 @@ const NormalForm = () => {
       dispatch({ type: 'google_login_failed' })
     if (google)
       window.location.href = google.redirect_url
-  }, [google, google])
+  }, [google, google_error])
 
   return (
     <>
@@ -257,29 +262,31 @@ const NormalForm = () => {
                     >
                       <span className='cursor-pointer text-primary-600'>{t('login.forget')}</span>
                     </Tooltip> */}
-                </label>
-                <div className="relative mt-1 rounded-md shadow-sm">
-                  <input
-                    id="password"
-                    value={password}
-                    onChange={e => setPassword(e.target.value)}
-                    onKeyDown={(e) => {
-                      if (e.key === 'Enter')
-                        handleEmailPasswordLogin()
-                    }}
-                    type={showPassword ? 'text' : 'password'}
-                    autoComplete="current-password"
-                    placeholder={t('login.passwordPlaceholder') || ''}
-                    className={'appearance-none block w-full rounded-lg pl-[14px] px-3 py-2 border border-gray-200 hover:border-gray-300 hover:shadow-sm focus:outline-none focus:ring-primary-500 focus:border-primary-500 placeholder-gray-400 caret-primary-600 sm:text-sm pr-10'}
-                  />
-                  <div className="absolute inset-y-0 right-0 flex items-center pr-3">
-                    <button
-                      type="button"
-                      onClick={() => setShowPassword(!showPassword)}
-                      className="text-gray-400 hover:text-gray-500 focus:outline-none focus:text-gray-500"
-                    >
-                      {showPassword ? '👀' : '😝'}
-                    </button>
+                  
+                  </label>
+                  <div className="relative mt-1">
+                    <input
+                      id="password"
+                      value={password}
+                      onChange={e => setPassword(e.target.value)}
+                      onKeyDown={(e) => {
+                        if (e.key === 'Enter')
+                          handleEmailPasswordLogin()
+                      }}
+                      type={showPassword ? 'text' : 'password'}
+                      autoComplete="current-password"
+                      placeholder={t('login.passwordPlaceholder') || ''}
+                      className={'appearance-none block w-full rounded-lg pl-[14px] px-3 py-2 border border-gray-200 hover:border-gray-300 hover:shadow-sm focus:outline-none focus:ring-primary-500 focus:border-primary-500 placeholder-gray-400 caret-primary-600 sm:text-sm pr-10'}
+                    />
+                    <div className="absolute inset-y-0 right-0 flex items-center pr-3">
+                      <button
+                        type="button"
+                        onClick={() => setShowPassword(!showPassword)}
+                        className="text-gray-400 hover:text-gray-500 focus:outline-none focus:text-gray-500"
+                      >
+                        {showPassword ? '👀' : '😝'}
+                      </button>
+                    </div>
                   </div>
                 </div>
               </div>
@@ -313,6 +320,15 @@ const NormalForm = () => {
               href='https://www.racio.chat/privacy'
             >{t('login.pp')}</Link>
           </div>
+
+          {IS_CE_EDITION && <div className="w-hull text-center block mt-2 text-xs text-gray-600">
+            {t('login.goToInit')}
+            &nbsp;
+            <Link
+              className='text-primary-600'
+              href='/install'
+            >{t('login.setAdminAccount')}</Link>
+          </div>}
 
         </div>
       </div>

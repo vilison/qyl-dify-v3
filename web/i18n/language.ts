@@ -18,6 +18,8 @@ export type I18nText = {
   'uk-UA': string
   'vi-VN': string
   'de_DE': string
+  'zh_Hant': string
+  'pl-PL': string
 }
 
 export const languages = [
@@ -31,6 +33,12 @@ export const languages = [
     value: 'zh-Hans',
     name: '简体中文',
     example: '你好，Racio！',
+    supported: true,
+  },
+  {
+    value: 'zh-Hant',
+    name: '繁體中文',
+    example: '你好，Dify！',
     supported: true,
   },
   {
@@ -105,6 +113,12 @@ export const languages = [
     example: 'Xin chào, Racio!',
     supported: true,
   },
+  {
+    value: 'pl-PL',
+    name: 'Polski (Polish)',
+    example: 'Cześć, Dify!',
+    supported: true,
+  },
 ]
 
 export const LanguagesSupported = languages.filter(item => item.supported).map(item => item.value)
@@ -126,6 +140,7 @@ export const NOTICE_I18N = {
     de_DE: 'Wichtiger Hinweis',
     ja_JP: '重要なお知らせ',
     ko_KR: '중요 공지',
+    pl_PL: 'Ważne ogłoszenie',
     uk_UA: 'Важливе повідомлення',
     vi_VN: 'Thông báo quan trọng',
   },
@@ -138,6 +153,7 @@ export const NOTICE_I18N = {
     de_DE: 'Our system will be unavailable from 19:00 to 24:00 UTC on August 28 for an upgrade. For questions, kindly contact our support team (support@dify.ai). We value your patience.',
     ja_JP: 'Our system will be unavailable from 19:00 to 24:00 UTC on August 28 for an upgrade. For questions, kindly contact our support team (support@dify.ai). We value your patience.',
     ko_KR: 'Our system will be unavailable from 19:00 to 24:00 UTC on August 28 for an upgrade. For questions, kindly contact our support team (support@dify.ai). We value your patience.',
+    pl_PL: 'Nasz system będzie niedostępny od 19:00 do 24:00 UTC 28 sierpnia w celu aktualizacji. W przypadku pytań prosimy o kontakt z naszym zespołem wsparcia (support@dify.ai). Doceniamy Twoją cierpliwość.',
     uk_UA: 'Наша система буде недоступна з 19:00 до 24:00 UTC 28 серпня для оновлення. Якщо у вас виникнуть запитання, будь ласка, зв’яжіться з нашою службою підтримки (support@dify.ai). Дякуємо за терпіння.',
     vi_VN: 'Hệ thống của chúng tôi sẽ ngừng hoạt động từ 19:00 đến 24:00 UTC vào ngày 28 tháng 8 để nâng cấp. Nếu có thắc mắc, vui lòng liên hệ với nhóm hỗ trợ của chúng tôi (support@dify.ai). Chúng tôi đánh giá cao sự kiên nhẫn của bạn.',
   },
