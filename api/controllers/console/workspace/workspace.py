@@ -1,9 +1,10 @@
 import logging
+from uuid import UUID
 
 from flask import request
 from flask_login import current_user
 from flask_restful import Resource, fields, inputs, marshal, marshal_with, reqparse
-from werkzeug.exceptions import NotFound, Unauthorized
+from werkzeug.exceptions import BadRequest, NotFound, Unauthorized
 
 import services
 from controllers.console import api
@@ -20,7 +21,7 @@ from controllers.console.wraps import account_initialization_required, cloud_edi
 from extensions.ext_database import db
 from libs.helper import TimestampField
 from libs.login import login_required
-from models.account import Tenant, TenantStatus
+from models.account import Tenant, TenantAccountJoin, TenantAccountJoinRole, TenantStatus
 from services.account_service import TenantService
 from services.file_service import FileService
 from services.workspace_service import WorkspaceService
@@ -116,6 +117,36 @@ class WorkspaceApi(Resource):
             raise NotFound(f'Workspace {workspace_id} not found.')
 
         return {'data': marshal(tenant, workspace_fields)}, 200
+
+
+class WorkspaceAccountMatchApi(Resource):
+    @setup_required
+    @admin_required
+    def get(self):
+        parser = reqparse.RequestParser()
+        parser.add_argument('account_id', type=str, required=True,
+                            location='args', help='Account_id is required.')
+        parser.add_argument('role', type=str, required=False,
+                            choices=['owner', 'admin', 'normal'],
+                            default=TenantAccountJoinRole.OWNER.value,
+                            location='args', help='Role is optional. choices: owner, admin, normal.')
+
+        args = parser.parse_args()
+        account_id = args['account_id']
+        role = args['role']
+
+        # 400 - BAD REQUEST
+        if not account_id:
+            raise BadRequest('Missing account_id parameter.')
+
+        try:
+            tenants = TenantAccountJoin.query.filter_by(account_id=UUID(str(account_id)), role=role).all()
+            tenant_id_list = [tenant.tenant_id for tenant in tenants]
+
+            return {'data': tenant_id_list}, 200
+        except Exception as e:
+            logging.exception(f"An error occurred during the WorkspaceAccountMatchApi.get() process with: {str(e)}")
+            raise ValueError(str(e))
 
 
 class TenantApi(Resource):
@@ -214,12 +245,14 @@ class WebappLogoWorkspaceApi(Resource):
         except services.errors.file.UnsupportedFileTypeError:
             raise UnsupportedFileTypeError()
         
-        return { 'id': upload_file.id }, 201
+        return {'id': upload_file.id}, 201
 
 
 api.add_resource(TenantListApi, '/workspaces')  # GET for getting all tenants
 api.add_resource(WorkspaceListApi, '/all-workspaces')  # GET for getting all tenants via admin
 api.add_resource(WorkspaceApi, '/all-workspaces/<uuid:workspace_id>')  # GET for tenant by id via admin
+api.add_resource(WorkspaceAccountMatchApi, '/all-workspaces/match-account')  # GET for tenant by account and role via admin
+# api.add_resource(WorkspaceAccountJoinApi, '/all-workspaces/join-account')  # POST for joining tenant by account via admin
 api.add_resource(TenantApi, '/workspaces/current', endpoint='workspaces_current')  # GET for getting current tenant info
 api.add_resource(TenantApi, '/info', endpoint='info')  # Deprecated
 api.add_resource(SwitchWorkspaceApi, '/workspaces/switch')  # POST for switching tenant

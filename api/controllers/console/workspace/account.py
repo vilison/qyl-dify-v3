@@ -32,7 +32,6 @@ from services.errors.account import CurrentPasswordIncorrectError as ServiceCurr
 
 @dataclass
 class UserInfo:
-    # id: str
     name: str
     email: str
 
