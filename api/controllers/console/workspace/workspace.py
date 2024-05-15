@@ -21,6 +21,7 @@ from controllers.console.setup import setup_required
 from controllers.console.wraps import account_initialization_required, cloud_edition_billing_resource_check
 from events.tenant_event import tenant_was_created
 from extensions.ext_database import db
+from fields.member_fields import account_with_role_fields
 from libs.helper import TimestampField
 from libs.login import login_required
 from models.account import Account, Tenant, TenantAccountJoin, TenantAccountJoinRole, TenantStatus
@@ -280,7 +281,7 @@ class WorkspaceAccountGetTenantsApi(Resource):
     @admin_required
     def get(self):
         parser = reqparse.RequestParser()
-        parser.add_argument('account_id', type=str, required=True, location='args', help='Account_id is required.')
+        parser.add_argument('account_id', type=str, required=True, location='args', help='Account id is required.')
 
         args = parser.parse_args()
         account_id = args['account_id']
@@ -304,7 +305,32 @@ class WorkspaceAccountGetTenantsApi(Resource):
 
 
 class WorkspaceAccountGetMembersApi(Resource):
-    pass
+    @setup_required
+    @admin_required
+    def get(self):
+        parser = reqparse.RequestParser()
+        parser.add_argument('tenant_id', type=str, required=True, location='args', help='Tenant id is required.')
+
+        args = parser.parse_args()
+        tenant_id = args['tenant_id']
+
+        # 400 - BAD REQUEST
+        if not tenant_id:
+            raise BadRequest('Missing tenant_id parameter.')
+
+        # 404 - NOT FOUND
+        tenant = Tenant.query.filter_by(id=UUID(str(tenant_id))).first()
+        if not tenant:
+            raise NotFound(f'Tenant {tenant_id} not found.')
+
+        try:
+            members = TenantService.get_tenant_members(tenant)
+
+            return {'data': marshal(members, account_with_role_fields)}, 200
+        except Exception as e:
+            logging.exception(
+                f"An error occurred during the WorkspaceAccountGetMembersApi.get() process with: {str(e)}")
+            raise ValueError(str(e))
 
 
 class TenantApi(Resource):
