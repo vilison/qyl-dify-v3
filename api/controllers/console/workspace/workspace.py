@@ -275,6 +275,38 @@ class WorkspaceAccountJoinApi(Resource):
             return None
 
 
+class WorkspaceAccountGetTenantsApi(Resource):
+    @setup_required
+    @admin_required
+    def get(self):
+        parser = reqparse.RequestParser()
+        parser.add_argument('account_id', type=str, required=True, location='args', help='Account_id is required.')
+
+        args = parser.parse_args()
+        account_id = args['account_id']
+
+        # 400 - BAD REQUEST
+        if not account_id:
+            raise BadRequest('Missing account_id parameter.')
+
+        # 404 - NOT FOUND
+        account = Account.query.filter_by(id=UUID(str(account_id))).first()
+        if not account:
+            raise NotFound(f'Account {account_id} not found.')
+
+        try:
+            tenants = TenantService.get_join_tenants(account)
+
+            return {'data': marshal(tenants, tenants_fields)}, 200
+        except Exception as e:
+            logging.exception(f"An error occurred during the WorkspaceAccountGetTenantsApi.get() process with: {str(e)}")
+            raise ValueError(str(e))
+
+
+class WorkspaceAccountGetMembersApi(Resource):
+    pass
+
+
 class TenantApi(Resource):
     @setup_required
     @login_required
@@ -379,6 +411,9 @@ api.add_resource(WorkspaceListApi, '/all-workspaces')  # GET for getting all ten
 api.add_resource(WorkspaceApi, '/all-workspaces/<uuid:workspace_id>')  # GET for tenant by id via admin
 api.add_resource(WorkspaceAccountMatchApi, '/all-workspaces/match-account')  # GET for tenant by account and role via admin
 api.add_resource(WorkspaceAccountJoinApi, '/all-workspaces/add-member')  # POST for joining tenant by account via admin
+api.add_resource(WorkspaceAccountGetTenantsApi, '/all-workspaces/get-tenants')  # GET for getting all tenants by account id via admin
+api.add_resource(WorkspaceAccountGetMembersApi, '/all-workspaces/get-members')  # GET for getting all accounts by tenant id via admin
+
 api.add_resource(TenantApi, '/workspaces/current', endpoint='workspaces_current')  # GET for getting current tenant info
 api.add_resource(TenantApi, '/info', endpoint='info')  # Deprecated
 api.add_resource(SwitchWorkspaceApi, '/workspaces/switch')  # POST for switching tenant
