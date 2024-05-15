@@ -19,6 +19,7 @@ from controllers.console.datasets.error import (
 from controllers.console.error import AccountNotLinkTenantError
 from controllers.console.setup import setup_required
 from controllers.console.wraps import account_initialization_required, cloud_edition_billing_resource_check
+from events.tenant_event import tenant_was_created
 from extensions.ext_database import db
 from libs.helper import TimestampField
 from libs.login import login_required
@@ -68,8 +69,8 @@ tenant_account_join_fields = {
     'account_id': fields.String,
     'role': fields.String,
     'invited_by': fields.String,
-    'created_at': fields.String,
-    'updated_at': fields.String
+    'created_at': TimestampField,
+    'updated_at': TimestampField
 }
 
 
@@ -116,6 +117,40 @@ class WorkspaceListApi(Resource):
             'page': args['page'],
             'total': total
                 }, 200
+
+    @setup_required
+    @admin_required
+    def post(self):
+        parser = reqparse.RequestParser()
+        parser.add_argument('name', type=str, required=True, location='json')
+        parser.add_argument('owner_email', type=str, required=True, location='json')
+
+        args = parser.parse_args()
+        name = args['name']
+        owner_email = args['owner_email']
+
+        # 400 - BAD REQUEST
+        if not name:
+            raise BadRequest('Missing name parameter.')
+        if not owner_email:
+            raise BadRequest('Missing owner_email parameter.')
+
+        # 404 - NOT FOUND
+        account = Account.query.filter_by(email=owner_email).first()
+        if account is None:
+            raise NotFound(f'Owner account {owner_email} not found.')
+
+        try:
+            tenant = TenantService.create_tenant(name)
+            # add account as owner member
+            TenantService.create_tenant_member(tenant, account, role='owner')
+            # send event
+            tenant_was_created.send(tenant)
+
+            return {'data': marshal(tenant, workspace_fields)}, 201
+        except Exception as e:
+            logging.exception(f"An error occurred during the WorkspaceListApi.post() process with: {str(e)}")
+            raise ValueError(str(e))
 
 
 class WorkspaceApi(Resource):
