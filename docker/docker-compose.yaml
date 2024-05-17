@@ -130,9 +130,9 @@ services:
       PGVECTOR_PASSWORD: difyai123456
       PGVECTOR_DATABASE: dify
       # Mail configuration, support: resend, smtp
-      MAIL_TYPE: ''
+      MAIL_TYPE: resend
       # default send from email address, if not specified
-      MAIL_DEFAULT_SEND_FROM: 'YOUR EMAIL FROM (eg: no-reply <no-reply@dify.ai>)'
+      MAIL_DEFAULT_SEND_FROM: no-reply@promptgens.com
       SMTP_SERVER: ''
       SMTP_PORT: 587
       SMTP_USERNAME: ''
@@ -165,6 +165,11 @@ services:
       # SSRF Proxy server
       SSRF_PROXY_HTTP_URL: 'http://ssrf_proxy:3128'
       SSRF_PROXY_HTTPS_URL: 'http://ssrf_proxy:3128'
+      # Cloud OAuth2 configurations
+      WECHAT_CLIENT_ID: wxbcxxxx
+      WECHAT_CLIENT_SECRET: ''
+      GOOGLE_CLIENT_ID: xxx-xxx.apps.googleusercontent.com
+      GOOGLE_CLIENT_SECRET: GOCSPX-xxx
     depends_on:
       - db
       - redis
@@ -187,7 +192,6 @@ services:
       CONSOLE_WEB_URL: ''
       # Startup mode, 'worker' starts the Celery worker for processing the queue.
       MODE: worker
-
       # --- All the configurations below are the same as those in the 'api' service. ---
 
       # The log level for the application. Supported values are `DEBUG`, `INFO`, `WARNING`, `ERROR`, `CRITICAL`
@@ -257,9 +261,9 @@ services:
       # The milvus tls switch.
       MILVUS_SECURE: 'false'
       # Mail configuration, support: resend
-      MAIL_TYPE: ''
+      MAIL_TYPE: resend
       # default send from email address, if not specified
-      MAIL_DEFAULT_SEND_FROM: 'YOUR EMAIL FROM (eg: no-reply <no-reply@dify.ai>)'
+      MAIL_DEFAULT_SEND_FROM: no-reply@promptgens.com
       SMTP_SERVER: ''
       SMTP_PORT: 587
       SMTP_USERNAME: ''
@@ -310,6 +314,8 @@ services:
       APP_API_URL: ''
       # The DSN for Sentry error reporting. If not set, Sentry error reporting will be disabled.
       SENTRY_DSN: ''
+      # APP_ERROR_REPLACE_URL
+      APP_ERROR_REPLACE_URL_404: 'https://at.racio.chat/chat/XwzsksyMCKupYvIr'
     # uncomment to expose dify-web port to host
     # ports:
     #   - "3000:3000"

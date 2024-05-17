@@ -146,13 +146,15 @@ const ConfigPanel = () => {
                 ? null
                 : (
                   <div className={`flex items-center justify-end ${isMobile && 'w-full'}`}>
-                    <a className='flex items-center pr-3 space-x-3' href="https://dify.ai/" target="_blank">
-                      <span className='uppercase'>{t('share.chat.powerBy')}</span>
+                    <a className='flex items-center pr-3 space-x-3' href="https://www.racio.chat/" target="_blank">
+                      {/* <span className='uppercase'>{t('share.chat.powerBy')}</span> */}
+                      <span className='uppercase'>→</span>
                       {
                         customConfig?.replace_webapp_logo
                           ? <img src={customConfig?.replace_webapp_logo} alt='logo' className='block w-auto h-5' />
                           : <FootLogo />
                       }
+                      <span className='uppercase'>提供支持</span>
                     </a>
                   </div>
                 )
