@@ -130,7 +130,7 @@ services:
       PGVECTOR_PASSWORD: difyai123456
       PGVECTOR_DATABASE: dify
       # Mail configuration, support: resend, smtp
-      MAIL_TYPE: resend
+      MAIL_TYPE: ''
       # default send from email address, if not specified
       MAIL_DEFAULT_SEND_FROM: no-reply@promptgens.com
       SMTP_SERVER: ''
@@ -261,7 +261,7 @@ services:
       # The milvus tls switch.
       MILVUS_SECURE: 'false'
       # Mail configuration, support: resend
-      MAIL_TYPE: resend
+      MAIL_TYPE: ''
       # default send from email address, if not specified
       MAIL_DEFAULT_SEND_FROM: no-reply@promptgens.com
       SMTP_SERVER: ''
