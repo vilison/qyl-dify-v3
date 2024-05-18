@@ -57,6 +57,15 @@ tenants_fields = {
     'current': fields.Boolean
 }
 
+tenants_with_role_fields = {
+    'id': fields.String,
+    'name': fields.String,
+    'plan': fields.String,
+    'status': fields.String,
+    'created_at': TimestampField,
+    'role': fields.String
+}
+
 workspace_fields = {
     'id': fields.String,
     'name': fields.String,
@@ -296,9 +305,26 @@ class WorkspaceAccountGetTenantsApi(Resource):
             raise NotFound(f'Account {account_id} not found.')
 
         try:
+            # Get all joined tenants
             tenants = TenantService.get_join_tenants(account)
 
-            return {'data': marshal(tenants, tenants_fields)}, 200
+            tenants_info = []
+            for tenant in tenants:
+                # Get role of tenant member
+                tenant_account_join = db.session.query(TenantAccountJoin).filter(
+                    TenantAccountJoin.tenant_id == tenant.id,
+                    TenantAccountJoin.account_id == UUID(str(account_id))
+                ).first()
+
+                tenant_info = tenant.__dict__.copy()  # 复制所有属性
+                if tenant_account_join:
+                    role = tenant_account_join.role
+                    tenant_info['role'] = role
+                else:
+                    tenant_info['role'] = None
+                tenants_info.append(tenant_info)
+
+            return {'data': marshal(tenants_info, tenants_with_role_fields)}, 200
         except Exception as e:
             logging.exception(f"An error occurred during the WorkspaceAccountGetTenantsApi.get() process with: {str(e)}")
             raise ValueError(str(e))
