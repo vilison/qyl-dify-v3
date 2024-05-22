@@ -382,6 +382,8 @@ class Config:
         self.KEYWORD_DATA_SOURCE_TYPE = get_env('KEYWORD_DATA_SOURCE_TYPE')
         self.ENTERPRISE_ENABLED = get_bool_env('ENTERPRISE_ENABLED')
 
+        self.RACIO_ACCOUNT_ENABLED = get_bool_env('RACIO_ACCOUNT_ENABLED')
+
 
 class CloudEditionConfig(Config):
 
@@ -397,5 +399,3 @@ class CloudEditionConfig(Config):
         self.GOOGLE_CLIENT_ID = get_env('GOOGLE_CLIENT_ID')
         self.GOOGLE_CLIENT_SECRET = get_env('GOOGLE_CLIENT_SECRET')
         self.OAUTH_REDIRECT_PATH = get_env('OAUTH_REDIRECT_PATH')
-
-        self.RACIO_ACCOUNT_ENABLED = get_bool_env('RACIO_ACCOUNT_ENABLED')
