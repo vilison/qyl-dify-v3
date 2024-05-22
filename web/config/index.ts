@@ -23,8 +23,8 @@ else {
   // const domainParts = globalThis.location?.host?.split('.');
   // in production env, the host is dify.app . In other env, the host is [dev].dify.app
   // const env = domainParts.length === 2 ? 'ai' : domainParts?.[0];
-  apiPrefix = 'http://localhost:5001/console/api'
-  publicApiPrefix = 'http://localhost:5001/api' // avoid browser private mode api cross origin
+  apiPrefix = 'http://dify.corp.chaolian360.com/console/api'
+  publicApiPrefix = 'http://dify.corp.chaolian360.com/api' // avoid browser private mode api cross origin
 }
 
 export const API_PREFIX: string = apiPrefix
@@ -159,28 +159,28 @@ export const DEFAULT_AGENT_SETTING = {
 }
 
 export const DEFAULT_AGENT_PROMPT = {
-  chat: `Respond to the human as helpfully and accurately as possible. 
+  chat: `Respond to the human as helpfully and accurately as possible.
 
   {{instruction}}
-  
+
   You have access to the following tools:
-  
+
   {{tools}}
-  
+
   Use a json blob to specify a tool by providing an {{TOOL_NAME_KEY}} key (tool name) and an {{ACTION_INPUT_KEY}} key (tool input).
   Valid "{{TOOL_NAME_KEY}}" values: "Final Answer" or {{tool_names}}
-  
+
   Provide only ONE action per $JSON_BLOB, as shown:
-  
+
   \`\`\`
   {
     "{{TOOL_NAME_KEY}}": $TOOL_NAME,
     "{{ACTION_INPUT_KEY}}": $ACTION_INPUT
   }
   \`\`\`
-  
+
   Follow this format:
-  
+
   Question: input question to answer
   Thought: consider previous and subsequent steps
   Action:
@@ -197,10 +197,10 @@ export const DEFAULT_AGENT_PROMPT = {
     "{{ACTION_INPUT_KEY}}": "Final response to human"
   }
   \`\`\`
-  
+
   Begin! Reminder to ALWAYS respond with a valid json blob of a single action. Use tools if necessary. Respond directly if appropriate. Format is Action:\`\`\`$JSON_BLOB\`\`\`then Observation:.`,
   completion: `
-  Respond to the human as helpfully and accurately as possible. 
+  Respond to the human as helpfully and accurately as possible.
 
 {{instruction}}
 

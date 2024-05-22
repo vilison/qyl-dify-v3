@@ -6,10 +6,12 @@ import { useSelectedLayoutSegment } from 'next/navigation'
 import { Bars3Icon } from '@heroicons/react/20/solid'
 import HeaderBillingBtn from '../billing/header-billing-btn'
 import AccountDropdown from './account-dropdown'
-import AppNav from './app-nav'
 import DatasetNav from './dataset-nav'
 import EnvNav from './env-nav'
-import ExploreNav from './explore-nav'
+// import AppNav from './app-nav'
+import Rtraining from './racio-training-nav'
+// import ExploreNav from './explore-nav'
+import Roffice from './racio-office-nav'
 import ToolsNav from './tools-nav'
 import GithubStar from './github-star'
 import { WorkspaceProvider } from '@/context/workspace-context'
@@ -68,9 +70,15 @@ const Header = () => {
         </div>
       )}
       {!isMobile && (
+        // <div className='flex items-center'>
+        //   <ExploreNav className={navClassName} />
+        //   <AppNav />
+        //   {isCurrentWorkspaceManager && <DatasetNav />}
+        //   <ToolsNav className={navClassName} />
+        // </div>
         <div className='flex items-center'>
-          <ExploreNav className={navClassName} />
-          <AppNav />
+          <Roffice className={navClassName} />
+          <Rtraining />
           {isCurrentWorkspaceManager && <DatasetNav />}
           <ToolsNav className={navClassName} />
         </div>
@@ -95,9 +103,15 @@ const Header = () => {
         </WorkspaceProvider>
       </div>
       {(isMobile && isShowNavMenu) && (
+        // <div className='w-full flex flex-col p-2 gap-y-1'>
+        //   <ExploreNav className={navClassName} />
+        //   <AppNav />
+        //   {isCurrentWorkspaceManager && <DatasetNav />}
+        //   <ToolsNav className={navClassName} />
+        // </div>
         <div className='w-full flex flex-col p-2 gap-y-1'>
-          <ExploreNav className={navClassName} />
-          <AppNav />
+          <Roffice className={navClassName} />
+          <Rtraining />
           {isCurrentWorkspaceManager && <DatasetNav />}
           <ToolsNav className={navClassName} />
         </div>
