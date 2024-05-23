@@ -15,6 +15,7 @@ const loadLangResources = (lang: string) => ({
     appDebug: require(`./${lang}/app-debug`).default,
     appApi: require(`./${lang}/app-api`).default,
     appLog: require(`./${lang}/app-log`).default,
+    racio: require(`./${lang}/racio`).default,
     appAnnotation: require(`./${lang}/app-annotation`).default,
     share: require(`./${lang}/share-app`).default,
     dataset: require(`./${lang}/dataset`).default,
