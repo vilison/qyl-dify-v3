@@ -33,7 +33,7 @@ EXPOSE 5002
 # set timezone
 ENV TZ UTC
 
-WORKDIR /app/account-api
+WORKDIR /app/racio
 
 
 # 中科大 USTC
@@ -45,7 +45,7 @@ RUN apt-get update \
     && rm -rf /var/lib/apt/lists/*
 
 COPY --from=packages /pkg /usr/local
-COPY . /app/account-api/
+COPY . /app/racio/
 
 COPY docker/entrypoint.sh /entrypoint.sh
 RUN chmod +x /entrypoint.sh
