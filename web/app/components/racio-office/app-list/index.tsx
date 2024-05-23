@@ -58,7 +58,7 @@ const Apps = ({
     setTagList(res)
     res.filter(item => item.name === 'rma').map((item) => {
       setRmaTagId(item.id)
-      console.log(currCategory)
+
       if (currCategory === '' || currCategory === '推荐')
         getApplist(item.id)
     })
@@ -97,17 +97,22 @@ const Apps = ({
 
   const mobileAllListData = useMemo(() => {
     // 使用 .map 方法而不是直接修改 mobileAllList
-
     if (isMobile) {
-      tagList.map(async (item) => {
-        fetchAppList({ url: '/apps', params: { tag_ids: item.id } }).then((result) => {
-          result.data.map((items) => {
-            for (const v of installedApps)
-              console.log(v, items, 'ddc', v.app.id == items.id)
-          })
-          setMobileAllList(prevList => [...prevList, { name: item.name, data: result.data, tag_id: item.id }])
-        }).catch((err) => {
+      tagList.map(async (item: any) => {
+        fetchAppList({ url: '/apps', params: { tag_ids: item.id } }).then((result: any) => {
+          const rdata = result.data.map((items) => {
+            for (const v of installedApps) {
+              if (v.app.id == items.id) {
+                items.id = v.id
 
+                return { name: item.name, data: items, tag_id: item.id }
+              }
+            }
+          })
+
+          setMobileAllList(prevList => [...prevList, { name: item.name, data: rdata, tag_id: item.id }])
+        }).catch((err) => {
+          console.log(err)
         })
       })
     }
@@ -119,8 +124,6 @@ const Apps = ({
         })
       }
     }
-
-    return mobileAllList
   }, [installedApps, tagList])
 
   const [currApp, setCurrApp] = React.useState<App | null>(null)
@@ -194,19 +197,19 @@ const Apps = ({
         </div>)}
       {isMobile && (
         <div className='relative flex flex-1 p-6 flex-col overflow-auto bg-sky-50 shrink-0 grow gap-4'>
-          {mobileAllListData.map((app, index) => (
-            <React.Fragment key={app.id + index}>
+          {mobileAllList.map((app, index) => (
+            <React.Fragment key={index}>
               {app.data.length > 1 && (
                 <>
                   <div className='text-black text-l font-bold'>{app.name === 'rma' ? '推荐' : app.name}</div>
-                  {app.data.map(item => (
+                  {app.data.map((item, idx) => (
                     <MappCard
-                      key={item.id}
+                      key={item.data.id + idx}
                       isExplore={pageType === PageType.EXPLORE}
-                      app={item}
+                      app={item.data}
                       canCreate={hasEditPermission}
-                      onOpen={() => {
-                        onOpen(item.id)
+                      onOpen={(id) => {
+                        onOpen(id)
                       }}
                     />
                   ))}
