@@ -10,21 +10,22 @@ import ExploreContext from '@/context/explore-context'
 import type { App } from '@/models/explore'
 import Category from '@/app/components/racio-office/category'
 import AppCard from '@/app/components/racio-office/app-card'
+import MappCard from '@/app/components/racio-office/app-card/m-index'
 import { fetchAppList } from '@/service/apps'
 import { fetchTagList } from '@/service/tag'
 import { useTabSearchParams } from '@/hooks/use-tab-searchparams'
 import AppTypeSelector from '@/app/components/app/type-selector'
 import Loading from '@/app/components/base/loading'
-import { useAppContext } from '@/context/app-context'
-import { useStore as useTagStore } from '@/app/components/base/tag-management/store'
 import { fetchInstalledAppList as doFetchInstalledAppList } from '@/service/explore'
+import useBreakpoints, { MediaType } from '@/hooks/use-breakpoints'
+
 type AppsProps = {
   pageType?: PageType
   onSuccess?: () => void
 }
 
 export enum PageType {
-  EXPLORE = 'explore',
+  EXPLORE = 'office',
   CREATE = 'create',
 }
 
@@ -33,56 +34,64 @@ const Apps = ({
   onSuccess,
 }: AppsProps) => {
   const { t } = useTranslation()
-  const { isCurrentWorkspaceManager } = useAppContext()
   const { push } = useRouter()
   const { hasEditPermission } = useContext(ExploreContext)
   const allCategoriesEn = t('racio.apps.allCategories', { lng: 'en' })
-
+  const media = useBreakpoints()
+  const isMobile = media === MediaType.mobile
   const [currentType, setCurrentType] = useState<string>('')
+  const [currTagId, setCurrTagId] = useState('')
   const [currCategory, setCurrCategory] = useTabSearchParams({
     defaultTab: allCategoriesEn,
     disableSearchParams: pageType !== PageType.EXPLORE,
   })
   const [allList, setAllList] = useState([])
   const [installedApps, setInstalledApps] = useState([])
-
-  let tagNameList: string | string[] = []
-  const type = 'app'
-  const tagList = useTagStore(s => s.tagList)
-  const setTagList = useTagStore(s => s.setTagList)
-  const getTagList = async (type: 'knowledge' | 'app') => {
-    const res = await fetchTagList(type)
+  const [rmaTagId, setRmaTagId] = useState([])
+  const [mobileAllList, setMobileAllList] = useState([])
+  // var mobileAllList = []
+  // const tagList = useTagStore(s => s.tagList)
+  // const setTagList = useTagStore(s => s.setTagList)
+  const [tagList, setTagList] = useState([])
+  const getTagList = async () => {
+    const res = await fetchTagList('app')
     setTagList(res)
-    tagNameList = tagList.map(item => item.name)
-    getApplist()
-    fetchInstalledAppList()
-  }
+    res.filter(item => item.name === 'rma').map((item) => {
+      setRmaTagId(item.id)
+      console.log(currCategory)
+      if (currCategory === '' || currCategory === '推荐')
+        getApplist(item.id)
+    })
 
-  const getKey = (
-    pageIndex: number,
-    previousPageData: AppListResponse,
-    activeTab: string,
-    tags: string[],
-    keywords: string,
-  ) => {
-    if (!pageIndex || previousPageData.has_more) {
-      const params: any = { url: 'apps', params: { page: pageIndex + 1, limit: 30, name: keywords } }
+    if (isMobile) {
+      res.map(async (item) => {
+        console.log(item.id, 'item.id')
 
-      if (activeTab !== 'all')
-        params.params.mode = activeTab
-      else
-        delete params.params.mode
+        fetchAppList({ url: '/apps', params: { tag_ids: item.id } }).then((result) => {
+          setMobileAllList(prevList => [...prevList, { name: item.name, data: result.data, id: item.id }])
+        }).catch((err) => {
 
-      if (tags.length)
-        params.params.tag_ids = tags
-
-      return params
+        })
+      })
     }
-    return null
+    else {
+      if (currCategory != '推荐' && currCategory != '') {
+        res.filter(item => item.name === currCategory).map((item) => {
+          setCurrTagId(item.id)
+          getApplist(item.id)
+        })
+      }
+    }
   }
 
-  async function getApplist() {
-    const { data: appList, mutate: mutateApps } = await fetchAppList({ url: '/apps', params: getKey })
+  async function getApplist(param: any) {
+    let ids = ''
+    if (param.length != 0)
+      ids = param
+    else
+      ids = currTagId
+
+    const { data: appList, mutate: mutateApps } = await fetchAppList({ url: '/apps', params: { tag_ids: ids } })
     setAllList(appList)
   }
 
@@ -92,10 +101,13 @@ const Apps = ({
   }
 
   useEffect(() => {
-    getTagList(type)
-  }, [type])
+    fetchInstalledAppList()
+    getTagList()
+  }, [])
 
   const filteredList = useMemo(() => {
+    console.log(tagList, currCategory, 'dddtagList', mobileAllList, 'mobileAllList')
+
     installedApps.map((item) => {
       for (const v in allList) {
         if (item.app.id == allList[v].id)
@@ -103,13 +115,13 @@ const Apps = ({
       }
     })
     return allList
-  }, [currentType, currCategory, allCategoriesEn, allList, installedApps])
+  }, [currCategory, installedApps, allList])
 
   const [currApp, setCurrApp] = React.useState<App | null>(null)
   const [isShowCreateModal, setIsShowCreateModal] = React.useState(false)
 
   const onOpen = (id: string) => {
-    const url = `/explore/installed/${id}`
+    const url = `/office/installed/${id}`
     push(url)
   }
 
@@ -142,36 +154,62 @@ const Apps = ({
             <div className='mx-2 w-[1px] h-3.5 bg-gray-200' />
           </>
         )}
-        <Category
-          list={tagList}
-          value={currCategory}
-          onChange={setCurrCategory}
-          allCategoriesEn={allCategoriesEn}
-        />
+        {!isMobile && (
+          <Category
+            list={tagList}
+            value={currCategory}
+            onChange={setCurrCategory}
+            allCategoriesEn={allCategoriesEn}
+          />)}
       </div>
-      <div className={cn(
-        'relative flex flex-1 pb-6 flex-col overflow-auto bg-gray-100 shrink-0 grow',
-        pageType === PageType.EXPLORE ? 'mt-6' : 'mt-0 pt-2',
-      )}>
-        <nav
-          className={cn(
-            s.appList,
-            'grid content-start shrink-0',
-            pageType === PageType.EXPLORE ? 'gap-4 px-6 sm:px-12' : 'gap-3 px-8  sm:!grid-cols-2 md:!grid-cols-3 lg:!grid-cols-4',
-          )}>
-          {filteredList.map(app => (
-            <AppCard
-              key={app.id}
-              isExplore={pageType === PageType.EXPLORE}
-              app={app}
-              canCreate={hasEditPermission}
-              onOpen={(id) => {
-                onOpen(id)
-              }}
-            />
+      {!isMobile && (
+        <div className={cn(
+          'relative flex flex-1 pb-6 flex-col overflow-auto bg-gray-100 shrink-0 grow',
+          pageType === PageType.EXPLORE ? 'mt-6' : 'mt-0 pt-2',
+        )}>
+          <nav
+            className={cn(
+              s.appList,
+              'grid content-start shrink-0',
+              pageType === PageType.EXPLORE ? 'gap-4 px-6 sm:px-12' : 'gap-3 px-8  sm:!grid-cols-2 md:!grid-cols-3 lg:!grid-cols-4',
+            )}>
+            {filteredList.map(app => (
+              <AppCard
+                key={app.id}
+                isExplore={pageType === PageType.EXPLORE}
+                app={app}
+                canCreate={hasEditPermission}
+                onOpen={(id) => {
+                  onOpen(id)
+                }}
+              />
+            ))}
+          </nav>
+        </div>)}
+      {isMobile && (
+        <div className='relative flex flex-1 p-6 flex-col overflow-auto bg-sky-50 shrink-0 grow gap-4'>
+          {mobileAllList.map((app, index) => (
+            <React.Fragment key={app.id + index}>
+              {app.data.length > 1 && (
+                <>
+                  <div className='text-black text-l font-bold'>{app.name}</div>
+                  {app.data.map(item => (
+                    <MappCard
+                      key={item.id}
+                      isExplore={pageType === PageType.EXPLORE}
+                      app={item}
+                      canCreate={hasEditPermission}
+                      onOpen={() => {
+                        onOpen(item.id)
+                      }}
+                    />
+                  ))}
+                </>
+              )}
+            </React.Fragment>
           ))}
-        </nav>
-      </div>
+        </div>
+      )}
     </div>
   )
 }

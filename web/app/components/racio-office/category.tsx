@@ -46,15 +46,22 @@ const Category: FC<ICategoryProps> = ({
         {t('explore.apps.allCategories')}
       </div>
 
-      {list.map(tag => (
-        <div
-          key={tag.id}
-          className={itemClassName(tag.name === value)}
-          onClick={() => onChange(tag.name)}
-        >
-          {tag.name}
-        </div>
-      ))}
+      {list.map((tag) => {
+        // 只有当 tag.name 不等于 "rma" 时才渲染该标签
+        if (tag.name !== 'rma') {
+          return (
+            <div
+              key={tag.id}
+              className={itemClassName(tag.name === value)}
+              onClick={() => onChange(tag.name)}
+            >
+              {tag.name}
+            </div>
+          )
+        }
+        // 如果 tag.name 等于 "rma"，则不返回任何内容，即不显示该标签
+        return null
+      })}
     </div>
   )
 }
