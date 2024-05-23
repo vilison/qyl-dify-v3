@@ -62,26 +62,6 @@ const Apps = ({
       if (currCategory === '' || currCategory === '推荐')
         getApplist(item.id)
     })
-
-    if (isMobile) {
-      res.map(async (item) => {
-        console.log(item.id, 'item.id')
-
-        fetchAppList({ url: '/apps', params: { tag_ids: item.id } }).then((result) => {
-          setMobileAllList(prevList => [...prevList, { name: item.name, data: result.data, id: item.id }])
-        }).catch((err) => {
-
-        })
-      })
-    }
-    else {
-      if (currCategory != '推荐' && currCategory != '') {
-        res.filter(item => item.name === currCategory).map((item) => {
-          setCurrTagId(item.id)
-          getApplist(item.id)
-        })
-      }
-    }
   }
 
   async function getApplist(param: any) {
@@ -106,8 +86,6 @@ const Apps = ({
   }, [])
 
   const filteredList = useMemo(() => {
-    console.log(tagList, currCategory, 'dddtagList', mobileAllList, 'mobileAllList')
-
     installedApps.map((item) => {
       for (const v in allList) {
         if (item.app.id == allList[v].id)
@@ -115,7 +93,35 @@ const Apps = ({
       }
     })
     return allList
-  }, [currCategory, installedApps, allList])
+  }, [installedApps, allList])
+
+  const mobileAllListData = useMemo(() => {
+    // 使用 .map 方法而不是直接修改 mobileAllList
+
+    if (isMobile) {
+      tagList.map(async (item) => {
+        fetchAppList({ url: '/apps', params: { tag_ids: item.id } }).then((result) => {
+          result.data.map((items) => {
+            for (const v of installedApps)
+              console.log(v, items, 'ddc', v.app.id == items.id)
+          })
+          setMobileAllList(prevList => [...prevList, { name: item.name, data: result.data, tag_id: item.id }])
+        }).catch((err) => {
+
+        })
+      })
+    }
+    else {
+      if (currCategory != '推荐' && currCategory != '') {
+        tagList.filter(item => item.name === currCategory).map((item) => {
+          setCurrTagId(item.id)
+          getApplist(item.id)
+        })
+      }
+    }
+
+    return mobileAllList
+  }, [installedApps, tagList])
 
   const [currApp, setCurrApp] = React.useState<App | null>(null)
   const [isShowCreateModal, setIsShowCreateModal] = React.useState(false)
@@ -188,7 +194,7 @@ const Apps = ({
         </div>)}
       {isMobile && (
         <div className='relative flex flex-1 p-6 flex-col overflow-auto bg-sky-50 shrink-0 grow gap-4'>
-          {mobileAllList.map((app, index) => (
+          {mobileAllListData.map((app, index) => (
             <React.Fragment key={app.id + index}>
               {app.data.length > 1 && (
                 <>
