@@ -1,10 +1,11 @@
 'use client'
 import type { FC } from 'react'
-import React from 'react'
+import React, { useEffect } from 'react'
 import { useContext } from 'use-context-selector'
 import ExploreContext from '@/context/explore-context'
 import TextGenerationApp from '@/app/components/share/text-generation'
 import Loading from '@/app/components/base/loading'
+import { fetchInstalledAppList as doFetchInstalledAppList } from '@/service/explore'
 import ChatWithHistory from '@/app/components/base/chat/chat-with-history'
 
 export type IInstalledAppProps = {
@@ -14,9 +15,16 @@ export type IInstalledAppProps = {
 const InstalledApp: FC<IInstalledAppProps> = ({
   id,
 }) => {
-  const { installedApps } = useContext(ExploreContext)
-  const installedApp = installedApps.find(item => item.id === id)
+  const { installedApps, setInstalledApps } = useContext(ExploreContext)
+  const fetchInstalledAppList = async () => {
+    const { installed_apps }: any = await doFetchInstalledAppList()
+    setInstalledApps(installed_apps)
+  }
 
+  const installedApp = installedApps.find(item => item.id === id)
+  useEffect(() => {
+    fetchInstalledAppList()
+  }, [])
   if (!installedApp) {
     return (
       <div className='flex h-full items-center'>

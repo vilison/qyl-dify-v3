@@ -192,7 +192,7 @@ const Apps = ({
             <React.Fragment key={app.id + index}>
               {app.data.length > 1 && (
                 <>
-                  <div className='text-black text-l font-bold'>{app.name}</div>
+                  <div className='text-black text-l font-bold'>{app.name === 'rma' ? '推荐' : app.name}</div>
                   {app.data.map(item => (
                     <MappCard
                       key={item.id}
