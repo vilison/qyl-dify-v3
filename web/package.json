@@ -12,7 +12,8 @@
     "prepare": "cd ../ && node -e \"if (process.env.NODE_ENV !== 'production'){process.exit(1)} \" || husky install ./web/.husky",
     "gen-icons": "node ./app/components/base/icons/script.js",
     "uglify-embed": "node ./bin/uglify-embed",
-    "check-i18n": "node ./i18n/script.js"
+    "check-i18n": "node ./i18n/script.js",
+    "increase-memory-limit": "cross-env LIMIT=4096 increase-memory-limit"
   },
   "dependencies": {
     "@babel/runtime": "^7.22.3",
