@@ -199,7 +199,7 @@ const Apps = ({
         <div className='relative flex flex-1 p-6 flex-col overflow-auto bg-sky-50 shrink-0 grow gap-4'>
           {mobileAllList.map((app, index) => (
             <React.Fragment key={index}>
-              {app.data.length > 1 && (
+              {app.data.length > 0 && (
                 <>
                   <div className='text-black text-l font-bold'>{app.name === 'rma' ? '推荐' : app.name}</div>
                   {app.data.map((item, idx) => (

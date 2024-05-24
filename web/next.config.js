@@ -34,11 +34,11 @@ const nextConfig = {
     // https://nextjs.org/docs/api-reference/next.config.js/ignoring-typescript-errors
     ignoreBuildErrors: true,
   },
-  async redirects() {
+  async redirects () {
     return [
       {
         source: '/',
-        destination: '/apps',
+        destination: '/office',
         permanent: false,
       },
     ]
