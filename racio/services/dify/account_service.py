@@ -1,11 +1,8 @@
 import json
 import logging
-from hashlib import sha256
-from typing import Any, Optional
-from extensions.ext_redis import redis_client
-from constants.languages import language_timezone_mapping
 from flask import g
 from services.dify.api_service import ApiService
+from models.racio.account import AccountRole
 
 
 class AccountService:
@@ -26,6 +23,28 @@ class AccountService:
         setattr(g, 'auth_token', token)
         apiService = ApiService()
         apiService.switch_tenant(tenant_id)
+
+
+    @staticmethod
+    def get_account_role(account) -> str:
+        if account.account_role == AccountRole.SUPERADMIN:
+            return account.account_role
+        apiService = ApiService()
+        tenants = apiService.get_all_tenant(account.id)
+        for tenant in tenants:
+            if tenant['role'] == AccountRole.OWNER:
+                return tenant['role']
+
+        for tenant in tenants:
+            if tenant['role'] == AccountRole.ADMIN:
+                return tenant['role']
+
+        for tenant in tenants:
+            if tenant['role'] == AccountRole.NORMAL:
+                return tenant['role']
+
+        return AccountRole.NORMAL
+
 
     # @classmethod
     # def _get_invitation_token_key(cls, token: str) -> str:
@@ -62,7 +81,7 @@ class AccountService:
     #         if account_integrate:
     #             # If it exists, update the record
     #             account_integrate.open_id = open_id
-    #             account_integrate.encrypted_token = ""
+    #             account_integrate.encrypted_token = ""  
     #             account_integrate.updated_at = datetime.now(timezone.utc).replace(tzinfo=None)
     #         else:
     #             # If it does not exist, create a new record

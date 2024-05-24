@@ -131,18 +131,18 @@ class ActivateApi(Resource):
         return response_json(0, 'success', data)
 
 
-class TestApi(Resource):
-
-    def post(self):
-        parser = reqparse.RequestParser()
-        parser.add_argument('account_id', type=str, required=True, nullable=False, location='json')
-        parser.add_argument('role', type=str, required=True, nullable=False, location='json')
-        args = parser.parse_args()
-
-        data = Dify_AccountService.check_owner_exists(args['account_id'], args['role'])
-        return response_json(0, 'success', data)
+# class TestApi(Resource):
+#
+#     def post(self):
+#         parser = reqparse.RequestParser()
+#         parser.add_argument('account_id', type=str, required=True, nullable=False, location='json')
+#         parser.add_argument('role', type=str, required=True, nullable=False, location='json')
+#         args = parser.parse_args()
+#
+#         data = Dify_AccountService.check_owner_exists(args['account_id'], args['role'])
+#         return response_json(0, 'success', data)
 
 
 api.add_resource(ActivateCheckApi, '/activate/check')
 api.add_resource(ActivateApi, '/activate')
-api.add_resource(TestApi, '/activate/check_owner_exists')
+# api.add_resource(TestApi, '/activate/check_owner_exists')
