@@ -180,7 +180,7 @@ services:
 
   #racio service
   racio:
-    image: racio:0.0.1
+    image: vilison/racio:0.0.1
     restart: always
     environment:
       # The log level for the application. Supported values are `DEBUG`, `INFO`, `WARNING`, `ERROR`, `CRITICAL`
@@ -203,7 +203,7 @@ services:
       DB_USERNAME: postgres
       DB_PASSWORD:
       DB_HOST: racio-db
-      DB_PORT: 5433
+      DB_PORT: 5432
       DB_DATABASE: racio
       # The configurations of redis connection.
       # It is consistent with the configuration in the 'redis' service below.
@@ -259,7 +259,7 @@ services:
       DIFY_ADMIN_API_KEY:
       DIFY_API_URL: http://api:5001
     depends_on:
-      - account-db
+      - racio-db
       - redis
     volumes:
       # Mount the storage directory to the container, for storing user files.
@@ -442,8 +442,8 @@ services:
     volumes:
       - ./volumes/racio-db/data:/var/lib/postgresql/data
     # uncomment to expose db(postgresql) port to host
-    ports:
-      - "5433:5432"
+    #ports:
+    #  - "5432:5432"
     healthcheck:
       test: [ "CMD", "pg_isready" ]
       interval: 1s
