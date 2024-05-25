@@ -185,7 +185,7 @@ services:
 
   #racio service
   racio:
-    image: vilison/racio:0.0.1
+    image: racio:0.0.1
     restart: always
     environment:
       # The log level for the application. Supported values are `DEBUG`, `INFO`, `WARNING`, `ERROR`, `CRITICAL`
@@ -193,20 +193,20 @@ services:
       # A secret key that is used for securely signing the session cookie and encrypting sensitive information on the database. You can generate a strong key using `openssl rand -base64 42`.
       SECRET_KEY: sk-9f73s3ljTXVcMT3Blb3ljTqtsKiGHXVcMT3BlbkFJLK7U
       # The base URL of console application web frontend, refers to the Console base URL of WEB service if console domain is
-      # different from api or web app domain.
-      CONSOLE_WEB_URL: ''
+      # different from api or web app domain. 邀请邮件里的链接用到
+      CONSOLE_WEB_URL: 'http://at-stg.racio.chat'
       # Password for admin user initialization.
       # If left unset, admin user will not be prompted for a password when creating the initial admin account.
-      INIT_PASSWORD: ''
+      INIT_PASSWORD: '12345678'
       # The base URL of console application api server, refers to the Console base URL of WEB service if console domain is
-      # different from api or web app domain.
-      CONSOLE_API_URL: ''
+      # different from api or web app domain. 微信授权用到
+      CONSOLE_API_URL: 'http://at-stg.racio.chat'
       # When enabled, migrations will be executed prior to application startup and the application will start after the migrations have completed.
       MIGRATION_ENABLED: 'true'
       # The configurations of postgres database connection.
       # It is consistent with the configuration in the 'db' service below.
       DB_USERNAME: postgres
-      DB_PASSWORD:
+      DB_PASSWORD: difyai123456
       DB_HOST: racio-db
       DB_PORT: 5432
       DB_DATABASE: racio
@@ -215,7 +215,7 @@ services:
       REDIS_HOST: redis
       REDIS_PORT: 6379
       REDIS_USERNAME: ''
-      REDIS_PASSWORD:
+      REDIS_PASSWORD: difyai123456
       REDIS_USE_SSL: 'false'
       # use redis db 0 for redis cache
       REDIS_DB: 0
@@ -236,7 +236,7 @@ services:
       # you must use the HTTPS protocol and set the configuration to `SameSite=None, Secure=true, HttpOnly=true`.
       #
       # Mail configuration, support: resend, smtp
-      MAIL_TYPE: resend
+      MAIL_TYPE: ''
       # default send from email address, if not specified
       MAIL_DEFAULT_SEND_FROM: no-reply@promptgens.com
       SMTP_SERVER: ''
@@ -268,7 +268,7 @@ services:
       - redis
     volumes:
       # Mount the storage directory to the container, for storing user files.
-      - ./volumes/racio/storage:/app/racio/storage
+      - ./volumes/racio/app/storage:/app/api/storage
     # uncomment to expose account-api port to host
     # ports:
     #   - "5002:5002"
@@ -440,13 +440,13 @@ services:
     environment:
       PGUSER: postgres
       # The password for the default postgres user.
-      POSTGRES_PASSWORD:
+      POSTGRES_PASSWORD: difyai123456
       # The name of the default postgres database.
       POSTGRES_DB: racio
       # postgres data directory
       PGDATA: /var/lib/postgresql/data/pgdata
     volumes:
-      - ./volumes/racio-db/data:/var/lib/postgresql/data
+      - ./volumes/racio/db/data:/var/lib/postgresql/data
     # uncomment to expose db(postgresql) port to host
     #ports:
     #  - "5432:5432"

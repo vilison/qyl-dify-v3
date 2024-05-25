@@ -148,6 +148,8 @@ docker/volumes/qdrant/*
 docker/volumes/etcd/*
 docker/volumes/minio/*
 docker/volumes/milvus/*
+docker/volumes/racio/*
+docker/docker-compose-configs/*
 
 sdks/python-client/build
 sdks/python-client/dist
