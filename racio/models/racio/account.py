@@ -1,12 +1,7 @@
 import enum
-from uuid import UUID
-
-import sqlalchemy
 from flask_login import UserMixin
-from sqlalchemy import Index, MetaData
-from models.racio import StringUUID
 from extensions.ext_database import db
-
+from models import StringUUID
 
 class AccountStatus(str, enum.Enum):
     PENDING = 'pending'
@@ -113,6 +108,23 @@ class MemberInvite(db.Model):
     remark = db.Column(db.String(255), nullable=True, server_default='')
     domain = db.Column(db.String(255), nullable=True, server_default='')
     created_at = db.Column(db.DateTime, nullable=False, server_default=db.text('CURRENT_TIMESTAMP(0)'))
+
+
+# class MemberInviteTest(db.Model):
+#     # __bind_key__ = 'racio_db'
+#     __tablename__ = 'member_invite_test'
+#     __table_args__ = (
+#         db.PrimaryKeyConstraint('id', name='member_invite_test_pkey'),
+#     )
+#
+#     id = db.Column(StringUUID, server_default=db.text('uuid_generate_v4()'))
+#     tenant_id = db.Column(StringUUID, nullable=True)
+#     role = db.Column(db.String(16), nullable=False)
+#     invited_by = db.Column(StringUUID, nullable=False)
+#     remark = db.Column(db.String(255), nullable=True, server_default='')
+#     domain = db.Column(db.String(255), nullable=True, server_default='')
+#     created_at = db.Column(db.DateTime, nullable=False, server_default=db.text('CURRENT_TIMESTAMP(0)'))
+
 
 
 

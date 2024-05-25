@@ -81,7 +81,7 @@ class AccountService:
     #         if account_integrate:
     #             # If it exists, update the record
     #             account_integrate.open_id = open_id
-    #             account_integrate.encrypted_token = ""  
+    #             account_integrate.encrypted_token = ""
     #             account_integrate.updated_at = datetime.now(timezone.utc).replace(tzinfo=None)
     #         else:
     #             # If it does not exist, create a new record

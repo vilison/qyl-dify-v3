@@ -3,6 +3,11 @@
 
 set -e
 
+if [[ "${MIGRATION_ENABLED}" == "true" ]]; then
+  echo "Running migrations"
+  flask db upgrade
+fi
+
 pip install --prefix=/pkg -r requirements.txt
 
 if [[ "${DEBUG}" == "true" ]]; then
