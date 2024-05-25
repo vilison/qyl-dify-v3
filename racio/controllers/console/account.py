@@ -1,6 +1,7 @@
 from flask import request
 from flask_restful import Resource, reqparse
 from services.racio.account_service import AccountService
+from services.dify.account_service import AccountService as Dify_AccountService
 from libs.response import response_json
 from . import api
 
@@ -41,7 +42,12 @@ class GetTokenApi(Resource):
             return response_json(-1, '未登录，请重新登录')
         AccountService.update_last_login(account, request)
         token = AccountService.get_account_jwt_token(account)
-        return response_json(0, 'success', token)
+        account_role = Dify_AccountService.get_account_role(account)
+        data = {
+            "token": token,
+            "account_role": account_role
+        }
+        return response_json(0, 'success', data)
 
 
 api.add_resource(CheckAccountApi, '/account/check')
