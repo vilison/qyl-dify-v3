@@ -114,7 +114,7 @@ const AppNav = () => {
         isApp
         icon={<Robot className='w-4 h-4' />}
         activeIcon={<RobotActive className='w-4 h-4' />}
-        text={t('common.menus.apps')}
+        text={t('racio.training.title')}
         activeSegment={['training', 'app']}
         link='/training'
         curNav={appDetail}
