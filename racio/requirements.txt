@@ -1,7 +1,7 @@
 beautifulsoup4==4.12.2
 flask~=3.0.1
-flask-sqlalchemy~=3.0.5
-sqlalchemy~=1.4.28
+Flask-SQLAlchemy~=3.0.5
+SQLAlchemy~=2.0.29
 flask-compress~=1.14
 flask-login~=0.6.3
 flask-migrate~=4.0.5
@@ -19,3 +19,4 @@ Authlib==1.2.0
 psycopg2-binary~=2.9.6
 resend~=0.7.0
 celery~=5.3.6
+flask-script

@@ -26,7 +26,7 @@ from extensions import (
     ext_compress,
     ext_database,
     ext_login,
-    # ext_migrate,
+    ext_migrate,
     ext_redis,
     ext_mail,
     ext_sms
@@ -94,13 +94,13 @@ def create_app(test_config=None) -> Flask:
     initialize_extensions(app)
 
     # Create tables if they do not exist already
-    with app.app_context():
-        try:
-            db.session.execute('CREATE EXTENSION IF NOT EXISTS "uuid-ossp";')
-            db.session.commit()
-        except Exception as e:
-            logging.info("uuid-ossp 已存在")
-        db.create_all()
+    # with app.app_context():
+    #     try:
+    #         db.session.execute('CREATE EXTENSION IF NOT EXISTS "uuid-ossp";')
+    #         db.session.commit()
+    #     except Exception as e:
+    #         logging.info("uuid-ossp 已存在")
+    #     db.create_all()
 
     # config_oauth(app)
     register_blueprints(app)
@@ -114,7 +114,7 @@ def initialize_extensions(app):
 
     ext_compress.init_app(app)
     ext_database.init_app(app)
-    # ext_migrate.init(app, db)
+    ext_migrate.init(app, db)
     ext_redis.init_app(app)
     # ext_celery.init_app(app)
     ext_login.init_app(app)
