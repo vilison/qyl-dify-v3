@@ -184,6 +184,17 @@ services:
       - default
 
   #racio service
+  racio-dashboard:
+    image: racio-dashboard:0.0.1
+    restart: always
+    depends_on:
+      - racio
+
+    # ports:
+    #   - "80:80"  # 容器内有nginx 指定了 80端口。
+    networks:
+      - ssrf_proxy_network
+      - default
   racio:
     image: racio:0.0.1
     restart: always
@@ -272,6 +283,9 @@ services:
     # uncomment to expose account-api port to host
     # ports:
     #   - "5002:5002"
+    networks:
+      - ssrf_proxy_network
+      - default
 
   # worker service
   # The Celery worker for processing the queue.
