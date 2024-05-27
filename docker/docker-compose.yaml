@@ -185,7 +185,7 @@ services:
 
   #racio service
   racio-dashboard:
-    image: racio-dashboard:0.0.1
+    image: briley/racio-dashboard:0.0.1
     restart: always
     depends_on:
       - racio
