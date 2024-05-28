@@ -1,19 +1,19 @@
 const translation = {
   office: {
-    title: '办公室',
+    title: 'Office',
   },
   training: {
-    title: '训练室',
+    title: 'Training',
   },
   sidebar: {
-    discovery: '发现',
-    chat: '智聊',
-    workspace: '工作区',
+    discovery: 'Discovery',
+    chat: 'Chat',
+    workspace: 'Workspace',
     action: {
-      pin: '置顶',
-      unpin: '取消置顶',
-      rename: '重命名',
-      delete: '删除',
+      pin: 'Pin',
+      unpin: 'Unpin',
+      rename: 'Rename',
+      delete: 'Delete',
     },
     delete: {
       title: '删除程序',
@@ -21,8 +21,8 @@ const translation = {
     },
   },
   apps: {
-    title: '探索Racio的应用',
-    description: '使用这些模板应用程序，或根据模板自定义您自己的应用程序。',
+    title: 'Explore Apps by Racio',
+    description: 'Use these template apps instantly or customize your own apps based on the templates.',
     allCategories: '推荐',
   },
   appCard: {

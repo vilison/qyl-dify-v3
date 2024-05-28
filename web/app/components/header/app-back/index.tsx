@@ -30,7 +30,7 @@ export default function AppBack({ curApp }: IAppBackProps) {
           ? <ArrowLeftIcon className='mr-1 w-[18px] h-[18px]' />
           : <Squares2X2Icon className='mr-1 w-[18px] h-[18px]' />
       }
-      {t('common.menus.apps')}
+      {t('racio.training.title')}
     </div>
   )
 }
