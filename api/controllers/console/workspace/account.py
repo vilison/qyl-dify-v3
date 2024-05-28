@@ -7,7 +7,7 @@ from uuid import UUID
 import pytz
 from flask import current_app, request
 from flask_login import current_user
-from flask_restful import Resource, fields, marshal, marshal_with, reqparse
+from flask_restful import Resource, fields, inputs, marshal, marshal_with, reqparse
 from werkzeug.exceptions import BadRequest, Conflict, NotFound
 
 from constants.languages import languages, supported_language
@@ -43,6 +43,36 @@ class OAuthUserInfo:
 
 
 class AccountsListApi(Resource):
+    @setup_required
+    @admin_required
+    def get(self):
+        parser = reqparse.RequestParser()
+        parser.add_argument('page', type=inputs.int_range(1, 99999), required=False, default=1, location='args')
+        parser.add_argument('limit', type=inputs.int_range(1, 100), required=False, default=20, location='args')
+        args = parser.parse_args()
+
+        accounts = db.session.query(Account).order_by(Account.created_at.desc())\
+            .paginate(page=args['page'], per_page=args['limit'])
+
+        has_more = False
+        if len(accounts.items) == args['limit']:
+            current_page_first_tenant = accounts[-1]
+            rest_count = db.session.query(Account).filter(
+                Account.created_at < current_page_first_tenant.created_at,
+                Account.id != current_page_first_tenant.id
+            ).count()
+
+            if rest_count > 0:
+                has_more = True
+        total = db.session.query(Account).count()
+        return {
+            'data': marshal(accounts.items, account_fields),
+            'has_more': has_more,
+            'limit': args['limit'],
+            'page': args['page'],
+            'total': total
+        }, 200
+
     @setup_required
     @admin_required
     def post(self):
