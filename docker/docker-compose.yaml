@@ -183,111 +183,7 @@ services:
       - ssrf_proxy_network
       - default
 
-  #racio service
-  racio-dashboard:
-    image: briley/racio-dashboard:0.0.1
-    restart: always
-    depends_on:
-      - racio
-
-    # ports:
-    #   - "80:80"  # 容器内有nginx 指定了 80端口。
-    networks:
-      - ssrf_proxy_network
-      - default
-  racio:
-    image: racio:0.0.1
-    restart: always
-    environment:
-      # The log level for the application. Supported values are `DEBUG`, `INFO`, `WARNING`, `ERROR`, `CRITICAL`
-      LOG_LEVEL: INFO
-      # A secret key that is used for securely signing the session cookie and encrypting sensitive information on the database. You can generate a strong key using `openssl rand -base64 42`.
-      SECRET_KEY: sk-9f73s3ljTXVcMT3Blb3ljTqtsKiGHXVcMT3BlbkFJLK7U
-      # The base URL of console application web frontend, refers to the Console base URL of WEB service if console domain is
-      # different from api or web app domain. 邀请邮件里的链接用到
-      CONSOLE_WEB_URL: 'http://at-stg.racio.chat'
-      # Password for admin user initialization.
-      # If left unset, admin user will not be prompted for a password when creating the initial admin account.
-      INIT_PASSWORD: '12345678'
-      # The base URL of console application api server, refers to the Console base URL of WEB service if console domain is
-      # different from api or web app domain. 微信授权用到
-      CONSOLE_API_URL: 'http://at-stg.racio.chat'
-      # When enabled, migrations will be executed prior to application startup and the application will start after the migrations have completed.
-      MIGRATION_ENABLED: 'true'
-      # The configurations of postgres database connection.
-      # It is consistent with the configuration in the 'db' service below.
-      DB_USERNAME: postgres
-      DB_PASSWORD: difyai123456
-      DB_HOST: racio-db
-      DB_PORT: 5432
-      DB_DATABASE: racio
-      # The configurations of redis connection.
-      # It is consistent with the configuration in the 'redis' service below.
-      REDIS_HOST: redis
-      REDIS_PORT: 6379
-      REDIS_USERNAME: ''
-      REDIS_PASSWORD: difyai123456
-      REDIS_USE_SSL: 'false'
-      # use redis db 0 for redis cache
-      REDIS_DB: 0
-      # The configurations of celery broker.
-      # Specifies the allowed origins for cross-origin requests to the Web API, e.g. https://dify.app or * for all origins.
-      WEB_API_CORS_ALLOW_ORIGINS: '*'
-      # Specifies the allowed origins for cross-origin requests to the console API, e.g. https://cloud.dify.ai or * for all origins.
-      CONSOLE_CORS_ALLOW_ORIGINS: '*'
-      # CSRF Cookie settings
-      # Controls whether a cookie is sent with cross-site requests,
-      # providing some protection against cross-site request forgery attacks
-      #
-      # Default: `SameSite=Lax, Secure=false, HttpOnly=true`
-      # This default configuration supports same-origin requests using either HTTP or HTTPS,
-      # but does not support cross-origin requests. It is suitable for local debugging purposes.
-      #
-      # If you want to enable cross-origin support,
-      # you must use the HTTPS protocol and set the configuration to `SameSite=None, Secure=true, HttpOnly=true`.
-      #
-      # Mail configuration, support: resend, smtp
-      MAIL_TYPE: ''
-      # default send from email address, if not specified
-      MAIL_DEFAULT_SEND_FROM: no-reply@promptgens.com
-      SMTP_SERVER: ''
-      SMTP_PORT: 587
-      SMTP_USERNAME: ''
-      SMTP_PASSWORD: ''
-      SMTP_USE_TLS: 'true'
-      # the api-key for resend (https://resend.com)
-      RESEND_API_KEY: ''
-      RESEND_API_URL: https://api.resend.com
-      # Cloud OAuth2 configurations
-      WX_CLIENT_ID:
-      WX_CLIENT_SECRET:
-      GOOGLE_CLIENT_ID: xxx-xxx.apps.googleusercontent.com
-      INVITE_EXPIRY_HOURS: 72
-      #Tencent Sms configurations
-      TENCENT_SECRET_ID:
-      TENCENT_SECRET_KEY:
-      TENCENT_SMS_SDK_APP_ID:
-      TENCENT_SMS_TEMPLATE_ID:
-      TENCENT_SMS_SIGNNAME:
-      TENCENT_SMS_TIMEOUT:
-      # Dify Api configurations
-      DIFY_INNER_API_KEY:
-      DIFY_ADMIN_API_KEY:
-      DIFY_API_URL: http://api:5001
-    depends_on:
-      - racio-db
-      - redis
-    volumes:
-      # Mount the storage directory to the container, for storing user files.
-      - ./volumes/racio/app/storage:/app/api/storage
-    # uncomment to expose account-api port to host
-    # ports:
-    #   - "5002:5002"
-    networks:
-      - ssrf_proxy_network
-      - default
-
-  # worker service
+  # Worker service
   # The Celery worker for processing the queue.
   worker:
     image: langgenius/dify-api:0.6.8
@@ -403,6 +299,99 @@ services:
       - ssrf_proxy_network
       - default
 
+  #Racio Account API service
+  racio-api:
+    image: racio-api:0.1.0
+    restart: always
+    environment:
+      # The log level for the application. Supported values are `DEBUG`, `INFO`, `WARNING`, `ERROR`, `CRITICAL`
+      LOG_LEVEL: INFO
+      # A secret key that is used for securely signing the session cookie and encrypting sensitive information on the database. You can generate a strong key using `openssl rand -base64 42`.
+      SECRET_KEY: sk-9f73s3ljTXVcMT3Blb3ljTqtsKiGHXVcMT3BlbkFJLK7U
+      # The base URL of console application web frontend, refers to the Console base URL of WEB service if console domain is
+      # different from api or web app domain. 邀请邮件里的链接用到
+      CONSOLE_WEB_URL: 'http://at-stg.racio.chat'
+      # Password for admin user initialization.
+      # If left unset, admin user will not be prompted for a password when creating the initial admin account.
+      INIT_PASSWORD: '12345678'
+      # The base URL of console application api server, refers to the Console base URL of WEB service if console domain is
+      # different from api or web app domain. 微信授权用到
+      CONSOLE_API_URL: 'http://at-stg.racio.chat'
+      # When enabled, migrations will be executed prior to application startup and the application will start after the migrations have completed.
+      MIGRATION_ENABLED: 'true'
+      # The configurations of postgres database connection.
+      # It is consistent with the configuration in the 'db' service below.
+      DB_USERNAME: postgres
+      DB_PASSWORD: difyai123456
+      DB_HOST: racio-db
+      DB_PORT: 5432
+      DB_DATABASE: racio
+      # The configurations of redis connection.
+      # It is consistent with the configuration in the 'redis' service below.
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
+      REDIS_USERNAME: ''
+      REDIS_PASSWORD: difyai123456
+      REDIS_USE_SSL: 'false'
+      # use redis db 0 for redis cache
+      REDIS_DB: 0
+      # The configurations of celery broker.
+      # Specifies the allowed origins for cross-origin requests to the Web API, e.g. https://dify.app or * for all origins.
+      WEB_API_CORS_ALLOW_ORIGINS: '*'
+      # Specifies the allowed origins for cross-origin requests to the console API, e.g. https://cloud.dify.ai or * for all origins.
+      CONSOLE_CORS_ALLOW_ORIGINS: '*'
+      # CSRF Cookie settings
+      # Controls whether a cookie is sent with cross-site requests,
+      # providing some protection against cross-site request forgery attacks
+      #
+      # Default: `SameSite=Lax, Secure=false, HttpOnly=true`
+      # This default configuration supports same-origin requests using either HTTP or HTTPS,
+      # but does not support cross-origin requests. It is suitable for local debugging purposes.
+      #
+      # If you want to enable cross-origin support,
+      # you must use the HTTPS protocol and set the configuration to `SameSite=None, Secure=true, HttpOnly=true`.
+      #
+      # Mail configuration, support: resend, smtp
+      MAIL_TYPE: ''
+      # default send from email address, if not specified
+      MAIL_DEFAULT_SEND_FROM: no-reply@promptgens.com
+      SMTP_SERVER: ''
+      SMTP_PORT: 587
+      SMTP_USERNAME: ''
+      SMTP_PASSWORD: ''
+      SMTP_USE_TLS: 'true'
+      # the api-key for resend (https://resend.com)
+      RESEND_API_KEY: re_xx
+      RESEND_API_URL: https://api.resend.com
+      # Cloud OAuth2 configurations
+      WX_CLIENT_ID: 'WX_CLIENT_ID'
+      WX_CLIENT_SECRET: 'WX_CLIENT_SECRET'
+      GOOGLE_CLIENT_ID: xxx-xxx.apps.googleusercontent.com
+      INVITE_EXPIRY_HOURS: 72
+      #Tencent Sms configurations
+      TENCENT_SECRET_ID: 
+      TENCENT_SECRET_KEY: 
+      TENCENT_SMS_SDK_APP_ID: 
+      TENCENT_SMS_TEMPLATE_ID: 
+      TENCENT_SMS_SIGNNAME: 
+      TENCENT_SMS_TIMEOUT: 
+      # Dify Api configurations
+      DIFY_INNER_API_KEY: 
+      DIFY_ADMIN_API_KEY: 
+      DIFY_API_URL: 
+    depends_on:
+      - racio-db
+      - redis
+    volumes:
+      # Mount the storage directory to the container, for storing user files.
+      - ./volumes/racio/app/storage:/app/api/storage
+    # uncomment to expose racio-api port to host
+    # ports:
+    #   - "5003:5003"
+    networks:
+      - ssrf_proxy_network
+      - default
+
   # Frontend web application.
   web:
     image: langgenius/dify-web:0.6.8
@@ -424,6 +413,26 @@ services:
     # ports:
     #   - "3000:3000"
 
+  #Racio Account Web service
+  racio-dashboard:
+    image: racio-dashboard:0.1.0
+    restart: always
+    environment:
+      # account-api 访问地址       # VITE_APP_BASE_API http://at-stg.racio.chat/api
+      RACIO_API_URL: ''           # Format: ${RACIO_API_URL}/api
+      # account-dashboard 访问地址 # VITE_APP_WEBSITE http://at-stg.racio.chat/dashboard
+      RACIO_APP_URL: ''           # Format: ${RACIO_APP_URL}/dashoard
+      # dify平台访问地址            # VITE_APP_DIFY_URL http://dify.corp.chaolian360.com
+      DIFY_APP_URL: ''            # ????
+    depends_on:
+      - racio-api
+    # uncomment to expose racio-dashboard port to host
+    # ports:
+    #   - "3001:3001"
+    networks:
+      - ssrf_proxy_network
+      - default
+
   # The postgres database.
   db:
     image: postgres:15-alpine
@@ -439,15 +448,15 @@ services:
     volumes:
       - ./volumes/db/data:/var/lib/postgresql/data
     # uncomment to expose db(postgresql) port to host
-    # ports:
-    #   - "5432:5432"
+    ports:
+      - "5432:5432"
     healthcheck:
       test: [ "CMD", "pg_isready" ]
       interval: 1s
       timeout: 3s
       retries: 30
 
-  # racio database
+  # The postgres database - racio database.
   racio-db:
     image: postgres:15-alpine
     restart: always
@@ -462,8 +471,8 @@ services:
     volumes:
       - ./volumes/racio/db/data:/var/lib/postgresql/data
     # uncomment to expose db(postgresql) port to host
-    #ports:
-    #  - "5432:5432"
+    # ports:
+    #  - "5433:5432"
     healthcheck:
       test: [ "CMD", "pg_isready" ]
       interval: 1s
@@ -540,6 +549,7 @@ services:
     networks:
       - ssrf_proxy_network
       - default
+
   # Qdrant vector store.
   # uncomment to use qdrant as vector store.
   # (if uncommented, you need to comment out the weaviate service above,
