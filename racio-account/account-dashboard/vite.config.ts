@@ -1,5 +1,6 @@
 import { defineConfig, ConfigEnv, UserConfig } from "vite"
 import path from "path"
+import viteEslint from 'vite-plugin-eslint'
 // vite.config.ts中无法使用import.meta.env 所以需要引入
 import vue from "@vitejs/plugin-vue"
 import { createSvgIconsPlugin } from "vite-plugin-svg-icons"
@@ -22,6 +23,10 @@ export default defineConfig(({ mode }: ConfigEnv): UserConfig => {
     return {
         define: {
             runtimeMode: JSON.stringify(mode),
+        },
+        ssr: {
+            noExternal: ["echarts"],
+            target: "webworker",
         },
         base: mode === "production" ? "/dashboard/" : "/",
         plugins: [

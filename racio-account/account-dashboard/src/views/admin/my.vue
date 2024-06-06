@@ -101,8 +101,8 @@ function openTenant(id) {
                                 tenant_id: id
                             }
                             UserStore.login(userInfo)
-
-                            window.location.href = `${import.meta.env.VITE_APP_DIFY_URL}?console_token=${data.token}`
+                            const uri = import.meta.env.VITE_APP_DIFY_URL ? import.meta.env.VITE_APP_DIFY_URL : window.globalVariable.DIFY_URL
+                            window.location.href = `${uri}?console_token=${data.token}`
                         }
                     })
             }

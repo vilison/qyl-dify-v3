@@ -22,7 +22,8 @@
 
 <script lang="ts" setup>
 const goToAI = () => {
-  window.open(`${import.meta.env.VITE_APP_DIFY_URL}?console_token=${localStorage.token}`, '_blank')
+  const uri = import.meta.env.VITE_APP_DIFY_URL ? import.meta.env.VITE_APP_DIFY_URL : window.globalVariable.DIFY_URL
+  window.open(`${uri}?console_token=${localStorage.token}`, '_blank')
 }
 
 </script>

@@ -369,16 +369,16 @@ services:
       GOOGLE_CLIENT_ID: xxx-xxx.apps.googleusercontent.com
       INVITE_EXPIRY_HOURS: 72
       #Tencent Sms configurations
-      TENCENT_SECRET_ID: 
-      TENCENT_SECRET_KEY: 
-      TENCENT_SMS_SDK_APP_ID: 
-      TENCENT_SMS_TEMPLATE_ID: 
-      TENCENT_SMS_SIGNNAME: 
-      TENCENT_SMS_TIMEOUT: 
+      TENCENT_SECRET_ID:
+      TENCENT_SECRET_KEY:
+      TENCENT_SMS_SDK_APP_ID:
+      TENCENT_SMS_TEMPLATE_ID:
+      TENCENT_SMS_SIGNNAME:
+      TENCENT_SMS_TIMEOUT:
       # Dify Api configurations
-      DIFY_INNER_API_KEY: 
-      DIFY_ADMIN_API_KEY: 
-      DIFY_API_URL: 
+      DIFY_INNER_API_KEY:
+      DIFY_ADMIN_API_KEY:
+      DIFY_API_URL:
     depends_on:
       - racio-db
       - redis
@@ -418,12 +418,11 @@ services:
     image: racio-dashboard:0.1.0
     restart: always
     environment:
-      # account-api 访问地址       # VITE_APP_BASE_API http://at-stg.racio.chat/api
-      RACIO_API_URL: ''           # Format: ${RACIO_API_URL}/api
-      # account-dashboard 访问地址 # VITE_APP_WEBSITE http://at-stg.racio.chat/dashboard
-      RACIO_APP_URL: ''           # Format: ${RACIO_APP_URL}/dashoard
-      # dify平台访问地址            # VITE_APP_DIFY_URL http://dify.corp.chaolian360.com
-      DIFY_APP_URL: ''            # ????
+      APPID: ''  #微信网站扫描应用appid
+      GZHAPPID: ''  #微信公众号appid
+      BASE_API: '' # account-api 访问地址         #http://at-stg.racio.chat/api
+      WEBSITE: ' ' # account-dashboard 访问地址   #http://at-stg.racio.chat/dashboard
+      DIFY_URL: ' '  # dify平台访问地址            #http://dify.corp.chaolian360.com
     depends_on:
       - racio-api
     # uncomment to expose racio-dashboard port to host

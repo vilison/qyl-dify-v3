@@ -69,7 +69,16 @@ function tenantList() {
     accountTenantList()
         .then(res => {
             let { code, data, msg } = res.data
-            TenantList.value = data
+            if (code == 0) {
+                TenantList.value = data
+            } else {
+
+                ElMessage({
+                    message: msg,
+                    type: 'error',
+                    duration: 5000,
+                })
+            }
         })
 }
 onMounted(() => {
@@ -100,8 +109,15 @@ function openTenant(id) {
                                 tenant_id: id
                             }
                             UserStore.login(userInfo)
+                            const uri = import.meta.env.VITE_APP_DIFY_URL ? import.meta.env.VITE_APP_DIFY_URL : window.globalVariable.DIFY_URL
+                            window.location.href = `${uri}?console_token=${data.token}`
+                        } else {
 
-                            window.location.href = `${import.meta.env.VITE_APP_DIFY_URL}?console_token=${data.token}`
+                            ElMessage({
+                                message: msg,
+                                type: 'error',
+                                duration: 5000,
+                            })
                         }
                     })
             }

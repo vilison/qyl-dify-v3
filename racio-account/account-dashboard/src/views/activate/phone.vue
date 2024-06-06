@@ -2,60 +2,62 @@
     <div class="login-container">
         <div class="login-box">
             <div class="login-form">
-                <el-row :gutter="5" style="padding-bottom: 10px;" v-if="invitTokenInfo.role == 'owner'">
+                <el-row :gutter="5" style="padding-bottom: 10px;">
                     <el-col>
                         <h3>创建空间</h3>
                     </el-col>
-                    <el-col :span="18">
+                    <el-col :span="24">
                         <el-tooltip :visible="checkWorkSpaceBtn.tips" class="box-item" effect="light"
-                            :content="checkWorkSpaceBtn.tipstext ? checkWorkSpaceBtn.tipstext : '只能填写英文字母+数字组合8-30个字符'"
+                            :content="checkWorkSpaceBtn.tipstext ? checkWorkSpaceBtn.tipstext : '长度8-30个字符'"
                             placement="top-end">
                             <el-input placeholder="请输入用户名/空间名" v-model.trim="workspace" minlength="8" maxlength="30"
-                                clearable @input="isWorkspace" />
+                                clearable @input="isWorkspace" :disabled="invitTokenInfo.role !== 'owner'" />
                         </el-tooltip>
                     </el-col>
-                    <el-col :span="6">
-                        <div class="check-code">
-                            <el-button size="small" :loading="checkWorkSpaceBtn.loading" type="success"
-                                @click="checkWorkSpace">
-                                {{ checkWorkSpaceBtn.text }}
-                            </el-button>
+                    <!-- <el-col :span=" 6">
+                                <div class="check-code">
+                                    <el-button size="small" :loading="checkWorkSpaceBtn.loading" type="success"
+                                        @click="checkWorkSpace">
+                                        {{ checkWorkSpaceBtn.text }}
+                                    </el-button>
 
-                        </div>
-                    </el-col>
+                                </div>
+                    </el-col> -->
                 </el-row>
-                <el-row :gutter="5" style="padding-bottom: 10px;" v-if="showVerify">
+                <el-row :gutter="15" style="padding-bottom: 10px;">
                     <el-col>
                         <h3>绑定手机号</h3>
                     </el-col>
                     <el-col :span="18">
                         <div>
                             <el-input maxlength="11" clearable v-model.number="phoneNum" @input="isPhone"
-                                placeholder="输入需要绑定的手机号码" />
+                                placeholder="输入需要绑定的手机号码" :disabled="!showVerify" />
                         </div>
                     </el-col>
-                    <el-col :span="6">
+                    <el-col :span="4">
                         <div class="check-code">
-                            <el-button :loading="checkCodeBtn.loading" type="primary" @click="getCheckCode"> {{
-                                checkCodeBtn.text }}
+                            <el-button :disabled="!showVerify" :loading="checkCodeBtn.loading" type="primary"
+                                @click="getCheckCode"> {{
+                                    checkCodeBtn.text }}
                             </el-button>
                         </div>
                     </el-col>
                 </el-row>
 
-                <el-row :gutter="20" :justify="'start'" style="padding-bottom: 10px;" v-if="showVerify">
-                    <el-col :span="18">
+                <el-row :gutter="24" :justify="'start'" style="padding-bottom: 10px;">
+                    <el-col :span="24">
                         <div>
-                            <el-input maxlength="4" clearable v-model.number="verifyCode" placeholder="请输入验证码" />
+                            <el-input maxlength="4" clearable v-model.number="verifyCode" placeholder="请输入验证码"
+                                :disabled="!showVerify" />
                         </div>
                     </el-col>
                 </el-row>
                 <el-row>
-                    <el-col :span="20" style="text-align:center">
+                    <el-col :span="24" style="text-align:center">
                         <div>
                             <el-button size="large" :width="100" type="primary" @click="activateAccount">{{
                                 invitTokenInfo.role == "owner" ? "关联并创建空间" : "关联工作空间"
-                                }}</el-button>
+                            }}</el-button>
                         </div>
                     </el-col>
                 </el-row>
@@ -156,7 +158,7 @@ function checkToekn() {
                     ElMessage({
                         message: '邀请链接已失效，请联系管理员（微信：dukexls）',
                         type: 'warning',
-                        duration: 3000,
+                        duration: 5000,
                     })
                 }
 
@@ -186,8 +188,11 @@ function activateAccount() {
         ElMessage({
             message: '请先完成微信授权',
             type: 'warning',
+            duration: 5000,
         })
-        router.back()
+        setTimeout(() => {
+            router.back()
+        }, 5000);
         return
     } else if (token == "") {
         ElMessage({
@@ -214,12 +219,13 @@ function activateAccount() {
                 ElMessage({
                     message: '绑定成功',
                     type: 'success',
+                    duration: 3000,
                 })
                 setTimeout(() => {
                     router.replace({
                         path: "/invitSuccess",
                     })
-                }, 800);
+                }, 3000);
             } else {
                 ElMessage({
                     message: msg,
@@ -275,6 +281,8 @@ const getCheckCode = () => {
         ElMessage({
             message: '请输入手机号',
             type: 'warning',
+            duration: 5000,
+
         })
         return
     }

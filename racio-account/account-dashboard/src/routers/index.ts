@@ -109,7 +109,7 @@ export const constantRoutes: Array<RouteRecordRaw & extendRoute> = [
     {
         path: "/login",
         name: "Login",
-        component: () => import("@/views/admin/login/index.vue"),
+        component: () => import("@/views/login/index.vue"),
         hidden: true,
         meta: { title: "管理员登录" },
     },
@@ -157,7 +157,7 @@ export const notFoundRouter = {
 
 
 const router = createRouter({
-    // history: createWebHistory(process.env.BASE_URL), // history
+    // history: createWebHistory(), // history
     history: createWebHashHistory(), // hash
     routes: constantRoutes,
 })

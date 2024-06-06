@@ -20,8 +20,8 @@ export const useUserStore = defineStore({
     actions: {
         // 登录
         login(userInfo) {
-
             return new Promise(async (resolve, reject) => {
+                this.userInfo = userInfo
                 this.token = userInfo.token
                 localStorage.setItem("token", userInfo.token)
                 this.isLogin = true

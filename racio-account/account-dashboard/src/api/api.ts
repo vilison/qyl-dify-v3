@@ -118,6 +118,15 @@ export function getWxInfo(data) {
     })
 }
 
+// 微信公众号授权获取access_token
+export function getGZHInfo(data) {
+    return request({
+        url: "/console/oauth/access_token/wechat",
+        method: "post",
+        data,
+    })
+}
+
 
 // 激活状态验证
 export function checkInvitToken(data) {

@@ -84,11 +84,12 @@ function check(access_token) {
                             let userInfo = {
                                 token: data.token,
                                 access_token: access_token,
-                                roles: [data.account_role]
+                                roles: [data.account_role],
+                                username: data.account_role == "owner" ? "空间所有者" : data.account_role == "admin" ? "空间管理员" : "尊享会员",
                             }
                             UserStore.login(userInfo)
-
-                            window.location.href = `${import.meta.env.VITE_APP_DIFY_URL}?console_token=${data.token}`
+                            const uri = import.meta.env.VITE_APP_DIFY_URL ? import.meta.env.VITE_APP_DIFY_URL : window.globalVariable.DIFY_URL
+                            window.location.href = `${uri}?console_token=${data.token}`
                         }
                     })
 

@@ -20,6 +20,7 @@ import Footer from "@/components/Footer/index.vue"
 import { getQueryObject } from "@/utils/index"
 import { useUserStore } from "@/store/modules/user"
 import { useRouter } from "vue-router"
+import { onMounted } from "vue"
 const router = useRouter()
 
 
@@ -30,7 +31,21 @@ const { tokens } = ref(getQueryObject(null))
 
 const { token, roles, isLogin } = useUserStore()
 
-console.log(token, roles, isLogin, "token, roles, isLogin");
+function isWechat() {
+    var ua = navigator.userAgent.toLowerCase();
+    if (ua.match(/MicroMessenger/i) == "micromessenger") {
+        return true;
+    } else {
+        return false;
+    }
+}
+
+onMounted(() => {
+    console.log(isWechat(), "isWechat");
+
+    if (isWechat()) {
+        location.href="//at-stg.racio.chat/api/console/oauth/login/wechat"
+    }
 
 
 if (isLogin) {
@@ -41,6 +56,11 @@ if (isLogin) {
         router.replace({ path: "/account" })
     }
 }
+})
+
+
+
+
 
 </script>
 <style lang="scss" scoped>

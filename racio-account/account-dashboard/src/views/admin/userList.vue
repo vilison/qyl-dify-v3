@@ -26,13 +26,21 @@
             <el-col :span="24">
                 <el-table :data="tableData" style="width: 100%">
                     <el-table-column type="index" prop="date" label="编号" width="60" />
-                    <el-table-column prop="name" label="用户名" min-width="90" />
+                    <el-table-column prop="name" label="用户名" min-width="100" />
                     <el-table-column prop="phone" label="手机号码" width="120" />
                     <el-table-column prop="id" label="用户ID" width="300" />
                     <el-table-column prop="email" label="邮箱" width="180" />
-                    <el-table-column prop="status" label="邀请状态" width="100" />
-                    <!-- <el-table-column prop="email" label="邀请链接" /> -->
-                    <el-table-column prop="account_role" label="帐号角色" width="120" />
+                    <el-table-column prop="status" label="邀请状态" width="100">
+                        <template #default="scope">
+                            <div>{{ scope.row.status == "active" ? "已激活使用" : "未激活" }}</div>
+                        </template>
+                    </el-table-column>
+                    <el-table-column prop="account_role" label="帐号角色" width="120">
+                        <template #default="scope">
+                            <div>{{ scope.row.account_role == "owner" ? "空间所有者" : scope.row.account_role == "admin" ?
+                                "空间管理员" : "尊享会员" }}</div>
+                        </template>
+                    </el-table-column>
                     <el-table-column prop="last_login_at" label="最后登录时间" width="150">
                         <template #default="scope">
                             <div>{{ scope.row.last_login_at == null ? "无登录" : formatTime(scope.row.last_login_at,
@@ -48,7 +56,7 @@
                     <el-table-column label="操作" fixed="right" width="200">
                         <template #default="scope">
                             <el-button type="primary" @click="editRolesDialog(scope.row)">修改权限</el-button>
-                            <el-button type="danger">移除</el-button>
+                            <el-button type="danger" @click="deleteDialog(scope.row)">移除</el-button>
                         </template>
                     </el-table-column>
                 </el-table>
@@ -135,9 +143,9 @@
 <script lang="ts" setup>
 import { ref, onMounted } from "vue"
 import { Plus, Search } from '@element-plus/icons-vue'
-import { ElMessage } from "element-plus"
+import { ElMessage, ElMessageBox } from "element-plus"
 import { useRouter } from "vue-router"
-import { getAuthList, inviteUser, members, memberChangeRole } from "@/api/api"
+import { inviteUser, members, memberChangeRole, memberRemove } from "@/api/api"
 import clip from "@/utils/clipboard"
 import { formatTime } from "@/utils"
 import { useUserStore } from "@/store/modules/user"
@@ -180,6 +188,40 @@ const editRolesDialog = (arg) => {
 
     editRoles.value = true
 }
+
+const deleteDialog = (arg) => {
+
+    ElMessageBox.confirm('是否删除该用户', '删除提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+    })
+        .then(({ data }) => {
+            memberRemove({ account_id: arg.id })
+                .then(res => {
+                    let { code, data, msg } = res.data
+                    if (code == 0) {
+                        ElMessage({
+                            message: "删除成功 !",
+                            type: "success",
+                            duration: 3000,
+                        })
+                    } else {
+                        ElMessage({
+                            message: msg,
+                            type: "error",
+                            duration: 3000,
+                        })
+                    }
+                })
+        })
+        .catch(() => {
+            ElMessage({
+                type: 'info',
+                message: '取消删除',
+            })
+        })
+}
+
 const caneditRolesDialog = () => {
     editRoles.value = false
 }
@@ -221,6 +263,13 @@ function membersList() {
             // PageInfo.value.total = data.total
             // PageInfo.value.page = data.page
             // PageInfo.value.limit = data.limit
+        } else {
+
+            ElMessage({
+                message: msg,
+                type: "error",
+                duration: 3000,
+            })
         }
 
 
