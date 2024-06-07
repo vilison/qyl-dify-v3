@@ -3,7 +3,7 @@
 set -e
 # 读取环境变量
 APPID="${APPID:-default_app_id}"
-GZHAPPID="${GZHAPPID:-default_dify_url}"
+GZHAPPID="${GZHAPPID:-default_gzhapp_id}"
 BASE_API="${BASE_API:-default_base_api}"
 WEBSITE="${WEBSITE:-default_website}"
 DIFY_URL="${DIFY_URL:-default_dify_url}"

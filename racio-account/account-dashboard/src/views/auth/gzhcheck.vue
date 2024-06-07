@@ -20,7 +20,7 @@ const accessToken = ref("")
 const UserStore = useUserStore()
 function GZHInfo() {
 
-    getGZHInfo({ token: urlQuery.token, code: urlQuery.code })
+    getGZHInfo({ code: urlQuery.code })
         .then(res => {
             let { code, data, msg } = res.data
             if (code == 0) {
@@ -87,7 +87,8 @@ function check(access_token) {
 
 }
 onMounted(() => {
-    WxInfo()
+
+    GZHInfo()
 })
 </script>
 <style lang="scss" scoped>

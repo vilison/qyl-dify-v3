@@ -19,7 +19,7 @@ let props = defineProps({
 })
 const uri = import.meta.env.VITE_APP_WEBSITE ? import.meta.env.VITE_APP_WEBSITE : window.globalVariable.WEBSITE
 const appid = import.meta.env.VITE_APP_APPID ? import.meta.env.VITE_APP_APPID : window.globalVariable.APPID
-const redirect_uri = `${uri}/#/auth/check?token=${props.token}`
+const redirect_uri = `${uri}/auth/check?token=${props.token}`
 
 </script>
 

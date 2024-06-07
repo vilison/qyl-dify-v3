@@ -94,13 +94,19 @@ export default defineConfig(({ mode }: ConfigEnv): UserConfig => {
         //   pure:mode==='production' ? ["console.log", "debugger"] : []
         // },
 
-        // build: {
-        //   terserOptions: {
-        //     compress: {
-        //       drop_console: true,
-        //       drop_debugger: true,
-        //     },
-        //   },
-        // },
+        build: {
+            chunkSizeWarningLimit: 1000,
+            outDir: "dist",
+            assetsDir: "assets", //指定静态资源存放路径
+            sourcemap: true, //是否构建source map 文件
+            terserOptions: {
+                // 生产环境移除console
+                compress: {
+                    drop_console: true,
+                    drop_debugger: true,
+                },
+
+            },
+        }
     }
 })

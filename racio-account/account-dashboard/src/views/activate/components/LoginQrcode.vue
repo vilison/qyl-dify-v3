@@ -1,8 +1,6 @@
 <template>
     <div class="login-qrcode">
         <h2 class="title">
-            <h4>邀请您体验{{ role == "owner" ? "新" : workspace_name }}的AI数字员工{{ role == "owner" ? "空间所有者" : role ==
-                "admin" ? "空间管理员" : "尊享会员" }}</h4>
             <h5>请用您的微信扫码登录，方便后续使用</h5>
         </h2>
         <div id="snsapi_login"></div>
@@ -32,7 +30,7 @@ let props = defineProps({
 
 const uri = import.meta.env.VITE_APP_WEBSITE ? import.meta.env.VITE_APP_WEBSITE : window.globalVariable.WEBSITE
 const appid = import.meta.env.VITE_APP_APPID ? import.meta.env.VITE_APP_APPID : window.globalVariable.APPID
-const redirect_uri = `${uri}/#/activate/phone?token=${props.token}`
+const redirect_uri = `${uri}/activate/phone?token=${props.token}`
 
 
 
@@ -48,5 +46,7 @@ const redirect_uri = `${uri}/#/activate/phone?token=${props.token}`
 
 .title {
     text-align: center;
+    padding: 0;
+    margin: 0;
 }
 </style>
