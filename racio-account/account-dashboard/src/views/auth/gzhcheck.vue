@@ -3,51 +3,28 @@
         checking...
     </div>
 
-
-    <el-dialog v-model="dialogSelectVisible" title="登录成功" :close-on-click-modal="false" :close-on-press-escape="false"
-        :show-close="false">
-        <el-row>
-            <el-col :span="5">
-                <el-card @click="goTo('/account')" style="cursor: pointer;">
-                    进入管理后台
-                </el-card>
-            </el-col>
-        </el-row>
-        <el-row>
-            <el-col>
-                <h3>选择进入的工作空间</h3>
-            </el-col>
-            <el-col :span="5">
-                <el-card>
-                    进入管理后台
-                </el-card>
-            </el-col>
-        </el-row>
-    </el-dialog>
-
 </template>
 
 <script lang="ts" setup>
 import { onMounted, ref } from "vue"
 
 import { getQueryObject } from "@/utils/index"
-import { getWxInfo, checkOpenId, getJwtToken } from "@/api/api"
+import { getGZHInfo, checkOpenId, getJwtToken } from "@/api/api"
 import { ElMessage, ElMessageBox } from "element-plus"
 import { useRouter } from "vue-router"
 import { useUserStore } from "@/store/modules/user"
 const router = useRouter()
 const urlQuery = getQueryObject(null)
 const accessToken = ref("")
-const dialogSelectVisible = ref(false)
-const UserStore = useUserStore()
-function WxInfo() {
 
-    getWxInfo({ token: urlQuery.token, code: urlQuery.code })
+const UserStore = useUserStore()
+function GZHInfo() {
+
+    getGZHInfo({ code: urlQuery.code })
         .then(res => {
             let { code, data, msg } = res.data
             if (code == 0) {
                 accessToken.value = data
-
                 check(data)
             }
         })
@@ -110,7 +87,8 @@ function check(access_token) {
 
 }
 onMounted(() => {
-    WxInfo()
+
+    GZHInfo()
 })
 </script>
 <style lang="scss" scoped>

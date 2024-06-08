@@ -126,6 +126,13 @@ function AuthList() {
             PageInfo.value.total = data.total
             PageInfo.value.page = data.page
             PageInfo.value.limit = data.limit
+        } else {
+
+            ElMessage({
+                message: msg,
+                type: "error",
+                duration: 3000,
+            })
         }
 
 

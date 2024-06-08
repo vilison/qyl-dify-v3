@@ -3,7 +3,7 @@
         <h2 class="title">Racio用户登录</h2>
         <div id="snsapi_login"></div>
 
-        <wxlogin appid="wx14d04b12be5b6bb1" scope="snsapi_login" :redirect_uri="encodeURIComponent(redirect_uri)">
+        <wxlogin :appid="appid" scope="snsapi_login" :redirect_uri="encodeURIComponent(redirect_uri)">
         </wxlogin>
     </div>
 </template>
@@ -17,7 +17,10 @@ let props = defineProps({
         default: "",
     },
 })
-const redirect_uri = `${import.meta.env.VITE_APP_WEBSITE}/#/auth/check?token=${props.token}`
+const uri = import.meta.env.VITE_APP_WEBSITE ? import.meta.env.VITE_APP_WEBSITE : window.globalVariable.WEBSITE
+const appid = import.meta.env.VITE_APP_APPID ? import.meta.env.VITE_APP_APPID : window.globalVariable.APPID
+const redirect_uri = `${uri}/auth/check?token=${props.token}`
+
 </script>
 
 <style lang="scss" scoped>

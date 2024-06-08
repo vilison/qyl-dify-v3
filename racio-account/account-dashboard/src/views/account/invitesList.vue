@@ -17,7 +17,8 @@
                     <el-table-column prop="remark" label="备注" width="120" />
                     <el-table-column prop="role" label="角色" width="120">
                         <template #default="scope">
-                            <div>{{ scope.row.role == "owner" ? "空间所有者" : scope.row.role == "admin" ? "管理员" : "使用者" }}
+                            <div>{{ scope.row.role == "owner" ? "空间所有者" : scope.row.role == "admin" ? "空间管理员" : "尊享会员"
+                                }}
                             </div>
                         </template>
                     </el-table-column>
@@ -152,6 +153,13 @@ function AuthList() {
             PageInfo.value.total = data.total
             PageInfo.value.page = data.page
             PageInfo.value.limit = data.limit
+        } else {
+
+            ElMessage({
+                message: msg,
+                type: "error",
+                duration: 3000,
+            })
         }
 
 
@@ -166,6 +174,13 @@ function getMemberInvites() {
         let { code, msg, data } = res.data
         if (code == 0) {
             tableData.value = data
+        } else {
+
+            ElMessage({
+                message: msg,
+                type: "error",
+                duration: 3000,
+            })
         }
     })
 }
@@ -194,6 +209,12 @@ function sendInvite() {
             let { code, data, msg } = res.data
             if (code == 0) {
                 invitUrl.value = data.url
+            } else {
+                ElMessage({
+                    message: msg,
+                    type: "error",
+                    duration: 3000,
+                })
             }
         })
         .catch(error => {

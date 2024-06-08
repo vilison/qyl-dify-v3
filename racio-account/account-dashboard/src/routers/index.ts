@@ -82,6 +82,12 @@ export const constantRoutes: Array<RouteRecordRaw & extendRoute> = [
                 name: "check",
                 component: () => import("@/views/auth/check.vue"),
                 meta: { title: "checking" },
+            },
+            {
+                path: "/auth/gzhcheck",
+                name: "check",
+                component: () => import("@/views/auth/gzhcheck.vue"),
+                meta: { title: "gzhchecking" },
             }
         ]
     },
@@ -109,7 +115,7 @@ export const constantRoutes: Array<RouteRecordRaw & extendRoute> = [
     {
         path: "/login",
         name: "Login",
-        component: () => import("@/views/admin/login/index.vue"),
+        component: () => import("@/views/login/index.vue"),
         hidden: true,
         meta: { title: "管理员登录" },
     },
@@ -130,6 +136,12 @@ export const constantRoutes: Array<RouteRecordRaw & extendRoute> = [
                 path: "/activate/phone",
                 component: () => import("@/views/activate/phone.vue"),
                 name: "phone",
+                meta: { title: "绑定手机", icon: "Phone" },
+            },
+            {
+                path: "/activate/gzhphone",
+                component: () => import("@/views/activate/gzhphone.vue"),
+                name: "gzhphone",
                 meta: { title: "绑定手机", icon: "Phone" },
             },
         ]
@@ -157,8 +169,8 @@ export const notFoundRouter = {
 
 
 const router = createRouter({
-    // history: createWebHistory(process.env.BASE_URL), // history
-    history: createWebHashHistory(), // hash
+    history: createWebHistory(import.meta.env.MODE === "production" ? "/dashboard/" : "/"), // history
+    // history: createWebHashHistory(), // hash
     routes: constantRoutes,
 })
 

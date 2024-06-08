@@ -62,7 +62,7 @@ import { ref, onMounted } from "vue"
 import { ElMessage } from "element-plus"
 import { useRouter } from "vue-router"
 
-import { getAuthList, inviteUser } from "@/api/api"
+import { getAuthList, } from "@/api/api"
 import clip from "@/utils/clipboard"
 import { formatTime } from "@/utils"
 
@@ -101,6 +101,13 @@ function AuthList() {
             PageInfo.value.total = data.total
             PageInfo.value.page = data.page
             PageInfo.value.limit = data.limit
+        } else {
+
+            ElMessage({
+                message: msg,
+                type: "error",
+                duration: 3000,
+            })
         }
 
 
@@ -130,14 +137,7 @@ function sendInvite() {
 }
 onMounted(async () => {
 
-    if (token == "") {
-
-        await router.replace({
-            path: "/admin/login",
-        })
-    }
-
-    AuthList()
+    // AuthList()
 })
 </script>
 <style lang="scss" scoped>

@@ -83,7 +83,8 @@ const submitForm = (formEl: FormInstance | undefined) => {
                     if (code == 0) {
                         let userInfo = {
                             token: data,
-                            roles: ["superAdmin"]
+                            roles: ["superAdmin"],
+                            username: "Racio超级管理员"
                         }
                         UserStore.login(userInfo)
 

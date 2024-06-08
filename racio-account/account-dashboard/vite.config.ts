@@ -1,5 +1,6 @@
 import { defineConfig, ConfigEnv, UserConfig } from "vite"
 import path from "path"
+import viteEslint from 'vite-plugin-eslint'
 // vite.config.ts中无法使用import.meta.env 所以需要引入
 import vue from "@vitejs/plugin-vue"
 import { createSvgIconsPlugin } from "vite-plugin-svg-icons"
@@ -22,6 +23,10 @@ export default defineConfig(({ mode }: ConfigEnv): UserConfig => {
     return {
         define: {
             runtimeMode: JSON.stringify(mode),
+        },
+        ssr: {
+            noExternal: ["echarts"],
+            target: "webworker",
         },
         base: mode === "production" ? "/dashboard/" : "/",
         plugins: [
@@ -89,13 +94,19 @@ export default defineConfig(({ mode }: ConfigEnv): UserConfig => {
         //   pure:mode==='production' ? ["console.log", "debugger"] : []
         // },
 
-        // build: {
-        //   terserOptions: {
-        //     compress: {
-        //       drop_console: true,
-        //       drop_debugger: true,
-        //     },
-        //   },
-        // },
+        build: {
+            chunkSizeWarningLimit: 1000,
+            outDir: "dist",
+            assetsDir: "assets", //指定静态资源存放路径
+            sourcemap: true, //是否构建source map 文件
+            terserOptions: {
+                // 生产环境移除console
+                compress: {
+                    drop_console: true,
+                    drop_debugger: true,
+                },
+
+            },
+        }
     }
 })
