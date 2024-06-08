@@ -300,8 +300,8 @@ services:
       - default
 
   #Racio Account API service
-  racio-api:
-    image: racio-api:0.1.0
+  racio-account-api:
+    image: racio-account-api:latest
     restart: always
     environment:
       # The log level for the application. Supported values are `DEBUG`, `INFO`, `WARNING`, `ERROR`, `CRITICAL`
@@ -414,17 +414,17 @@ services:
     #   - "3000:3000"
 
   #Racio Account Web service
-  racio-dashboard:
-    image: racio-dashboard:0.1.0
+  racio-account-dashboard:
+    image: racio-account-dashboard:latest
     restart: always
     environment:
-      APPID: ''  #微信网站扫描应用appid
-      GZHAPPID: ''  #微信公众号appid
-      BASE_API: '' # account-api 访问地址         #http://at-stg.racio.chat/api
-      WEBSITE: ' ' # account-dashboard 访问地址   #http://at-stg.racio.chat/dashboard
-      DIFY_URL: ' '  # dify平台访问地址            #http://dify.corp.chaolian360.com
+      APPID: ''     # 微信网站扫描应用appid
+      GZHAPPID: ''  # 微信公众号appid
+      BASE_API: 'http://localhost:5003/account/api' # account-api       访问地址         # http://at-stg.racio.chat/api
+      WEBSITE: 'http://localhost:3001/dashboard'    # account-dashboard 访问地址         # http://at-stg.racio.chat/dashboard
+      DIFY_URL: 'hppt://localhost:3000'             # dify web          访问地址         # http://dify.corp.chaolian360.com
     depends_on:
-      - racio-api
+      - racio-account-api
     # uncomment to expose racio-dashboard port to host
     # ports:
     #   - "3001:3001"
@@ -599,10 +599,13 @@ services:
       - ./nginx/nginx.conf:/etc/nginx/nginx.conf
       - ./nginx/proxy.conf:/etc/nginx/proxy.conf
       - ./nginx/conf.d:/etc/nginx/conf.d
-      #- ./nginx/ssl:/etc/ssl
+      - ./nginx/verify.d:/etc/nginx/verify.d
+      # - ./nginx/ssl:/etc/ssl
     depends_on:
       - api
       - web
+      - racio-account-api
+      - racio-account-dashboard
     ports:
       - "80:80"
       #- "443:443"

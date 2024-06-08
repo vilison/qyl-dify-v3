@@ -2,11 +2,11 @@
 
 docker-compose上的环境变量
 
-APPID: ''  #微信网站扫描应用appid
-GZHAPPID: ''  #微信公众号appid
-BASE_API: '' # account-api 访问地址         #http://at-stg.racio.chat/api
-WEBSITE: ' ' # account-dashboard 访问地址   #http://at-stg.racio.chat/dashboard
-DIFY_URL: ' '  # dify平台访问地址            #http://dify.corp.chaolian360.com
+APPID: ''       # 微信网站扫描应用appid
+GZHAPPID: ''    # 微信公众号appid
+BASE_API: ''    # account-api           访问地址   # http://at-stg.racio.chat/api
+WEBSITE: ''     # account-dashboard     访问地址   # http://at-stg.racio.chat/dashboard
+DIFY_URL: ''    # dify-web              访问地址   # http://dify.corp.chaolian360.com
 
 
 
