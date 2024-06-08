@@ -28,5 +28,5 @@ COPY --from=base /app/web/docker/default.conf /etc/nginx/conf.d/
 COPY --from=base /app/web/docker/entrypoint.sh ./entrypoint.sh
 
 
-EXPOSE 80
+EXPOSE 3001
 ENTRYPOINT ["/bin/sh", "./entrypoint.sh"]

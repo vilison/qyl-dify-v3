@@ -4,7 +4,7 @@
             <div class="login-form">
                 <el-row :gutter="5" style="padding-bottom: 10px;">
                     <el-col>
-                        <h3>创建空间</h3>
+                        <h3>{{ roleTypes == "owner" ? "创建空间" : "加入空间" }}</h3>
                     </el-col>
                     <el-col :span="24">
                         <el-tooltip :visible="checkWorkSpaceBtn.tips" class="box-item" effect="light"
@@ -57,7 +57,7 @@
                         <div>
                             <el-button size="large" :width="100" type="primary" @click="activateAccount">{{
                                 invitTokenInfo.role == "owner" ? "关联并创建空间" : "关联工作空间"
-                            }}</el-button>
+                                }}</el-button>
                         </div>
                     </el-col>
                 </el-row>
@@ -98,6 +98,8 @@ const invitTokenInfo = ref({
     workspace_name: "",
     role: ""
 })
+const roleTypes = ref("")
+
 function isPhone(value: string) {
     const reg = /^((13[0-9])|(14[5-7])|(15[0-3,5-9])|(17[0,3,5-8])|(18[0-9])|166|198|199|(147))\d{8}$/
     if (reg.test(value)) {
@@ -151,6 +153,8 @@ function checkToekn() {
                 if (data.is_valid) {
 
                     invitTokenInfo.value = data
+                    workspace.value = data.workspace_name
+                    roleTypes.value = data.role
 
                     WxInfo()
                 } else {
@@ -223,7 +227,7 @@ function activateAccount() {
                 })
                 setTimeout(() => {
                     router.replace({
-                        path: "/invitSuccess",
+                        path: `/invitSuccess?roleTypes=${data.account_role}`,
                     })
                 }, 3000);
             } else {

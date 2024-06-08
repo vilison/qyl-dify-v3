@@ -12,7 +12,7 @@
           <div class="bullshit">
             <div class="bullshit__oops">激活成功！</div>
             <el-button type="primary" @click="goToAI">体验Ai应用</el-button>
-            <el-button @click="$router.push('/account')">进入管理后台</el-button>
+            <el-button @click="$router.push('/account')" v-if="roleTypes != 'normal'">进入管理后台</el-button>
           </div>
         </div>
       </div>
@@ -21,6 +21,11 @@
 </template>
 
 <script lang="ts" setup>
+import { onMounted } from 'vue';
+import { getQueryObject } from "@/utils/index"
+const urlQuery = getQueryObject(null)
+
+const { roleTypes } = urlQuery
 const goToAI = () => {
   const uri = import.meta.env.VITE_APP_DIFY_URL ? import.meta.env.VITE_APP_DIFY_URL : window.globalVariable.DIFY_URL
   window.open(`${uri}?console_token=${localStorage.token}`, '_blank')

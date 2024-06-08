@@ -7,7 +7,7 @@ import { hasPermission, filterAsyncRoutes } from "@/utils/routers"
 
 NProgress.configure({ showSpinner: false }) // NProgress Configuration
 
-const whiteList = ["/404", "/403", "/login", "/auth/index", "/auth/gzhcheck", "/auth/check", "/activate", "/activate/index", "/activate/phone", "/auth-redirect"] // 设置白名单
+const whiteList = ["/404", "/403", "/login", "/auth/index", "/auth/gzhcheck", "/invitSuccess", "/auth/check", "/activate", "/activate/index", "/activate/phone", "/auth-redirect"] // 设置白名单
 
 // 记录路由
 let hasRoles = true

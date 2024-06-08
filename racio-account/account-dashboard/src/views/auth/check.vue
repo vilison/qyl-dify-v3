@@ -18,7 +18,7 @@
                 <h3>选择进入的工作空间</h3>
             </el-col>
             <el-col :span="5">
-                <el-card>
+                <el-card @click="goTo(dify_url)">
                     进入管理后台
                 </el-card>
             </el-col>
@@ -40,6 +40,7 @@ const urlQuery = getQueryObject(null)
 const accessToken = ref("")
 const dialogSelectVisible = ref(false)
 const UserStore = useUserStore()
+const dify_url = import.meta.env.VITE_APP_DIFY_URL ? import.meta.env.VITE_APP_DIFY_URL : window.globalVariable.DIFY_URL
 function WxInfo() {
 
     getWxInfo({ token: urlQuery.token, code: urlQuery.code })
@@ -64,7 +65,7 @@ function WxInfo() {
 }
 function goTo(uri) {
     if (uri.indexOf("http") != -1) {
-        location.href = uri
+        location.href = `${uri}?console_token=${localStorage.DIFY_TOKEN}`
     } else {
         router.push(uri)
     }
@@ -74,22 +75,22 @@ function check(access_token) {
     checkOpenId({ "access_token": access_token })
         .then(res => {
             let { code, data, msg } = res.data
-            console.log(code, data, "status, data");
 
             if (code == 0 && data == true) {
                 getJwtToken({ "access_token": access_token })
                     .then(res => {
-                        let { code, data, msg } = res.data
+                        let { code, response, msg } = res.data
                         if (code == 0) {
                             let userInfo = {
-                                token: data.token,
+                                token: response.token,
                                 access_token: access_token,
-                                roles: [data.account_role],
-                                username: data.account_role == "owner" ? "空间所有者" : data.account_role == "admin" ? "空间管理员" : "尊享会员",
+                                roles: [response.account_role],
+                                username: response.account_role == "owner" ? "空间所有者" : response.account_role == "admin" ? "空间管理员" : "尊享会员",
                             }
                             UserStore.login(userInfo)
-                            const uri = import.meta.env.VITE_APP_DIFY_URL ? import.meta.env.VITE_APP_DIFY_URL : window.globalVariable.DIFY_URL
-                            window.location.href = `${uri}?console_token=${data.token}`
+                            dialogSelectVisible.value = true
+
+                            localStorage.setItem("DIFY_TOKEN", response.token)
                         }
                     })
 
