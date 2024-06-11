@@ -38,7 +38,16 @@ export default function AppSelector({ isMobile }: IAppSelecotr) {
     if (localStorage?.getItem('console_token'))
       localStorage.removeItem('console_token')
 
-    router.push('/signin')
+    // router.push('/signin')
+    let authUrl = ''
+    if (process.env.NEXT_PUBLIC_AUTH_URL)
+      authUrl = process.env.NEXT_PUBLIC_AUTH_URL
+    else if (process.env.AUTH_URL)
+      authUrl = process.env.AUTH_URL
+    else
+      authUrl = globalThis.document?.body?.getAttribute('data-public-auth-account') as string
+
+    location.href = `${authUrl}/logout`
   }
 
   return (

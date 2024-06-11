@@ -78,9 +78,9 @@ const Header = () => {
           // </div>
           <div className='flex items-center'>
             <Roffice className={navClassName} />
-            <Rtraining />
+            {(currentWorkspace.role !== 'normal') && <Rtraining />}
             {isCurrentWorkspaceManager && <DatasetNav />}
-            <ToolsNav className={navClassName} />
+            {(currentWorkspace.role !== 'normal') && <ToolsNav className={navClassName} />}
           </div>
         )}
         <div className='flex items-center flex-shrink-0'>

@@ -49,9 +49,7 @@ const Apps = ({
   const [installedApps, setInstalledApps] = useState([])
   const [rmaTagId, setRmaTagId] = useState([])
   const [mobileAllList, setMobileAllList] = useState([])
-  // var mobileAllList = []
-  // const tagList = useTagStore(s => s.tagList)
-  // const setTagList = useTagStore(s => s.setTagList)
+
   const [tagList, setTagList] = useState([])
   const getTagList = async () => {
     const res = await fetchTagList('app')
@@ -98,16 +96,19 @@ const Apps = ({
   const mobileAllListData = useMemo(() => {
     // 使用 .map 方法而不是直接修改 mobileAllList
     if (isMobile) {
-      tagList.map(async (item: any) => {
+      tagList.forEach(async (item: any) => {
+        console.log(item)
+
         fetchAppList({ url: '/apps', params: { tag_ids: item.id } }).then((result: any) => {
-          const rdata = result.data.forEach((items) => {
+          const rdata = result.data.map((items) => {
             for (const v of installedApps) {
-              if (v.app.id === items.id) {
+              if (v.app.id === items.id)
                 items.id = v.id
 
-                return { name: item.name, data: items, tag_id: item.id }
-              }
+              // return { name: item.name, data: items, tag_id: item.id }
             }
+
+            return { name: item.name, data: items, tag_id: item.id }
           })
 
           setMobileAllList(prevList => [...prevList, { name: item.name, data: rdata, tag_id: item.id }])

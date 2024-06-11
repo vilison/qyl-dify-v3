@@ -20,8 +20,8 @@ import {
   Webhooks,
 } from '@/app/components/base/icons/src/vender/line/development'
 import { Database03 as Database03Solid } from '@/app/components/base/icons/src/vender/solid/development'
-import { Users01 } from '@/app/components/base/icons/src/vender/line/users'
-import { Users01 as Users01Solid } from '@/app/components/base/icons/src/vender/solid/users'
+import { User01, Users01 } from '@/app/components/base/icons/src/vender/line/users'
+import { User01 as User01Solid, Users01 as Users01Solid } from '@/app/components/base/icons/src/vender/solid/users'
 import { Globe01 } from '@/app/components/base/icons/src/vender/line/mapsAndTravel'
 import { XClose } from '@/app/components/base/icons/src/vender/line/general'
 import { CubeOutline } from '@/app/components/base/icons/src/vender/line/shapes'
@@ -29,6 +29,7 @@ import { Colors } from '@/app/components/base/icons/src/vender/line/editor'
 import { Colors as ColorsSolid } from '@/app/components/base/icons/src/vender/solid/editor'
 import useBreakpoints, { MediaType } from '@/hooks/use-breakpoints'
 import { useProviderContext } from '@/context/provider-context'
+import { useAppContext } from '@/context/app-context'
 
 const iconClassName = `
   w-4 h-4 ml-3 mr-2
@@ -58,7 +59,7 @@ export default function AccountSetting({
   const [activeMenu, setActiveMenu] = useState(activeTab)
   const { t } = useTranslation()
   const { enableBilling, enableReplaceWebAppLogo } = useProviderContext()
-
+  const { currentWorkspace, isCurrentWorkspaceManager, langeniusVersionInfo } = useAppContext()
   const workplaceGroupItems = (() => {
     return [
       {
@@ -105,7 +106,7 @@ export default function AccountSetting({
   const media = useBreakpoints()
   const isMobile = media === MediaType.mobile
 
-  const menuItems = [
+  let menuItems = [
     {
       key: 'workspace-group',
       name: t('common.settings.workplaceGroup'),
@@ -115,12 +116,12 @@ export default function AccountSetting({
       key: 'account-group',
       name: t('common.settings.accountGroup'),
       items: [
-        // {
-        //   key: 'account',
-        //   name: t('common.settings.account'),
-        //   icon: <User01 className={iconClassName} />,
-        //   activeIcon: <User01Solid className={iconClassName} />,
-        // },
+        {
+          key: 'account',
+          name: t('common.settings.account'),
+          icon: <User01 className={iconClassName} />,
+          activeIcon: <User01Solid className={iconClassName} />,
+        },
         // {
         //   key: 'integrations',
         //   name: t('common.settings.integrations'),
@@ -150,7 +151,14 @@ export default function AccountSetting({
     }
   }, [])
 
-  const activeItem = [...menuItems[0].items, ...menuItems[1].items].find(item => item.key === activeMenu)
+  let activeItem = []
+  if (currentWorkspace.role !== 'normal') {
+    activeItem = [...menuItems[0].items, ...menuItems[1].items].find(item => item.key === activeMenu)
+  }
+  else {
+    menuItems = menuItems.slice(1, 2)
+    activeItem = [...menuItems[0].items].find(item => item.key === activeMenu)
+  }
 
   return (
     <Modal
@@ -163,30 +171,29 @@ export default function AccountSetting({
         <div className='w-[44px] sm:w-[200px] px-[1px] py-4 sm:p-4 border border-gray-100 shrink-0 sm:shrink-1 flex flex-col items-center sm:items-start'>
           <div className='mb-8 ml-0 sm:ml-2 text-sm sm:text-base font-medium leading-6 text-gray-900'>{t('common.userProfile.settings')}</div>
           <div className='w-full'>
-            {
-              menuItems.map(menuItem => (
-                <div key={menuItem.key} className='mb-4'>
-                  <div className='px-2 mb-[6px] text-[10px] sm:text-xs font-medium text-gray-500'>{menuItem.name}</div>
-                  <div>
-                    {
-                      menuItem.items.map(item => (
-                        <div
-                          key={item.key}
-                          className={`
+            {menuItems.map(menuItem => (
+              <div key={menuItem.key} className='mb-4'>
+                <div className='px-2 mb-[6px] text-[10px] sm:text-xs font-medium text-gray-500'>{menuItem.name}</div>
+                <div>
+                  {
+                    menuItem.items.map(item => (
+                      <div
+                        key={item.key}
+                        className={`
                             flex items-center h-[37px] mb-[2px] text-sm cursor-pointer rounded-lg
                             ${activeMenu === item.key ? 'font-semibold text-primary-600 bg-primary-50' : 'font-light text-gray-700'}
                           `}
-                          title={item.name}
-                          onClick={() => setActiveMenu(item.key)}
-                        >
-                          {activeMenu === item.key ? item.activeIcon : item.icon}
-                          {!isMobile && <div className='truncate'>{item.name}</div>}
-                        </div>
-                      ))
-                    }
-                  </div>
+                        title={item.name}
+                        onClick={() => setActiveMenu(item.key)}
+                      >
+                        {activeMenu === item.key ? item.activeIcon : item.icon}
+                        {!isMobile && <div className='truncate'>{item.name}</div>}
+                      </div>
+                    ))
+                  }
                 </div>
-              ))
+              </div>
+            ))
             }
           </div>
         </div>
