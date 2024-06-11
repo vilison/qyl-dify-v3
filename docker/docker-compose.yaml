@@ -397,6 +397,7 @@ services:
     image: langgenius/dify-web:0.6.8
     restart: always
     environment:
+      AUTH_URL: 'http://at-stg.racio.chat/account'  #这个是授权的地址 必须填
       # The base URL of console application api server, refers to the Console base URL of WEB service if console domain is
       # different from api or web app domain.
       # example: http://cloud.dify.ai

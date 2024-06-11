@@ -43,9 +43,10 @@ const LocaleLayout = ({
         data-public-maintenance-notice={process.env.NEXT_PUBLIC_MAINTENANCE_NOTICE}
         data-public-site-about={process.env.NEXT_PUBLIC_SITE_ABOUT}
         data-public-deploy-region={process.env.NEXT_PUBLIC_DEPLOY_REGION}
+        data-public-auth-account={process.env.NEXT_PUBLIC_AUTH_URL}
         data-public-app-error-replace-url-404={process.env.NEXT_PUBLIC_APP_ERROR_REPLACE_URL_404}
       >
-        <Topbar/>
+        <Topbar />
         <BrowerInitor>
           <SentryInitor>
             {/* @ts-expect-error Async Server Component */}

@@ -9,18 +9,25 @@ import UserSSOForm from './userSSOForm'
 
 import type { SystemFeatures } from '@/types/feature'
 import { defaultSystemFeatures } from '@/types/feature'
-import { getSystemFeatures } from '@/service/common'
 
 const SignIn = () => {
   const [loading, setLoading] = useState<boolean>(true)
   const [systemFeatures, setSystemFeatures] = useState<SystemFeatures>(defaultSystemFeatures)
-
   useEffect(() => {
-    getSystemFeatures().then((res) => {
-      setSystemFeatures(res)
-    }).finally(() => {
-      setLoading(false)
-    })
+    let authUrl = ''
+    if (process.env.NEXT_PUBLIC_AUTH_URL)
+      authUrl = process.env.NEXT_PUBLIC_AUTH_URL
+    else if (process.env.AUTH_URL)
+      authUrl = process.env.AUTH_URL
+    else
+      authUrl = globalThis.document?.body?.getAttribute('data-public-auth-account') as string
+
+    location.href = authUrl
+    // getSystemFeatures().then((res) => {
+    //   setSystemFeatures(res)
+    // }).finally(() => {
+    //   setLoading(false)
+    // })
   }, [])
 
   return (
