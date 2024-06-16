@@ -49,14 +49,12 @@ const Apps = ({
   const [installedApps, setInstalledApps] = useState([])
   const [rmaTagId, setRmaTagId] = useState([])
   const [mobileAllList, setMobileAllList] = useState([])
-  // var mobileAllList = []
-  // const tagList = useTagStore(s => s.tagList)
-  // const setTagList = useTagStore(s => s.setTagList)
+
   const [tagList, setTagList] = useState([])
   const getTagList = async () => {
     const res = await fetchTagList('app')
     setTagList(res)
-    res.filter(item => item.name === 'rma').map((item) => {
+    res.filter(item => item.name === 'rma').forEach((item) => {
       setRmaTagId(item.id)
 
       if (currCategory === '' || currCategory === '推荐')
@@ -66,7 +64,7 @@ const Apps = ({
 
   async function getApplist(param: any) {
     let ids = ''
-    if (param.length != 0)
+    if (param.length !== 0)
       ids = param
     else
       ids = currTagId
@@ -86,9 +84,9 @@ const Apps = ({
   }, [])
 
   const filteredList = useMemo(() => {
-    installedApps.map((item) => {
+    installedApps.forEach((item) => {
       for (const v in allList) {
-        if (item.app.id == allList[v].id)
+        if (item.app.id === allList[v].id)
           allList[v].id = item.id
       }
     })
@@ -98,16 +96,19 @@ const Apps = ({
   const mobileAllListData = useMemo(() => {
     // 使用 .map 方法而不是直接修改 mobileAllList
     if (isMobile) {
-      tagList.map(async (item: any) => {
+      tagList.forEach(async (item: any) => {
+        console.log(item)
+
         fetchAppList({ url: '/apps', params: { tag_ids: item.id } }).then((result: any) => {
           const rdata = result.data.map((items) => {
             for (const v of installedApps) {
-              if (v.app.id == items.id) {
+              if (v.app.id === items.id)
                 items.id = v.id
 
-                return { name: item.name, data: items, tag_id: item.id }
-              }
+              // return { name: item.name, data: items, tag_id: item.id }
             }
+
+            return { name: item.name, data: items, tag_id: item.id }
           })
 
           setMobileAllList(prevList => [...prevList, { name: item.name, data: rdata, tag_id: item.id }])
@@ -117,8 +118,8 @@ const Apps = ({
       })
     }
     else {
-      if (currCategory != '推荐' && currCategory != '') {
-        tagList.filter(item => item.name === currCategory).map((item) => {
+      if (currCategory !== '推荐' && currCategory !== '') {
+        tagList.filter(item => item.name === currCategory).forEach((item) => {
           setCurrTagId(item.id)
           getApplist(item.id)
         })
@@ -147,12 +148,12 @@ const Apps = ({
       'flex flex-col',
       pageType === PageType.EXPLORE ? 'h-full border-l border-gray-200' : 'h-[calc(100%-56px)]',
     )}>
-      {pageType === PageType.EXPLORE && (
+      {/* {pageType === PageType.EXPLORE && (
         <div className='shrink-0 pt-6 px-12'>
           <div className={`mb-1 ${s.textGradient} text-xl font-semibold`}>{t('racio.apps.title')}</div>
           <div className='text-gray-500 text-sm'>{t('racio.apps.description')}</div>
         </div>
-      )}
+      )} */}
       <div className={cn(
         'flex items-center mt-6',
         pageType === PageType.EXPLORE ? 'px-12' : 'px-8',

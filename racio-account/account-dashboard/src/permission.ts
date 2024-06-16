@@ -31,7 +31,7 @@ router.beforeEach(async (to, from, next) => {
     if (!hasPermission(roles, to)) {
         console.log(roles, to.meta.roles, "访问权限与路由权限不一致。返回404");
 
-        if (to.meta.tag == "superAdmin") {
+        if (to.fullPath.includes('/admin')) {
             next(`/login?redirect=${to.path}`)
         } else {
             next(`/auth?redirect=${to.path}`)
@@ -63,7 +63,7 @@ router.beforeEach(async (to, from, next) => {
         if (whiteList.indexOf(to.path) !== -1) {
             next()
         } else {
-            if (to.meta.tag == "superAdmin") {
+            if (to.fullPath.includes('/admin')) {
                 next(`/login?redirect=${to.path}`)
             } else {
                 next(`/auth?redirect=${to.path}`)

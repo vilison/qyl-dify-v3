@@ -5,22 +5,14 @@ import dayjs from 'dayjs'
 import 'dayjs/locale/zh-cn'
 import relativeTime from 'dayjs/plugin/relativeTime'
 import { useContext } from 'use-context-selector'
-import { UserPlusIcon } from '@heroicons/react/24/outline'
 import { useTranslation } from 'react-i18next'
-import InviteModal from './invite-modal'
-import InvitedModal from './invited-modal'
-import Operation from './operation'
+import Link from 'next/link'
 import { fetchMembers } from '@/service/common'
 import I18n from '@/context/i18n'
 import { useAppContext } from '@/context/app-context'
-import Avatar from '@/app/components/base/avatar'
 import type { InvitationResult } from '@/models/common'
-import LogoEmbededChatHeader from '@/app/components/base/logo/logo-embeded-chat-header'
 import { useProviderContext } from '@/context/provider-context'
 import { Plan } from '@/app/components/billing/type'
-import UpgradeBtn from '@/app/components/billing/upgrade-btn'
-import { NUM_INFINITE } from '@/app/components/billing/config'
-import { LanguagesSupported } from '@/i18n/language'
 dayjs.extend(relativeTime)
 
 const MembersPage = () => {
@@ -42,10 +34,14 @@ const MembersPage = () => {
   const { plan, enableBilling } = useProviderContext()
   const isNotUnlimitedMemberPlan = enableBilling && plan.type !== Plan.team && plan.type !== Plan.enterprise
   const isMemberFull = enableBilling && isNotUnlimitedMemberPlan && accounts.length >= plan.total.teamMembers
-
+  const baseUrl = process.env.NEXT_PUBLIC_AUTH_URL ? process.env.NEXT_PUBLIC_AUTH_URL : globalThis.document?.body?.getAttribute('data-public-auth-account') as string
   return (
     <>
-      <div className='flex flex-col'>
+      <div>请进入
+        <Link href={`${baseUrl}/workspace/list`} target='_blank'><span style={{ color: 'blue' }}>【帐号管理平台】</span></Link>
+        操作</div>
+
+      {/* <div className='flex flex-col'>
         <div className='flex items-center mb-4 p-3 bg-gray-50 rounded-2xl'>
           <LogoEmbededChatHeader className='!w-10 !h-10' />
           <div className='grow mx-2'>
@@ -137,7 +133,7 @@ const MembersPage = () => {
             onCancel={() => setInvitedModalVisible(false)}
           />
         )
-      }
+      } */}
     </>
   )
 }
