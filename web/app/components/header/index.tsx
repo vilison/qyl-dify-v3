@@ -20,7 +20,6 @@ import LogoSite from '@/app/components/base/logo/logo-site'
 import PlanComp from '@/app/components/billing/plan'
 import useBreakpoints, { MediaType } from '@/hooks/use-breakpoints'
 import { useProviderContext } from '@/context/provider-context'
-
 const navClassName = `
   flex items-center relative mr-0 sm:mr-3 px-3 h-8 rounded-xl
   font-medium text-sm
@@ -28,7 +27,7 @@ const navClassName = `
 `
 
 const Header = () => {
-  const { isCurrentWorkspaceManager, langeniusVersionInfo } = useAppContext()
+  const { currentWorkspace, isCurrentWorkspaceManager, langeniusVersionInfo } = useAppContext()
   const [showUpgradePanel, setShowUpgradePanel] = useState(false)
   const upgradeBtnRef = useRef<HTMLElement>(null)
   useClickAway(() => {
@@ -49,7 +48,7 @@ const Header = () => {
     <>
       <div className='flex flex-1 items-center justify-between px-4'>
         <div className='flex items-center'>
-          {isMobile && <div
+          {isMobile && currentWorkspace.role !== 'normal' && <div
             className='flex items-center justify-center h-8 w-8 cursor-pointer'
             onClick={toggle}
           >
@@ -79,9 +78,9 @@ const Header = () => {
           // </div>
           <div className='flex items-center'>
             <Roffice className={navClassName} />
-            <Rtraining />
+            {(currentWorkspace.role !== 'normal') && <Rtraining />}
             {isCurrentWorkspaceManager && <DatasetNav />}
-            <ToolsNav className={navClassName} />
+            {(currentWorkspace.role !== 'normal') && <ToolsNav className={navClassName} />}
           </div>
         )}
         <div className='flex items-center flex-shrink-0'>

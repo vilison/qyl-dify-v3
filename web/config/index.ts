@@ -36,6 +36,9 @@ export const IS_CE_EDITION = EDITION === 'SELF_HOSTED'
 const DEPLOY_REGION = process.env.NEXT_PUBLIC_DEPLOY_REGION || globalThis.document?.body?.getAttribute('data-public-deploy-region') || 'CHINA'
 export const IS_CN_REGION = DEPLOY_REGION === 'CHINA'
 
+const AUTH_URL = process.env.NEXT_PUBLIC_AUTH_URL || globalThis.document?.body?.getAttribute('data-public-auth-account') || ''
+export const IS_AUTH_URL = AUTH_URL !== ''
+
 export const TONE_LIST = [
   {
     id: 1,
