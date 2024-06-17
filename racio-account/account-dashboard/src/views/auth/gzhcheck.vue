@@ -9,7 +9,7 @@
 import { onMounted, ref } from "vue"
 
 import { getQueryObject } from "@/utils/index"
-import { getGZHInfo, checkOpenId, getJwtToken } from "@/api/api"
+import { getGZHInfo, checkOpenId, getJwtToken, tenantSwitch } from "@/api/api"
 import { ElMessage, ElMessageBox } from "element-plus"
 import { useRouter } from "vue-router"
 import { useUserStore } from "@/store/modules/user"
@@ -58,13 +58,21 @@ function check(access_token) {
                     .then(res => {
                         let { code, data, msg } = res.data
                         if (code == 0) {
+
+                            if (data.tenant_id == "" && data.current_role != "super_admin") {
+                                ElMessageBox.alert('Racio尚未找到您的关联帐号，请联系管理员（微信：dukexls）申请试用', '提示', {
+                                    confirmButtonText: '知道了',
+                                })
+                                return
+                            }
                             let userInfo = {
                                 token: data.token,
                                 access_token: access_token,
-                                roles: [data.account_role],
-                                username: data.account_role == "owner" ? "空间所有者" : data.account_role == "admin" ? "空间管理员" : "尊享会员",
+                                roles: [data.current_role],
+                                username: data.current_role == "owner" ? "空间所有者" : data.account_role == "admin" ? "空间管理员" : "尊享会员",
                             }
                             UserStore.login(userInfo)
+                            swtichTenant(data.tenant_id)
                             const uri = import.meta.env.VITE_APP_DIFY_URL ? import.meta.env.VITE_APP_DIFY_URL : window.globalVariable.DIFY_URL
                             window.location.href = `${uri}?console_token=${data.token}`
                         }
@@ -86,6 +94,18 @@ function check(access_token) {
 
 
 }
+
+function swtichTenant(tenant_id) {
+    let data = {
+        tenant_id: tenant_id
+    }
+    tenantSwitch(data)
+        .then(res => {
+            let { code, data, msg } = res.data
+
+        })
+}
+
 onMounted(() => {
 
     GZHInfo()

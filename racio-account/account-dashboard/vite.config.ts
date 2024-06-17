@@ -28,7 +28,7 @@ export default defineConfig(({ mode }: ConfigEnv): UserConfig => {
             noExternal: ["echarts"],
             target: "webworker",
         },
-        base: mode === "production" ? "/dashboard/" : "/",
+        base: mode === "production" ? "/account" : "/",
         plugins: [
             vue(),
             vueSetupExtend(),

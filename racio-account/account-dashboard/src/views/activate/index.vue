@@ -6,7 +6,7 @@
             <div class="login-form">
                 <div>
                     <h2 class="title">
-                        <span>邀请您体验{{ role == "owner" ? "新" : workspace_name }}的AI数字员工{{ role == "owner" ? "空间所有者" :
+                        <span>邀请您体验【{{ role == "owner" ? "新" : workspace_name }}】的AI数字员工{{ role == "owner" ? "空间所有者" :
                             role
                                 ==
                                 "admin" ? "空间管理员" : "尊享会员" }}</span>
@@ -15,8 +15,8 @@
                 </div>
                 <LoginQrcode v-if="platform == 'pc'" :token="token" :role="role" :workspace_name="workspace_name" />
                 <div style="text-align: center;" v-else>
-                    <h3>请通过授权微信公众号关联，方便后续使用</h3>
-                    <el-button type="success" @click="GotoGZH">微信公众号授权关联</el-button>
+
+                    <el-button type="success" @click="GotoGZH">微信授权登录</el-button>
                 </div>
                 <Footer />
             </div>
@@ -53,8 +53,9 @@ function checkToekn() {
                     showQrcode.value = true
 
                 } else {
-                    ElMessageBox.alert("<h2>此邀请链接已经失效<br />请联系管理员（微信：dukexls）<br />获得新的邀请链接</h2>", '提示', {
+                    ElMessageBox.alert(`此邀请链接已经失效，请联系${workspace_name.value == "" ? "管理员（微信：dukexls）" : workspace_name.value + '的[管理员]'}获得新的邀请链接`, '提示', {
                         confirmButtonText: '知道了',
+                        dangerouslyUseHTMLString: true,
                         callback: () => {
                             router.back()
                         },
@@ -62,6 +63,15 @@ function checkToekn() {
                 }
 
             }
+        })
+        .catch(() => {
+            ElMessageBox.alert(`此邀请链接已经失效，请联系${workspace_name.value == "" ? "管理员（微信：dukexls）" : workspace_name.value + '的[管理员]'}获得新的邀请链接`, '提示', {
+                confirmButtonText: '知道了',
+                dangerouslyUseHTMLString: true,
+                callback: () => {
+                    router.back()
+                },
+            })
         })
 
 }
@@ -79,7 +89,7 @@ function isPlatform() {
 function GotoGZH() {
     const uri = import.meta.env.VITE_APP_WEBSITE ? import.meta.env.VITE_APP_WEBSITE : window.globalVariable.WEBSITE
     const appid = import.meta.env.VITE_APP_GZHAPPID ? import.meta.env.VITE_APP_GZHAPPID : window.globalVariable.GZHAPPID
-    const redirect_uri = encodeURIComponent(`${uri}/activate/phone?token=${token}`)
+    const redirect_uri = encodeURIComponent(`${uri}/activate/gzhphone?token=${token}`)
     const url = `https://open.weixin.qq.com/connect/oauth2/authorize?appid=${appid}&redirect_uri=${redirect_uri}&response_type=code&scope=snsapi_userinfo&state=STATE#wechat_redirect`
 
     location.href = url

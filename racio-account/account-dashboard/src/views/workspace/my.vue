@@ -105,7 +105,8 @@ function openTenant(id) {
                             let userInfo = {
                                 token: data.token,
                                 access_token: access_token,
-                                roles: [data.account_role],
+                                roles: [data.current_role], //
+                                workspace_name: data.tenant_name,
                                 tenant_id: id
                             }
                             UserStore.login(userInfo)
@@ -127,7 +128,7 @@ function openTenant(id) {
 </script>
 <style lang="scss" scoped>
 .home-container {
-    width: 90%;
+    width: 98%;
     margin: 32px;
 }
 

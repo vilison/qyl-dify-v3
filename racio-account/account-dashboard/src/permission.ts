@@ -7,7 +7,7 @@ import { hasPermission, filterAsyncRoutes } from "@/utils/routers"
 
 NProgress.configure({ showSpinner: false }) // NProgress Configuration
 
-const whiteList = ["/404", "/403", "/login", "/auth/index", "/auth/gzhcheck", "/invitSuccess", "/auth/check", "/activate", "/activate/index", "/activate/phone", "/auth-redirect"] // 设置白名单
+const whiteList = ["/", "/404", "/403", "/login", "/invitSuccess", "/auth/index", "/auth/gzhcheck", "/auth/check", "/activate", "/activate/index", "/activate/phone", "/activate/gzhphone"] // 设置白名单
 
 // 记录路由
 let hasRoles = true
@@ -29,7 +29,7 @@ router.beforeEach(async (to, from, next) => {
 
     //   访问权限与路由权限不一致。返回404
     if (!hasPermission(roles, to)) {
-        console.log(roles, to.meta.roles, "访问权限与路由权限不一致。返回404");
+        console.log(roles, to.meta.roles, to.meta.tag, "访问权限与路由权限不一致。返回404");
 
         if (to.fullPath.includes('/admin')) {
             next(`/login?redirect=${to.path}`)
@@ -63,6 +63,8 @@ router.beforeEach(async (to, from, next) => {
         if (whiteList.indexOf(to.path) !== -1) {
             next()
         } else {
+            console.log(to, "to");
+
             if (to.fullPath.includes('/admin')) {
                 next(`/login?redirect=${to.path}`)
             } else {

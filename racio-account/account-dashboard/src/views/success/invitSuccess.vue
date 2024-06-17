@@ -2,6 +2,10 @@
   <div class="app-container">
     <div class="app-container-inner">
       <div class="wscn-http403-container">
+        <div class="bullshit__oops">&#127881; 欢迎 {{ name }} <p>
+            进入<span>{{ workspace_name }}</span>的数字员工空间
+          </p>
+        </div>
         <div class="wscn-http403">
           <div class="pic-403">
             <img class="pic-403__parent" src="@/assets/success/success.png" alt="403" />
@@ -9,27 +13,51 @@
             <img class="pic-403__child mid" src="@/assets/403_images/403_cloud.png" alt="403" />
             <img class="pic-403__child right" src="@/assets/403_images/403_cloud.png" alt="403" />
           </div>
+        </div>
+        <div>
           <div class="bullshit">
-            <div class="bullshit__oops">激活成功！</div>
-            <el-button type="primary" @click="goToAI">体验Ai应用</el-button>
-            <el-button @click="$router.push('/account')" v-if="roleTypes != 'normal'">进入管理后台</el-button>
+            <el-button class="button-ai" v-if="platform == 'pc'" type="primary" @click="goToAI">立即体验</el-button>
+            <el-button v-else type="primary" @click="goToAI">立即体验</el-button>
+
+            <el-button class="button-admin" @click="$router.push('/workspace')"
+              v-if="roleTypes != 'normal' && platform == 'pc'">进入管理后台</el-button>
+          </div>
+          <div v-if="roleTypes != 'normal' && platform == 'wechat'"
+            style="margin-top:2px;font-weight: 800;position: absolute;bottom:0px;background:rgba(184, 184, 184,.23);padding: 10px;">
+            <div>打造数字员工请在PC端访问</div>
+            <div>{{ websiteUrl }}</div>
           </div>
         </div>
       </div>
+
     </div>
   </div>
 </template>
 
 <script lang="ts" setup>
-import { onMounted } from 'vue';
+import { onMounted, ref } from 'vue';
 import { getQueryObject } from "@/utils/index"
 const urlQuery = getQueryObject(null)
-
-const { roleTypes } = urlQuery
+const websiteUrl = import.meta.env.VITE_APP_WEBSITE ? import.meta.env.VITE_APP_WEBSITE : window.globalVariable.WEBSITE
+const { roleTypes, workspace_name, name } = urlQuery
 const goToAI = () => {
   const uri = import.meta.env.VITE_APP_DIFY_URL ? import.meta.env.VITE_APP_DIFY_URL : window.globalVariable.DIFY_URL
+  console.log(`${uri}?console_token=${localStorage.token}`)
   window.open(`${uri}?console_token=${localStorage.token}`, '_blank')
 }
+import { useUserStore } from '@/store/modules/user'
+const platform = ref("")
+function isPlatform() {
+  var ua = navigator.userAgent.toLowerCase();
+  if (ua.match(/MicroMessenger/i) == "micromessenger") {
+    platform.value = "wechat"
+  } else {
+    platform.value = "pc"
+  }
+}
+onMounted(() => {
+  isPlatform()
+})
 
 </script>
 
@@ -39,6 +67,7 @@ const goToAI = () => {
   height: 100%;
   display: flex;
   align-items: center;
+  flex-direction: column;
   justify-content: center;
 }
 
@@ -258,6 +287,43 @@ a {
         opacity: 1;
       }
     }
+  }
+}
+
+.bullshit__oops {
+  font-size: 24px;
+  font-weight: 800;
+  color: #3999f8;
+  text-align: center;
+}
+
+.bullshit__oops span {
+  font-size: 28px;
+  margin: 0 2px;
+  color: #1482f0
+}
+
+@media screen and (max-width: 768px) {
+  .wscn-http403 {
+    width: 100%;
+    padding: 0px;
+    margin: 0px
+  }
+
+  .pic-403 {}
+
+  .bullshit__oops {
+    font-size: 22px;
+  }
+
+  .button-admin {
+    display: none;
+  }
+
+  .button-ai {
+    width: 170px;
+    height: 42px;
+    font-size: 24px;
   }
 }
 </style>

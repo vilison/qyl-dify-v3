@@ -6,21 +6,17 @@
 
     <el-dialog v-model="dialogSelectVisible" title="登录成功" :close-on-click-modal="false" :close-on-press-escape="false"
         :show-close="false">
-        <el-row>
-            <el-col :span="5">
-                <el-card @click="goTo('/account')" style="cursor: pointer;">
+        <el-row style="display:flex;align-items: center;justify-items: center;justify-content: center;">
+            <el-col :span="12" style="display:flex;align-items: center;justify-items: center;justify-content: center;"
+                v-if="currentRole != 'normal'">
+                <el-button @click="goTo('/workspace')" style="cursor: pointer;">
                     进入管理后台
-                </el-card>
+                </el-button>
             </el-col>
-        </el-row>
-        <el-row>
-            <el-col>
-                <h3>选择进入的工作空间</h3>
-            </el-col>
-            <el-col :span="5">
-                <el-card @click="goTo(dify_url)">
-                    进入管理后台
-                </el-card>
+            <el-col :span="12" style="display:flex;align-items: center;justify-items: center;justify-content: center;">
+                <el-button type="primary" @click="goTo(dify_url)">
+                    进入Ai应用
+                </el-button>
             </el-col>
         </el-row>
     </el-dialog>
@@ -31,7 +27,7 @@
 import { onMounted, ref } from "vue"
 
 import { getQueryObject } from "@/utils/index"
-import { getWxInfo, checkOpenId, getJwtToken } from "@/api/api"
+import { getWxInfo, checkOpenId, getJwtToken, tenantSwitch } from "@/api/api"
 import { ElMessage, ElMessageBox } from "element-plus"
 import { useRouter } from "vue-router"
 import { useUserStore } from "@/store/modules/user"
@@ -40,10 +36,11 @@ const urlQuery = getQueryObject(null)
 const accessToken = ref("")
 const dialogSelectVisible = ref(false)
 const UserStore = useUserStore()
-const dify_url = import.meta.env.VITE_APP_DIFY_URL ? import.meta.env.VITE_APP_DIFY_URL : window.globalVariable.DIFY_URL
+const dify_url = ref("")
+const currentRole = ref("normal")
 function WxInfo() {
 
-    getWxInfo({ token: urlQuery.token, code: urlQuery.code })
+    getWxInfo({ code: urlQuery.code })
         .then(res => {
             let { code, data, msg } = res.data
             if (code == 0) {
@@ -64,14 +61,15 @@ function WxInfo() {
 
 }
 function goTo(uri) {
+    console.log(uri, "localStorage.DIFY_TOKEN");
+
     if (uri.indexOf("http") != -1) {
-        location.href = `${uri}?console_token=${localStorage.DIFY_TOKEN}`
+        window.open(uri, '_blank')
     } else {
-        router.push(uri)
+        router.replace(uri)
     }
 }
 function check(access_token) {
-
     checkOpenId({ "access_token": access_token })
         .then(res => {
             let { code, data, msg } = res.data
@@ -79,18 +77,40 @@ function check(access_token) {
             if (code == 0 && data == true) {
                 getJwtToken({ "access_token": access_token })
                     .then(res => {
-                        let { code, response, msg } = res.data
+                        let { code, data, msg } = res.data
                         if (code == 0) {
-                            let userInfo = {
-                                token: response.token,
-                                access_token: access_token,
-                                roles: [response.account_role],
-                                username: response.account_role == "owner" ? "空间所有者" : response.account_role == "admin" ? "空间管理员" : "尊享会员",
-                            }
-                            UserStore.login(userInfo)
-                            dialogSelectVisible.value = true
 
-                            localStorage.setItem("DIFY_TOKEN", response.token)
+                            if (data.tenant_id == "" && data.current_role != "super_admin") {
+                                ElMessageBox.alert('该Racio尚未找到您的关联帐号，请联系管理员（微信：dukexls）申请试用', '提示', {
+                                    confirmButtonText: '知道了',
+                                })
+                                return
+                            }
+                            let userInfo = {
+                                token: data.token,
+                                access_token: access_token,
+                                roles: [data.current_role],
+                                workspace_name: data.tenant_name,
+                                workspace_id: data.tenant_id,
+                                username: data.current_role == "owner" ? "空间所有者" : data.current_role == "admin" ? "空间管理员" : "尊享会员",
+                            }
+                            swtichTenant(data.tenant_id)
+                            currentRole.value = data.current_role
+                            UserStore.login(userInfo)
+
+
+                            dify_url.value = import.meta.env.VITE_APP_DIFY_URL ? `${import.meta.env.VITE_APP_DIFY_URL}?console_token=${data.token}` : `${window.globalVariable.DIFY_URL}?console_token=${data.token}`
+                            localStorage.setItem("DIFY_TOKEN", data.token)
+
+                            if (urlQuery.state == "index") {
+
+                                location.href = dify_url.value
+                            } else if (urlQuery.state == "auth") {
+                                router.replace("/workspace")
+                            } else {
+                                dialogSelectVisible.value = true
+                            }
+
                         }
                     })
 
@@ -107,9 +127,20 @@ function check(access_token) {
         })
 
 
-
-
 }
+
+function swtichTenant(tenant_id) {
+    let data = {
+        tenant_id: tenant_id
+    }
+    tenantSwitch(data)
+        .then(res => {
+            let { code, data, msg } = res.data
+
+        })
+}
+
+
 onMounted(() => {
     WxInfo()
 })

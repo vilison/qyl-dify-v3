@@ -1,10 +1,13 @@
 <template>
-    <div style="margin-right:20px;font-weight: 600;">
-        当前空间:{{ workspace_name }}
+
+    <div style="margin-right:20px;font-weight: 600;" v-if="!user.roles.includes('superAdmin')">
+        当前空间:{{ UserStore.workspace_name }}
     </div>
-    <el-button type="primary" @click="show" style="margin-right:20px">
+    <el-button type="primary" @click="show" style="margin-right:20px"
+        v-if="!user.roles.includes('superAdmin') && TenantList.length > 1">
         切换空间
     </el-button>
+
 
     <el-dialog v-model="dialogVisible" title="关联的工作空间" width="40%">
         <el-row :gutter="20">
@@ -41,11 +44,18 @@
 <script lang="ts" setup>
 import { onMounted, ref } from "vue"
 import { ElMessage } from "element-plus"
-import { accountTenantList, tenantSwitch } from "@/api/api"
+import { accountTenantList, tenantSwitch, getJwtToken } from "@/api/api"
 import router from "@/routers";
 const dialogVisible = ref(false)
-const workspace_name = localStorage.getItem("workspace_name")
 const TenantList = ref([])
+import { useUserStore } from "@/store/modules/user"
+const user = useUserStore()
+const workspace = ref({
+    name: "",
+    id: "",
+})
+
+const UserStore = useUserStore()
 const show = () => {
     dialogVisible.value = true
 }
@@ -61,8 +71,13 @@ function swtichTenant(tenant_id) {
             if (code == 0) {
                 localStorage.setItem("tenant_id", data.tenant_id)
                 localStorage.setItem("workspace_name", data.name)
-                ElMessage.success("切换成功")
+                localStorage.setItem("roles", `["${data.role}"]`)
+
+                UserStore.roles = [data.role] // data.role
+                UserStore.workspace_name = data.name
+
                 dialogVisible.value = false
+
                 location.reload()
             }
         })
@@ -71,12 +86,29 @@ function swtichTenant(tenant_id) {
 defineExpose({
     show,
 })
-const tenantList = ref([])
+
+
+function JwtToken() {
+    getJwtToken({ "access_token": localStorage.access_token })
+        .then(res => {
+            let { code, data, msg } = res.data
+            if (code == 0) {
+                workspace.value.name = data.tenant_name
+                workspace.value.id = data.tenant_id
+
+            }
+        })
+}
 onMounted(() => {
+    JwtToken()
     accountTenantList()
         .then(res => {
             let { code, data, msg } = res.data
-            TenantList.value = data
+            if (code == 0) {
+                TenantList.value = data
+            } else {
+                user.logout()
+            }
 
         })
 })

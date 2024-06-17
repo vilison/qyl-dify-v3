@@ -25,7 +25,7 @@ if (isLogin) {
     if (roles.some((item) => item == "superAdmin")) {
         router.replace({ path: "/admin" })
     } else if (roles.some((item) => item == "admin") || roles.some((item) => item == "owner")) {
-        router.replace({ path: "/account" })
+        router.replace({ path: "/workspace" })
     }
 }
 

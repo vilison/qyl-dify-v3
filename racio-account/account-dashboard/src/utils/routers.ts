@@ -24,7 +24,6 @@ export function filterAsyncRoutes(routes, roles) {
  * @param route
  */
 export function hasPermission(roles, route) {
-    console.log(typeof (roles), roles, "roles", route, "route", "hasPermission");
 
     if (route.meta && route.meta.roles) {
         return roles.some(role => route.meta.roles.includes(role))

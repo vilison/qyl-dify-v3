@@ -8,7 +8,7 @@
                     </el-col>
                     <el-col :span="24">
                         <el-tooltip :visible="checkWorkSpaceBtn.tips" class="box-item" effect="light"
-                            :content="checkWorkSpaceBtn.tipstext ? checkWorkSpaceBtn.tipstext : '长度8-30个字符'"
+                            :content="checkWorkSpaceBtn.tipstext ? checkWorkSpaceBtn.tipstext : '长度5-30个字符'"
                             placement="top-end">
                             <el-input placeholder="请输入用户名/空间名" v-model.trim="workspace" minlength="8" maxlength="30"
                                 clearable @input="isWorkspace" :disabled="invitTokenInfo.role !== 'owner'" />
@@ -24,7 +24,7 @@
                                 </div>
                     </el-col> -->
                 </el-row>
-                <el-row :gutter="15" style="padding-bottom: 10px;">
+                <el-row :gutter="15" style="padding-bottom: 10px;" v-if="showVerify">
                     <el-col>
                         <h3>绑定手机号</h3>
                     </el-col>
@@ -44,7 +44,7 @@
                     </el-col>
                 </el-row>
 
-                <el-row :gutter="24" :justify="'start'" style="padding-bottom: 10px;">
+                <el-row :gutter="24" :justify="'start'" style="padding-bottom: 10px;" v-if="showVerify">
                     <el-col :span="24">
                         <div>
                             <el-input maxlength="4" clearable v-model.number="verifyCode" placeholder="请输入验证码"
@@ -101,14 +101,14 @@ const invitTokenInfo = ref({
 const roleTypes = ref("")
 
 function isPhone(value: string) {
-    const reg = /^((13[0-9])|(14[5-7])|(15[0-3,5-9])|(17[0,3,5-8])|(18[0-9])|166|198|199|(147))\d{8}$/
+    const reg = /^1[3456789]\d{9}$/
     if (reg.test(value)) {
         checkCodeBtn.value.disabled = false
         phoneStatus.value = true
     }
 }
 function isWorkspace() {
-    const reg = /^[a-z0-9]{8,30}$/i
+    const reg = /^[a-z0-9]{5,30}$/i
 
     if (!reg.test(workspace.value)) {
         checkWorkSpaceBtn.value.tips = true
@@ -119,7 +119,7 @@ function isWorkspace() {
 
 function WxInfo() {
 
-    getWxInfo({ token: token, code: code })
+    getWxInfo({ code: code })
         .then(res => {
             let { code, msg, data } = res.data
             if (code == 0) {
@@ -159,10 +159,12 @@ function checkToekn() {
                     WxInfo()
                 } else {
 
-                    ElMessage({
-                        message: '邀请链接已失效，请联系管理员（微信：dukexls）',
-                        type: 'warning',
-                        duration: 5000,
+                    ElMessageBox.alert(`此邀请链接已经失效，请联系${workspace_name.value == "" ? "管理员（微信：dukexls）" : workspace_name.value + '的[管理员]'}获得新的邀请链接`, '提示', {
+                        confirmButtonText: '知道了',
+                        dangerouslyUseHTMLString: true,
+                        callback: () => {
+                            router.back()
+                        },
                     })
                 }
 
@@ -178,7 +180,7 @@ function check(access_token) {
             let { code, msg, data } = res.data
             if (code == 0) {
                 if (data) {
-                    activateAccount()
+                    showVerify.value = false
                 } else {
                     showVerify.value = true
                 }
@@ -199,9 +201,12 @@ function activateAccount() {
         }, 5000);
         return
     } else if (token == "") {
-        ElMessage({
-            message: '请先获取邀请链接，请联系管理员（微信：dukexls）获得新的邀请链接',
-            type: 'warning',
+        ElMessageBox.alert(`此邀请链接已经失效，请联系${workspace_name.value == "" ? "管理员（微信：dukexls）" : workspace_name.value + '的[管理员]'}获得新的邀请链接`, '提示', {
+            confirmButtonText: '知道了',
+            dangerouslyUseHTMLString: true,
+            callback: () => {
+                router.back()
+            },
         })
         return
     }
@@ -227,7 +232,7 @@ function activateAccount() {
                 })
                 setTimeout(() => {
                     router.replace({
-                        path: `/invitSuccess?roleTypes=${data.account_role}`,
+                        path: `/invitSuccess?roleTypes=${data.account_role}&workspace_name=${data.tenant_name}&name=${data.name}`
                     })
                 }, 3000);
             } else {
@@ -248,7 +253,21 @@ function sendmsm() {
                     message: '验证码发送成功',
                     type: 'success',
                 })
-
+                // 清除掉定时器
+                checkCodeBtn.value.timer && clearInterval(checkCodeBtn.value.timer)
+                // 开启定时器
+                checkCodeBtn.value.timer = setInterval(() => {
+                    const tmp = checkCodeBtn.value.duration--
+                    checkCodeBtn.value.text = `${tmp}秒`
+                    if (tmp <= 0) {
+                        // 清除掉定时器
+                        clearInterval(checkCodeBtn.value.timer)
+                        checkCodeBtn.value.duration = 60
+                        checkCodeBtn.value.text = '重新获取'
+                        // 设置按钮可以单击
+                        checkCodeBtn.value.disabled = false
+                    }
+                }, 1000)
             } else {
                 ElMessage({
                     message: msg,
@@ -258,12 +277,7 @@ function sendmsm() {
         })
 
 }
-function checkWorkSpace() {
-    if (workspace.value == "") {
-        checkWorkSpaceBtn.value.tips = true
-    }
 
-}
 let checkWorkSpaceBtn = ref({
     text: '检查是否可用',
     loading: false,
@@ -297,21 +311,7 @@ const getCheckCode = () => {
     } else {
         sendmsm() //调用发送短信接口
     }
-    // 清除掉定时器
-    checkCodeBtn.value.timer && clearInterval(checkCodeBtn.value.timer)
-    // 开启定时器
-    checkCodeBtn.value.timer = setInterval(() => {
-        const tmp = checkCodeBtn.value.duration--
-        checkCodeBtn.value.text = `${tmp}秒`
-        if (tmp <= 0) {
-            // 清除掉定时器
-            clearInterval(checkCodeBtn.value.timer)
-            checkCodeBtn.value.duration = 60
-            checkCodeBtn.value.text = '重新获取'
-            // 设置按钮可以单击
-            checkCodeBtn.value.disabled = false
-        }
-    }, 1000)
+
 }
 
 onMounted(() => {

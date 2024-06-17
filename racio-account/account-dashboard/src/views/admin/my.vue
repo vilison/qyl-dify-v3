@@ -87,7 +87,7 @@ function openTenant(id) {
             let { code, data, msg } = res.data
             if (code == 0) {
                 localStorage.setItem("tenant_id", data.tenant_id)
-                localStorage.setItem("workspace_name", data.name)
+                localStorage.setItem("workspace_name", data.tenant_name)
                 let access_token = localStorage.getItem("access_token")
 
                 getJwtToken({ "access_token": access_token })
@@ -103,6 +103,7 @@ function openTenant(id) {
                             UserStore.login(userInfo)
                             const uri = import.meta.env.VITE_APP_DIFY_URL ? import.meta.env.VITE_APP_DIFY_URL : window.globalVariable.DIFY_URL
                             window.location.href = `${uri}?console_token=${data.token}`
+                            swtichTenant(data.tenant_id)
                         }
                     })
             }
@@ -112,7 +113,7 @@ function openTenant(id) {
 </script>
 <style lang="scss" scoped>
 .home-container {
-    width: 90%;
+    width: 98%;
     margin: 32px;
 }
 

@@ -36,25 +36,7 @@
 
     </div>
 
-    <el-dialog v-model="inviteDialog" title="邀请开通空间" width="500" align-center>
-        <span>输入被邀请人邮箱，如空则只生成邀请链接</span>
-        <div>
-            <el-input v-model="invitText" style="width: 240px" placeholder="邮箱地址 " clearable />
-        </div>
-        <div v-if="invitUrl" style="border:#c9c9c9 2px dashed ; padding:5px;margin-top:5px"
-            @click="handleCopy(invitUrl, $event)">
-            点击复制邀请链接
-            <p>邀请链接：{{ invitUrl }}</p>
-        </div>
-        <template #footer>
-            <div class="dialog-footer">
-                <el-button @click="centerDialogVisible">取消</el-button>
-                <el-button type="primary" @click="sendInvite">
-                    发出邀请
-                </el-button>
-            </div>
-        </template>
-    </el-dialog>
+
 </template>
 
 <script lang="ts" setup>
@@ -77,9 +59,6 @@ const PageInfo = ref({
     "limit": 10,
     "total": 0
 })
-const handleCopy = (text, event) => {
-    clip(text, event)
-}
 
 function handleCurrentChange() {
     AuthList()
@@ -113,28 +92,7 @@ function AuthList() {
 
     })
 }
-function sendInvite() {
-    inviteUser({
-        email: invitText.value,
-        language: "zh-Hans",
-        domain: "racio.chat",
-        // role: "owener"
 
-    })
-        .then(res => {
-            let { code, data, msg } = res.data
-            if (code == 0) {
-                invitUrl.value = data.url
-            }
-        })
-        .catch(error => {
-            ElMessage({
-                message: error.message,
-                type: "error",
-                duration: 3000,
-            })
-        })
-}
 onMounted(async () => {
 
     // AuthList()
@@ -142,7 +100,7 @@ onMounted(async () => {
 </script>
 <style lang="scss" scoped>
 .home-container {
-    width: 90%;
+    width: 98%;
     margin: 32px;
 }
 

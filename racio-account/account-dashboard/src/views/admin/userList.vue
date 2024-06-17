@@ -10,7 +10,7 @@
             </el-col>
             <el-col :span="2">
                 <div style="padding-top: 4px;">
-                    <el-button type="primary" :icon="Search" @click="membersList">搜索</el-button>
+                    <el-buttoauthList">搜索</el-button>
                 </div>
             </el-col> -->
             <el-col :span="10">
@@ -25,40 +25,68 @@
 
             <el-col :span="24">
                 <el-table :data="tableData" style="width: 100%">
-                    <el-table-column type="index" prop="date" label="编号" width="60" />
+
                     <el-table-column prop="name" label="用户名" min-width="100" />
-                    <el-table-column prop="phone" label="手机号码" width="120" />
-                    <el-table-column prop="id" label="用户ID" width="300" />
-                    <el-table-column prop="email" label="邮箱" width="180" />
-                    <el-table-column prop="status" label="邀请状态" width="100">
+                    <el-table-column prop="nickname" label="昵称" min-width="100" />
+                    <el-table-column prop="headimgurl" label="头像" width="80">
                         <template #default="scope">
-                            <div>{{ scope.row.status == "active" ? "已激活使用" : "未激活" }}</div>
+                            <div>
+                                <el-image :src="scope.row.headimgurl" style="width: 80%; height: 80%">
+                                    <div slot="error" class="image-slot">
+                                        <span>无头像</span>
+                                    </div>
+                                </el-image>
+                            </div>
                         </template>
                     </el-table-column>
-                    <el-table-column prop="account_role" label="帐号角色" width="120">
+
+                    <el-table-column prop="phone" label="手机号码" width="120" />
+
+                    <el-table-column prop="status" label="邀请状态" width="100">
                         <template #default="scope">
-                            <div>{{ scope.row.account_role == "owner" ? "空间所有者" : scope.row.account_role == "admin" ?
-                                "空间管理员" : "尊享会员" }}</div>
+                            <div>{{ scope.row.status == "active" ? "正常" : "异常" }}</div>
                         </template>
                     </el-table-column>
                     <el-table-column prop="last_login_at" label="最后登录时间" width="150">
                         <template #default="scope">
-                            <div>{{ scope.row.last_login_at == null ? "无登录" : formatTime(scope.row.last_login_at,
-                                "") }}
+                            <div>{{ scope.row.last_login_at == null ? "无登录" :
+                                formatTime(scope.row.last_login_at,
+                                    "") }}
                             </div>
                         </template>
                     </el-table-column>
+                    <el-table-column prop="tenant_names" label="所在的空间" width="150">
+                        <template #default="scope">
+                            <el-dropdown v-if="scope.row.tenant_names.length > 1">
+                                <span class="el-dropdown-link">
+                                    多于1个空间
+                                    <el-icon class="el-icon--right">
+                                        <arrow-down />
+                                    </el-icon>
+                                </span>
+                                <template #dropdown>
+                                    <el-dropdown-menu>
+                                        <el-dropdown-item v-for="item in scope.row.tenant_names">{{ item
+                                            }}</el-dropdown-item>
+                                    </el-dropdown-menu>
+                                </template>
+                            </el-dropdown>
+                        </template>
+                    </el-table-column>
+
                     <el-table-column prop="created_at" label="邀请时间" width="150">
                         <template #default="scope">
                             <div>{{ formatTime(scope.row.created_at, "") }}</div>
                         </template>
                     </el-table-column>
-                    <el-table-column label="操作" fixed="right" width="200">
+                    <el-table-column prop="email" label="邮箱" width="180" />
+                    <el-table-column prop="id" label="用户ID" width="290" />
+                    <!-- <el-table-column label="操作" fixed="right" width="200">
                         <template #default="scope">
                             <el-button type="primary" @click="editRolesDialog(scope.row)">修改权限</el-button>
                             <el-button type="danger" @click="deleteDialog(scope.row)">移除</el-button>
                         </template>
-                    </el-table-column>
+                    </el-table-column> -->
                 </el-table>
             </el-col>
             <el-col>
@@ -110,7 +138,7 @@
         <template #footer>
             <div class="dialog-footer">
                 <el-button @click="centerDialogVisible">取消</el-button>
-                <el-button type="primary" @click="sendInvite">
+                <el-button type="primary" @click="sendInvite" :disabled="buttonStatus">
                     发出邀请
                 </el-button>
             </div>
@@ -120,13 +148,18 @@
     <el-dialog v-model="editRoles" title="修改权限" width="500" align-center>
         <el-row>
             <el-col style="margin-bottom:20px">
-                <span>现在该用户权限为：{{ currEditRoleInfo.account_role }}</span>
+                <span>现在该用户权限为：{{ currEditRoleInfo.account_role == "owner" ? "空间所有者" : currEditRoleInfo.account_role ==
+                    "admin"
+                    ? "空间管理员" : "尊享会员" }}</span>
             </el-col>
         </el-row>
         <el-row style="margin-bottom: 20px;">
             修改为：
             <el-select v-model="newRole">
-                <el-option v-for="item in rolesList" :key="item.key" :label="item.value" :value="item.key" />
+                <template v-for="item in rolesList" :key="item.key">
+                    <el-option :label="item.value" :value="item.key" />
+                </template>
+
             </el-select>
         </el-row>
         <template #footer>
@@ -145,7 +178,7 @@ import { ref, onMounted } from "vue"
 import { Plus, Search } from '@element-plus/icons-vue'
 import { ElMessage, ElMessageBox } from "element-plus"
 import { useRouter } from "vue-router"
-import { inviteUser, members, memberChangeRole, memberRemove } from "@/api/api"
+import { inviteUser, members, memberChangeRole, memberRemove, getAuthList } from "@/api/api"
 import clip from "@/utils/clipboard"
 import { formatTime } from "@/utils"
 import { useUserStore } from "@/store/modules/user"
@@ -168,6 +201,7 @@ const PageInfo = ref({
     "keyword": ""
 
 })
+const buttonStatus = ref(false)
 const newRole = ref("")
 const editRoles = ref(false)
 const currEditRoleInfo = ref({})
@@ -176,7 +210,7 @@ const handleCopy = (text, event) => {
 }
 
 function handleCurrentChange() {
-    membersList()
+    authList()
 }
 
 function openInvite() {
@@ -253,13 +287,13 @@ function centerDialogVisible() {
     invitText.value = ""
     inviteDialog.value = false
 }
-function membersList() {
-    members(PageInfo.value).then(res => {
+function authList() {
+    getAuthList(PageInfo.value).then(res => {
         let { code, msg, data } = res.data
         console.log(code, msg, data);
 
         if (code == 0) {
-            tableData.value = data
+            tableData.value = data.data
             // PageInfo.value.total = data.total
             // PageInfo.value.page = data.page
             // PageInfo.value.limit = data.limit
@@ -301,6 +335,7 @@ function sendInvite() {
             let { code, data, msg } = res.data
             if (code == 0) {
                 invitUrl.value = data.url
+                buttonStatus.value = true
             }
         })
         .catch(error => {
@@ -310,16 +345,26 @@ function sendInvite() {
                 duration: 3000,
             })
         })
+        .finally(() => {
+            authList()
+        })
 }
 onMounted(async () => {
 
-    membersList()
+    authList()
 })
 </script>
 <style lang="scss" scoped>
 .home-container {
-    width: 90%;
+    width: 98%;
     margin: 32px;
+}
+
+.image-slot {
+    text-align: center;
+    color: #ccc;
+    font-size: 14px;
+    margin-top: 10px;
 }
 
 @import "./index";
