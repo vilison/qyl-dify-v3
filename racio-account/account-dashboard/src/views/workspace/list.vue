@@ -93,7 +93,8 @@
         </el-row>
         <el-row v-if="roles.some(item => item !== 'superAdmin')" style="margin-bottom: 20px;">
             <el-select v-model="workspaceRole">
-                <el-option v-for="item in rolesList" :key="item.key" :label="item.value" :value="item.key" />
+                <el-option v-for="item in rolesList" :key="item.key" :label="item.value" :value="item.key"
+                    :disabled="(roles[0] != 'owner' && item.key == 'admin')" />
             </el-select>
         </el-row>
         <el-row>
@@ -197,7 +198,14 @@ const handleCopy = (text, event) => {
     clip(text, event)
 }
 const deleteDialog = (arg) => {
-
+    if (roles[0] !== "owner" && arg.account_role == "admin") {
+        ElMessage({
+            message: "无法移除空间管理员!",
+            type: "error",
+            duration: 3000,
+        })
+        return
+    }
     ElMessageBox.confirm('是否删除该用户', '删除提示', {
         confirmButtonText: '确定',
         cancelButtonText: '取消',
@@ -212,6 +220,8 @@ const deleteDialog = (arg) => {
                             type: "success",
                             duration: 3000,
                         })
+
+                        membersList()
                     } else {
                         ElMessage({
                             message: msg,
@@ -235,6 +245,8 @@ function handleCurrentChange() {
 
 function openInvite() {
     inviteDialog.value = true
+    buttonStatus.value = false
+    invitUrl.value = ""
 }
 function centerDialogVisible() {
     invitText.value = ""
@@ -263,6 +275,15 @@ function membersList() {
     })
 }
 const editRolesDialog = (arg) => {
+
+    if (roles[0] !== "owner" && arg.account_role == "admin") {
+        ElMessage({
+            message: "无法修改空间管理员!",
+            type: "error",
+            duration: 3000,
+        })
+        return
+    }
     currEditRoleInfo.value = arg;
 
     editRoles.value = true
@@ -299,9 +320,7 @@ function putRoles() {
 }
 function sendInvite() {
 
-    if (roles == "superAdmin") {
-        workspaceRole.value = "owner"
-    } else if (workspaceRole.value == "") {
+    if (workspaceRole.value == "") {
         ElMessage({
             message: "请选择邀请角色!",
             type: "error",
@@ -309,7 +328,6 @@ function sendInvite() {
         })
         return
     }
-
     inviteUser({
         email: invitText.value,
         domain: "racio.chat",
@@ -345,6 +363,14 @@ function sendInvite() {
 onMounted(async () => {
 
     membersList()
+
+    if (roles[0] == "owner") {
+        workspaceRole.value = "admin"
+    } else {
+        workspaceRole.value = "normal"
+    }
+
+
 })
 </script>
 <style lang="scss" scoped>

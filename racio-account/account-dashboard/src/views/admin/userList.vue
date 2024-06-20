@@ -215,6 +215,8 @@ function handleCurrentChange() {
 
 function openInvite() {
     inviteDialog.value = true
+    invitUrl.value = ""
+    buttonStatus.value = false
 }
 const editRolesDialog = (arg) => {
     currEditRoleInfo.value = arg;
@@ -239,6 +241,8 @@ const deleteDialog = (arg) => {
                             type: "success",
                             duration: 3000,
                         })
+
+                        authList()
                     } else {
                         ElMessage({
                             message: msg,

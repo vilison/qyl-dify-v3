@@ -1,23 +1,48 @@
 <template>
     <div class="login-container">
         <div class="login-box">
-            <SwitchDark class="login-dark" />
+            <div class="login-text view_wechat">
+                <h2 class="title">
+                    <div>
+                        <span>&#127881; 邀请您</span>
+                        <div>作为【{{ role == "owner" ? "全新" : workspace_name }}】的</div>
+                        <div>AI数字员工</div>
+                        <div>办公空间的{{ role == "owner" ?
+                            "所有者" : role == "admin" ? "管理员" : "尊享会员" }}</div>
+                    </div>
 
+
+                </h2>
+            </div>
             <div class="login-form">
-                <div>
-                    <h2 class="title">
-                        <span>邀请您体验【{{ role == "owner" ? "新" : workspace_name }}】的AI数字员工{{ role == "owner" ? "空间所有者" :
-                            role
-                                ==
-                                "admin" ? "空间管理员" : "尊享会员" }}</span>
+                <div class="view_pc">
+                    <div class="login-text ">
+                        <h2 class="title">
+                            <div>
+                                <span>&#127881; 邀请您</span>
+                                <div>作为【{{ role == "owner" ? "全新" : workspace_name }}】的</div>
+                                <div>AI数字员工</div>
+                                <div>办公空间的{{ role == "owner" ?
+                                    "所有者" : role == "admin" ? "管理员" : "尊享会员" }}</div>
+                            </div>
 
-                    </h2>
+
+                        </h2>
+                    </div>
                 </div>
                 <LoginQrcode v-if="platform == 'pc'" :token="token" :role="role" :workspace_name="workspace_name" />
-                <div style="text-align: center;" v-else>
+                <div style="text-align: center; margin:40px 0 100px;" v-else>
 
-                    <el-button type="success" @click="GotoGZH">微信授权登录</el-button>
+                    <el-button v-if="role == 'owner'" class="gzh-button" type="success"
+                        @click="GotoGZH">立即进驻</el-button>
+                    <el-button v-else class="gzh-button" type="success" @click="GotoGZH">微信授权登录</el-button>
+                    <div class="agreement-tips">
+                        授权即同意“<a href="https://www.racio.chat/privacy" target="_blank">隐私政策</a>”和“<a
+                            href=" https://www.racio.chat/terms" target="_blank">服务协议</a>”
+                    </div>
                 </div>
+            </div>
+            <div class="login-footer">
                 <Footer />
             </div>
         </div>
@@ -104,9 +129,8 @@ onMounted(async () => {
 <style lang="scss" scoped>
 @import "./index";
 
-.title {
-    text-align: center;
-    padding: 0;
-    margin: 0;
+.agreement-tips {
+    margin-top: 5px;
+    font-size: 12px;
 }
 </style>

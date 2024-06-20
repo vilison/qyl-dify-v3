@@ -66,7 +66,8 @@
         </el-row>
         <el-row v-if="roles.some(item => item !== 'superAdmin')" style="margin-bottom: 20px;">
             <el-select v-model="workspaceRole">
-                <el-option v-for="item in rolesList" :key="item.key" :label="item.value" :value="item.key" />
+                <el-option v-for="item in rolesList" :key="item.key" :label="item.value" :value="item.key"
+                    :disabled="(roles[0] != 'owner' && item.key == 'admin')" />
             </el-select>
         </el-row>
         <el-row>
@@ -144,6 +145,8 @@ function handleCurrentChange() {
 
 function openInvite() {
     inviteDialog.value = true
+    buttonStatus.value = false
+    invitUrl.value = ""
 }
 function centerDialogVisible() {
     invitText.value = ""
@@ -191,9 +194,7 @@ function getMemberInvites() {
 }
 function sendInvite() {
 
-    if (roles == "superAdmin") {
-        workspaceRole.value = "owner"
-    } else if (workspaceRole.value == "") {
+    if (workspaceRole.value == "") {
         ElMessage({
             message: "请选择邀请角色!",
             type: "error",
@@ -237,6 +238,12 @@ function sendInvite() {
 onMounted(async () => {
 
     getMemberInvites()
+
+    if (roles[0] == "owner") {
+        workspaceRole.value = "admin"
+    } else {
+        workspaceRole.value = "normal"
+    }
 })
 </script>
 <style lang="scss" scoped>

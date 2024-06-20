@@ -84,7 +84,7 @@ const submitForm = (formEl: FormInstance | undefined) => {
                         let userInfo = {
                             token: data,
                             roles: ["superAdmin"],
-                            username: "Racio超级管理员"
+                            username: "Racio"
                         }
                         UserStore.login(userInfo)
 

@@ -27,15 +27,16 @@ export const useUserStore = defineStore({
             return new Promise(async (resolve, reject) => {
                 this.userInfo = userInfo
                 this.token = userInfo.token
-                localStorage.setItem("token", userInfo.token)
                 this.workspace_name = userInfo.workspace_name
-                localStorage.setItem("workspace_name", userInfo.workspace_name)
                 this.isLogin = true
                 this.roles = userInfo.roles
-                localStorage.setItem("roles", userInfo.roles)
                 this.accessToken = userInfo.access_token
-                localStorage.setItem("access_token", userInfo.access_token || "")
                 this.tenantId = userInfo.tenant_id
+
+                localStorage.setItem("token", userInfo.token)
+                localStorage.setItem("workspace_name", userInfo.workspace_name)
+                localStorage.setItem("roles", userInfo.roles)
+                localStorage.setItem("access_token", userInfo.access_token || "")
                 localStorage.setItem("tenant_id", userInfo.tenant_id || "")
                 await this.getRoles(userInfo.roles)
                 resolve(userInfo)

@@ -14,15 +14,7 @@
                                 clearable @input="isWorkspace" :disabled="invitTokenInfo.role !== 'owner'" />
                         </el-tooltip>
                     </el-col>
-                    <!-- <el-col :span=" 6">
-                                <div class="check-code">
-                                    <el-button size="small" :loading="checkWorkSpaceBtn.loading" type="success"
-                                        @click="checkWorkSpace">
-                                        {{ checkWorkSpaceBtn.text }}
-                                    </el-button>
 
-                                </div>
-                    </el-col> -->
                 </el-row>
                 <el-row :gutter="15" style="padding-bottom: 10px;" v-if="showVerify">
                     <el-col>
@@ -77,7 +69,7 @@
 import { ref, onMounted } from "vue"
 import Footer from "@/components/Footer/index.vue"
 import { ElMessage, ElMessageBox } from "element-plus"
-import { getWxInfo, sendSms, activate, checkOpenId, checkInvitToken } from "@/api/api"
+import { getWxInfo, sendSms, activate, checkOpenId, checkInvitToken, hasOwnerTenant } from "@/api/api"
 import { getQueryObject } from "@/utils/index"
 import { useRouter } from "vue-router"
 import { useUserStore } from "@/store/modules/user"
@@ -108,7 +100,7 @@ function isPhone(value: string) {
     }
 }
 function isWorkspace() {
-    const reg = /^[a-z0-9]{5,30}$/i
+    const reg = /^[a-z0-9]{3,12}$/i
 
     if (!reg.test(workspace.value)) {
         checkWorkSpaceBtn.value.tips = true
@@ -125,6 +117,7 @@ function WxInfo() {
             if (code == 0) {
                 accessToken.value = data
                 localStorage.setItem("access_token", data)
+                hasTenant()
                 check(data)
             }
 
@@ -143,6 +136,41 @@ function WxInfo() {
 
 }
 
+function hasTenant() {
+    hasOwnerTenant({
+        token: token,
+        access_token: accessToken.value
+    })
+        .then((result) => {
+            let { code, msg, data } = result.data
+
+            if (code == 0) {
+                if (data.has_owner_tenant) {
+                    ElMessageBox.alert(`该微信帐号已经创建空间，请更换微信帐号完成绑定操作`, '提示', {
+                        confirmButtonText: '知道了',
+                        dangerouslyUseHTMLString: true,
+                        callback: () => {
+                            router.back()
+                        },
+                    })
+                } else {
+
+                    checkToekn()
+                }
+            } else {
+                checkToekn()
+            }
+        }).catch((err) => {
+            ElMessageBox.alert(`${err}`, '提示', {
+                confirmButtonText: '知道了',
+                dangerouslyUseHTMLString: true,
+                callback: () => {
+                    router.back()
+                },
+            })
+        });
+}
+
 function checkToekn() {
 
     checkInvitToken({ token: token })
@@ -156,7 +184,6 @@ function checkToekn() {
                     workspace.value = data.workspace_name
                     roleTypes.value = data.role
 
-                    WxInfo()
                 } else {
 
                     ElMessageBox.alert(`此邀请链接已经失效，请联系${workspace_name.value == "" ? "管理员（微信：dukexls）" : workspace_name.value + '的[管理员]'}获得新的邀请链接`, '提示', {
@@ -221,8 +248,12 @@ function activateAccount() {
             let { code, msg, data } = res.data
             if (code == 0) {
                 let userInfo = {
+                    access_token: accessToken.value,
                     token: data.token,
-                    roles: [data.account_role]
+                    roles: [data.account_role],
+                    workspace_name: data.tenant_name,
+                    name: data.name,
+                    tenant_id: data.tenant_id
                 }
                 UserStore.login(userInfo)
                 ElMessage({
@@ -232,7 +263,12 @@ function activateAccount() {
                 })
                 setTimeout(() => {
                     router.replace({
-                        path: `/invitSuccess?roleTypes=${data.account_role}&workspace_name=${data.tenant_name}&name=${data.name}`
+                        path: '/invitSuccess',
+                        query: {
+                            roleTypes: data.account_role,
+                            workspace_name: data.tenant_name,
+                            name: data.name
+                        }
                     })
                 }, 3000);
             } else {
@@ -315,8 +351,8 @@ const getCheckCode = () => {
 }
 
 onMounted(() => {
-    checkToekn()
 
+    WxInfo()
 })
 
 </script>
@@ -327,7 +363,7 @@ onMounted(() => {
     cursor: pointer
 }
 
-@import "./index";
+@import "./phone";
 
 .login-box {
     height: 80%

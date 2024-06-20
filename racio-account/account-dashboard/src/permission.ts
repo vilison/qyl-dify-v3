@@ -29,14 +29,12 @@ router.beforeEach(async (to, from, next) => {
 
     //   访问权限与路由权限不一致。返回404
     if (!hasPermission(roles, to)) {
-        console.log(roles, to.meta.roles, to.meta.tag, "访问权限与路由权限不一致。返回404");
+        console.log(roles, to.meta.roles, to.meta.tag, to.fullPath, "访问权限与路由权限不一致。返回404");
 
-        if (to.fullPath.includes('/admin')) {
-            next(`/login?redirect=${to.path}`)
-        } else {
-            next(`/auth?redirect=${to.path}`)
-        }
+        next(`/404`)
+
     }
+
     if (isLogin) {
         if (to.path === '/login') {
             // 如果已登录，请重定向到主页

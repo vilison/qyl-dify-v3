@@ -1,15 +1,27 @@
 <template>
     <div class="login-container">
         <div class="login-box">
-            <SwitchDark class="login-dark" />
+            <div class="login-text view-wechat">
+                &#127881; 欢迎来到 <br /> Racio数字员工空间
+            </div>
+
 
             <div class="login-form">
+                <div class="login-text ">
+                    <div class="view-pc">&#127881; 欢迎来到 <br /> Racio数字员工空间</div>
+                </div>
                 <LoginQrcode :token="tokens" :source="source" v-if="platform == 'pc'" />
                 <div style="text-align: center;" v-else>
-                    <el-button type="success" @click="GotoGZH">微信公众号授权登录</el-button>
+                    <el-button class="gzh-button" type="success" @click="GotoGZH">立即进入</el-button>
+                    <div class="agreement-tips">授权即同意<a href="https://www.racio.chat/privacy"
+                            target="_blank">隐私政策</a>”和“<a href="https://www.racio.chat/terms" target="_blank">服务条款</a>”
+                    </div>
                 </div>
-                <Footer />
+
             </div>
+        </div>
+        <div class="login-footer">
+            <Footer />
         </div>
     </div>
 </template>

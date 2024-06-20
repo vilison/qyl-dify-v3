@@ -1,10 +1,12 @@
 <template>
   <div class="app-container">
     <div class="app-container-inner">
-      <div class="wscn-http403-container">
-        <div class="bullshit__oops">&#127881; 欢迎 {{ name }} <p>
-            进入<span>{{ workspace_name }}</span>的数字员工空间
-          </p>
+      <div class="wscn-http403-container ">
+        <div class="bullshit__oops view_mobile"><span>&#127881; 欢迎 {{ name }}</span>
+          <div class="success_tips_txt">
+            进入<span>{{ workspace_name }}</span>
+            <div>的数字员工空间</div>
+          </div>
         </div>
         <div class="wscn-http403">
           <div class="pic-403">
@@ -14,19 +16,26 @@
             <img class="pic-403__child right" src="@/assets/403_images/403_cloud.png" alt="403" />
           </div>
         </div>
-        <div>
+        <div class="button-box">
+          <div class="bullshit__oops view_pc"><span>&#127881; 欢迎 {{ name }}</span>
+            <div class="success_tips_txt">
+              进入<span>{{ workspace_name }}</span>
+              <div>的数字员工空间</div>
+            </div>
+          </div>
           <div class="bullshit">
-            <el-button class="button-ai" v-if="platform == 'pc'" type="primary" @click="goToAI">立即体验</el-button>
-            <el-button v-else type="primary" @click="goToAI">立即体验</el-button>
+            <el-button class="button-ai" type="primary" size="large" @click="goToAI">立即体验</el-button>
 
-            <el-button class="button-admin" @click="$router.push('/workspace')"
+            <el-button class="button-admin" size="large" @click="$router.push('/workspace')"
               v-if="roleTypes != 'normal' && platform == 'pc'">进入管理后台</el-button>
           </div>
-          <div v-if="roleTypes != 'normal' && platform == 'wechat'"
-            style="margin-top:2px;font-weight: 800;position: absolute;bottom:0px;background:rgba(184, 184, 184,.23);padding: 10px;">
+          <div v-if="roleTypes != 'normal'" class="tips_pc">
             <div>打造数字员工请在PC端访问</div>
             <div>{{ websiteUrl }}</div>
           </div>
+        </div>
+        <div class="view_pc">
+
         </div>
       </div>
 
@@ -62,13 +71,28 @@ onMounted(() => {
 </script>
 
 <style lang="scss" scoped>
+.tips_pc {
+  background: rgba(184, 184, 184, .23);
+  padding: 10px;
+  margin-top: 10px;
+  width: 250px;
+}
+
 .wscn-http403-container {
   width: 100%;
   height: 100%;
   display: flex;
   align-items: center;
-  flex-direction: column;
+  flex-direction: row;
   justify-content: center;
+}
+
+.view_pc {
+  display: block;
+}
+
+.view_mobile {
+  display: none;
 }
 
 a {
@@ -81,8 +105,9 @@ a {
   display: flex;
   justify-content: center;
   align-items: center;
-  padding: 0 50px;
+
   overflow: hidden;
+  flex: 10;
 
   .pic-403 {
     position: relative;
@@ -291,39 +316,105 @@ a {
 }
 
 .bullshit__oops {
-  font-size: 24px;
+  font-size: 22px;
   font-weight: 800;
   color: #3999f8;
   text-align: center;
 }
 
 .bullshit__oops span {
-  font-size: 28px;
+  font-size: 24px;
   margin: 0 2px;
   color: #1482f0
 }
 
+.button-box {
+  flex: 5;
+  text-align: left;
+
+  .bullshit__oops {
+    text-align: left;
+    margin-bottom: 20px;
+
+  }
+}
+
+
+
+
+
+
 @media screen and (max-width: 768px) {
+  .button-box {
+    flex: 0
+  }
+
+  .view_mobile {
+    display: block;
+  }
+
+  .view_pc {
+    display: none;
+  }
+
+  .wscn-http403-container {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    flex-direction: column;
+    justify-content: center;
+  }
+
+  .success_tips_txt {
+    display: table;
+    text-align: left;
+    margin: auto;
+    margin-top: 100px;
+    margin-bottom: 20px;
+    font-size: 26px;
+
+  }
+
+
+  .bullshit__oops {
+    font-size: 20px;
+  }
+
+  .bullshit__oops span {
+    font-size: 24px;
+  }
+
+  .bullshit {
+    padding-top: 100px;
+    text-align: center;
+    margin-bottom: 20px;
+  }
+
+  .wscn-http403 {
+    display: none;
+  }
+
   .wscn-http403 {
     width: 100%;
     padding: 0px;
     margin: 0px
   }
 
-  .pic-403 {}
 
-  .bullshit__oops {
-    font-size: 22px;
+  .success_tips_txt span {
+    font-size: 26px;
   }
+
 
   .button-admin {
     display: none;
   }
 
   .button-ai {
-    width: 170px;
-    height: 42px;
-    font-size: 24px;
+    width: 248px;
+    height: 50px;
+    font-size: 28px;
   }
 }
 </style>

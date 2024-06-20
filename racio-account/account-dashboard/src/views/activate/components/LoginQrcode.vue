@@ -1,12 +1,17 @@
 <template>
     <div class="login-qrcode">
-        <h2 class="title">
-            <h5>请用您的微信扫码登录，方便后续使用</h5>
-        </h2>
+
         <div id="snsapi_login"></div>
-        <wxlogin :appid="appid" scope="snsapi_login" :redirect_uri="encodeURIComponent(redirect_uri)">
+        <wxlogin :appid="appid" scope="snsapi_login" :redirect_uri="encodeURIComponent(redirect_uri)"
+            :href="'data:text/css;base64,LmltcG93ZXJCb3ggLnRpdGxlIHsKIGRpc3BsYXk6IG5vbmU7Cn0KLmltcG93ZXJCb3ggLnN0YXR1cy5zdGF0dXNfYnJvd3NlciB7CiBkaXNwbGF5OiBub25lOwp9Ci5pbXBvd2VyQm94IC5xcmNvZGUgewogYm9yZGVyOiBub25lOwogd2lkdGg6IDIwMHB4OwogaGVpZ2h0OiAyMDBweDsKfQouaW1wb3dlckJveCAuc3RhdHVzewogZGlzcGxheTogbm9uZQp9'">
         </wxlogin>
+        <div class="qrcode-text">请使用微信扫描二维码授权</div>
+        <div class="agreement-tips">
+            授权即同意“<a href="https://www.racio.chat/privacy" target="_blank">隐私政策</a>”和“<a
+                href=" https://www.racio.chat/terms" target="_blank">服务协议</a>”
+        </div>
     </div>
+
 </template>
 
 <script lang="ts" setup>
@@ -48,5 +53,19 @@ const redirect_uri = `${uri}/activate/phone?token=${props.token}`
     text-align: center;
     padding: 0;
     margin: 0;
+}
+
+.login-qrcode {
+    height: 270px;
+}
+
+.qrcode-text {
+    font-size: 14px;
+    font-weight: 600;
+}
+
+.agreement-tips {
+    margin-top: 5px;
+    font-size: 12px;
 }
 </style>

@@ -2,6 +2,7 @@
     <el-dropdown>
         <span class="el-dropdown-link">
             <el-avatar :size="30" class="avatar" :src="AvatarLogo" />
+            {{ UserStore.userInfo.username }}-
             {{ currentRoles == "superAdmin" ? "Racio超级管理员" : currentRoles == "owner" ? "空间所有者" : "空间管理员" }}
             <el-icon class="header-icon el-icon--right">
                 <arrow-down />

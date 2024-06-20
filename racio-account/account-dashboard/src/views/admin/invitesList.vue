@@ -145,6 +145,8 @@ function handleCurrentChange() {
 
 function openInvite() {
     inviteDialog.value = true
+    buttonStatus.value = false
+    invitUrl.value = ""
 }
 function centerDialogVisible() {
     invitText.value = ""

@@ -69,7 +69,9 @@ function check(access_token) {
                                 token: data.token,
                                 access_token: access_token,
                                 roles: [data.current_role],
-                                username: data.current_role == "owner" ? "空间所有者" : data.account_role == "admin" ? "空间管理员" : "尊享会员",
+                                workspace_name: data.tenant_name,
+                                workspace_id: data.tenant_id,
+                                username: data.name
                             }
                             UserStore.login(userInfo)
                             swtichTenant(data.tenant_id)
@@ -81,7 +83,7 @@ function check(access_token) {
 
             } else {
 
-                ElMessageBox.alert('该微信未被绑定，请联系管理员', '提示', {
+                ElMessageBox.alert('Racio尚未找到您的关联帐号，请联系管理员（微信：dukexls）申请试用', '提示', {
                     confirmButtonText: '知道了',
                     callback: () => {
                         router.back()
