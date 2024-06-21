@@ -165,3 +165,10 @@ export function checkOpenId(data) {
         data,
     })
 }
+export function hasOwnerTenant(data) {
+    return request({
+        url: "/console/activate/create_check",
+        method: "post",
+        data,
+    })
+}

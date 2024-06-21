@@ -8,7 +8,7 @@ import {
 import Layout from "@/layout/index.vue"
 import store from '@/store'
 import adminRouter from "./modules/admin"
-import accountRouter from "./modules/account"
+import workspaseRouter from "./modules/workspace"
 import { storeToRefs } from 'pinia'
 import { useUserStore } from "@/store/modules/user"
 // 扩展继承属性
@@ -24,7 +24,7 @@ export const adminAsyncRoutes = [
 ]
 
 export const accountAsyncRoutes = [
-    ...accountRouter,
+    ...workspaseRouter,
 
 ]
 
@@ -74,30 +74,30 @@ export const constantRoutes: Array<RouteRecordRaw & extendRoute> = [
             {
                 path: "/auth/index",
                 name: "auth",
-                component: () => import("@/views/auth/index.vue"),
-                meta: { title: "扫码登录" },
+                component: () => import("@/views/auth/auth.vue"),
+                meta: { title: "微信登陆" },
             },
             {
                 path: "/auth/check",
-                name: "check",
+                name: "wxcheck",
                 component: () => import("@/views/auth/check.vue"),
                 meta: { title: "checking" },
             },
             {
                 path: "/auth/gzhcheck",
-                name: "check",
+                name: "gzhcheck",
                 component: () => import("@/views/auth/gzhcheck.vue"),
                 meta: { title: "gzhchecking" },
             }
         ]
     },
     {
-        path: "/account",
-        name: "account",
-        // redirect: "/account/index",
+        path: "/workspace",
+        name: "workspace",
+        redirect: "/workspace/my",
         component: Layout,
         hidden: true,
-        meta: { title: "空间管理后台", requireAuth: true, roles: ["owner", "admin"], tag: "account", },
+        meta: { title: "空间管理后台", requireAuth: true, roles: ["owner", "admin"], tag: "user", },
         children: [
         ]
     },
@@ -118,6 +118,13 @@ export const constantRoutes: Array<RouteRecordRaw & extendRoute> = [
         component: () => import("@/views/login/index.vue"),
         hidden: true,
         meta: { title: "管理员登录" },
+    },
+    {
+        path: "/logout",
+        name: "Logout",
+        component: () => import("@/views/logout/index.vue"),
+        hidden: true,
+        meta: { title: "退出登录" },
     },
     {
         path: "/activate",
@@ -149,9 +156,8 @@ export const constantRoutes: Array<RouteRecordRaw & extendRoute> = [
     {
         path: "/",
         name: "layout",
-        component: Layout,
         hidden: true,
-        redirect: "/auth",
+        component: () => import("@/views/auth/index.vue"),
         meta: { title: "首页", icon: "House" },
         children: []
     },
@@ -169,7 +175,7 @@ export const notFoundRouter = {
 
 
 const router = createRouter({
-    history: createWebHistory(import.meta.env.MODE === "production" ? "/dashboard/" : "/"), // history
+    history: createWebHistory(import.meta.env.MODE === "production" ? "/account" : "/"), // history
     // history: createWebHashHistory(), // hash
     routes: constantRoutes,
 })

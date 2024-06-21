@@ -4,31 +4,23 @@
             <div class="login-form">
                 <el-row :gutter="5" style="padding-bottom: 10px;">
                     <el-col>
-                        <h3>{{ roleTypes == "owner" ? "创建空间" : "加入空间" }}</h3>
+                        <h3>{{ invitTokenInfo.role == "owner" ? "创建空间" : "加入空间" }}</h3>
                     </el-col>
                     <el-col :span="24">
                         <el-tooltip :visible="checkWorkSpaceBtn.tips" class="box-item" effect="light"
-                            :content="checkWorkSpaceBtn.tipstext ? checkWorkSpaceBtn.tipstext : '长度8-30个字符'"
+                            :content="checkWorkSpaceBtn.tipstext ? checkWorkSpaceBtn.tipstext : '长度5-30个字符'"
                             placement="top-end">
                             <el-input placeholder="请输入用户名/空间名" v-model.trim="workspace" minlength="8" maxlength="30"
                                 clearable @input="isWorkspace" :disabled="invitTokenInfo.role !== 'owner'" />
                         </el-tooltip>
                     </el-col>
-                    <!-- <el-col :span=" 6">
-                                <div class="check-code">
-                                    <el-button size="small" :loading="checkWorkSpaceBtn.loading" type="success"
-                                        @click="checkWorkSpace">
-                                        {{ checkWorkSpaceBtn.text }}
-                                    </el-button>
 
-                                </div>
-                    </el-col> -->
                 </el-row>
-                <el-row :gutter="15" style="padding-bottom: 10px;">
+                <el-row :gutter="15" style="padding-bottom: 10px;" v-if="showVerify">
                     <el-col>
                         <h3>绑定手机号</h3>
                     </el-col>
-                    <el-col :span="18">
+                    <el-col :span="16">
                         <div>
                             <el-input maxlength="11" clearable v-model.number="phoneNum" @input="isPhone"
                                 placeholder="输入需要绑定的手机号码" :disabled="!showVerify" />
@@ -44,7 +36,7 @@
                     </el-col>
                 </el-row>
 
-                <el-row :gutter="24" :justify="'start'" style="padding-bottom: 10px;">
+                <el-row :gutter="24" :justify="'start'" style="padding-bottom: 10px;" v-if="showVerify">
                     <el-col :span="24">
                         <div>
                             <el-input maxlength="4" clearable v-model.number="verifyCode" placeholder="请输入验证码"
@@ -56,7 +48,7 @@
                     <el-col :span="24" style="text-align:center">
                         <div>
                             <el-button size="large" :width="100" type="primary" @click="activateAccount">{{
-                                invitTokenInfo.role == "owner" ? "关联并创建空间" : "关联工作空间"
+                                invitTokenInfo.role == "owner" ? "关联并创建空间" : "下一步"
                             }}</el-button>
                         </div>
                     </el-col>
@@ -77,7 +69,7 @@
 import { ref, onMounted } from "vue"
 import Footer from "@/components/Footer/index.vue"
 import { ElMessage, ElMessageBox } from "element-plus"
-import { getWxInfo, sendSms, activate, checkOpenId, checkInvitToken } from "@/api/api"
+import { getGZHInfo, sendSms, activate, checkOpenId, checkInvitToken, hasOwnerTenant } from "@/api/api"
 import { getQueryObject } from "@/utils/index"
 import { useRouter } from "vue-router"
 import { useUserStore } from "@/store/modules/user"
@@ -100,14 +92,14 @@ const invitTokenInfo = ref({
 })
 const roleTypes = ref("")
 function isPhone(value: string) {
-    const reg = /^((13[0-9])|(14[5-7])|(15[0-3,5-9])|(17[0,3,5-8])|(18[0-9])|166|198|199|(147))\d{8}$/
+    const reg = /^1[3456789]\d{9}$/
     if (reg.test(value)) {
         checkCodeBtn.value.disabled = false
         phoneStatus.value = true
     }
 }
 function isWorkspace() {
-    const reg = /^[a-z0-9]{8,30}$/i
+    const reg = /^[a-z0-9]{3,12}$/i
 
     if (!reg.test(workspace.value)) {
         checkWorkSpaceBtn.value.tips = true
@@ -118,28 +110,78 @@ function isWorkspace() {
 
 function WxInfo() {
 
-    getWxInfo({ token: token, code: code })
+    getGZHInfo({ token: token, code: code })
         .then(res => {
             let { code, msg, data } = res.data
             if (code == 0) {
                 accessToken.value = data
                 localStorage.setItem("access_token", data)
+                hasTenant()
                 check(data)
             }
 
         })
         .catch(err => {
             ElMessage({
-                message: "微信扫码异常，请重新扫码",
+                message: "微信公众号授权异常，请重新扫码",
                 type: 'error',
                 duration: 5000,
             })
             setTimeout(() => {
-                router.back()
+                router.replace(
+                    {
+                        path: "/activate",
+                        query: {
+                            token: token
+                        }
+                    }
+                )
             }, 5000);
         })
 
 
+}
+
+function hasTenant() {
+    hasOwnerTenant({
+        token: token,
+        access_token: accessToken.value
+    })
+        .then((result) => {
+            let { code, msg, data } = result.data
+
+            if (code == 0) {
+                if (data.has_owner_tenant) {
+                    ElMessageBox.alert(`该微信帐号已经创建空间，请更换微信帐号完成绑定操作`, '提示', {
+                        confirmButtonText: '知道了',
+                        dangerouslyUseHTMLString: true,
+                        callback: () => {
+                            router.replace(
+                                {
+                                    path: "/activate",
+                                    query: {
+                                        token: token
+                                    }
+                                }
+                            )
+                        },
+                    })
+                } else {
+                    checkToekn()
+
+                }
+            } else {
+                checkToekn()
+            }
+        }).catch((err) => {
+            ElMessageBox.alert(`${err}`, '提示', {
+                confirmButtonText: '知道了',
+                dangerouslyUseHTMLString: true,
+                callback: () => {
+                    router.back()
+                },
+            })
+        });
 }
 
 function checkToekn() {
@@ -154,13 +196,15 @@ function checkToekn() {
                     invitTokenInfo.value = data
                     workspace.value = data.workspace_name
                     roleTypes.value = data.role
-                    WxInfo()
+
                 } else {
 
-                    ElMessage({
-                        message: '邀请链接已失效，请联系管理员（微信：dukexls）',
-                        type: 'warning',
-                        duration: 5000,
+                    ElMessageBox.alert(`此邀请链接已经失效，请联系${workspace_name.value == "" ? "管理员（微信：dukexls）" : workspace_name.value + '的[管理员]'}获得新的邀请链接`, '提示', {
+                        confirmButtonText: '知道了',
+                        dangerouslyUseHTMLString: true,
+                        callback: () => {
+                            router.back()
+                        },
                     })
                 }
 
@@ -176,7 +220,7 @@ function check(access_token) {
             let { code, msg, data } = res.data
             if (code == 0) {
                 if (data) {
-                    activateAccount()
+                    showVerify.value = false
                 } else {
                     showVerify.value = true
                 }
@@ -197,9 +241,12 @@ function activateAccount() {
         }, 5000);
         return
     } else if (token == "") {
-        ElMessage({
-            message: '请先获取邀请链接，请联系管理员（微信：dukexls）获得新的邀请链接',
-            type: 'warning',
+        ElMessageBox.alert(`此邀请链接已经失效，请联系${workspace_name.value == "" ? "管理员（微信：dukexls）" : workspace_name.value + '的[管理员]'}获得新的邀请链接`, '提示', {
+            confirmButtonText: '知道了',
+            dangerouslyUseHTMLString: true,
+            callback: () => {
+                router.back()
+            },
         })
         return
     }
@@ -214,8 +261,12 @@ function activateAccount() {
             let { code, msg, data } = res.data
             if (code == 0) {
                 let userInfo = {
+                    access_token: accessToken.value,
                     token: data.token,
-                    roles: [data.account_role]
+                    roles: [data.account_role],
+                    workspace_name: data.tenant_name,
+                    name: data.name,
+                    tenant_id: data.tenant_id
                 }
                 UserStore.login(userInfo)
                 ElMessage({
@@ -225,7 +276,12 @@ function activateAccount() {
                 })
                 setTimeout(() => {
                     router.replace({
-                        path: `/invitSuccess?roleTypes=${data.account_role}`,
+                        path: '/invitSuccess',
+                        query: {
+                            roleTypes: data.account_role,
+                            workspace_name: data.tenant_name,
+                            name: data.name
+                        }
                     })
                 }, 3000);
             } else {
@@ -247,6 +303,22 @@ function sendmsm() {
                     type: 'success',
                 })
 
+
+                // 清除掉定时器
+                checkCodeBtn.value.timer && clearInterval(checkCodeBtn.value.timer)
+                // 开启定时器
+                checkCodeBtn.value.timer = setInterval(() => {
+                    const tmp = checkCodeBtn.value.duration--
+                    checkCodeBtn.value.text = `${tmp}秒`
+                    if (tmp <= 0) {
+                        // 清除掉定时器
+                        clearInterval(checkCodeBtn.value.timer)
+                        checkCodeBtn.value.duration = 60
+                        checkCodeBtn.value.text = '重新获取'
+                        // 设置按钮可以单击
+                        checkCodeBtn.value.disabled = false
+                    }
+                }, 1000)
             } else {
                 ElMessage({
                     message: msg,
@@ -295,25 +367,11 @@ const getCheckCode = () => {
     } else {
         sendmsm() //调用发送短信接口
     }
-    // 清除掉定时器
-    checkCodeBtn.value.timer && clearInterval(checkCodeBtn.value.timer)
-    // 开启定时器
-    checkCodeBtn.value.timer = setInterval(() => {
-        const tmp = checkCodeBtn.value.duration--
-        checkCodeBtn.value.text = `${tmp}秒`
-        if (tmp <= 0) {
-            // 清除掉定时器
-            clearInterval(checkCodeBtn.value.timer)
-            checkCodeBtn.value.duration = 60
-            checkCodeBtn.value.text = '重新获取'
-            // 设置按钮可以单击
-            checkCodeBtn.value.disabled = false
-        }
-    }, 1000)
+
 }
 
 onMounted(() => {
-    checkToekn()
+    WxInfo()
 
 })
 
@@ -325,7 +383,7 @@ onMounted(() => {
     cursor: pointer
 }
 
-@import "./index";
+@import "./phone";
 
 .login-box {
     height: 80%

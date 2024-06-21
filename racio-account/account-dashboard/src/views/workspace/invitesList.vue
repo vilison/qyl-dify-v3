@@ -11,18 +11,22 @@
             </el-col>
             <el-col :span="24">
                 <el-table :data="tableData" style="width: 100%">
-                    <el-table-column prop="invited_by" label="邀请人" min-width="240" />
-                    <el-table-column prop="id" label="邀请token" min-width="240" />
-                    <el-table-column prop="tenant_id" label="空间ID" min-width="240" />
-                    <el-table-column prop="remark" label="备注" width="120" />
-                    <el-table-column prop="role" label="角色" width="120">
+                    <el-table-column prop="email" label="邮箱地址" min-width="200" />
+                    <el-table-column prop="invite_link" label="邀请链接" min-width="200">
                         <template #default="scope">
-                            <div>{{ scope.row.role == "owner" ? "空间所有者" : scope.row.role == "admin" ? "空间管理员" : "尊享会员"
+                            <div @click="handleCopy(scope.row.invite_link, $event)">点击复制：{{ scope.row.invite_link }}
+                            </div>
+                        </template>
+                    </el-table-column>
+                    <el-table-column prop="remark" label="备注" width="120" />
+                    <el-table-column prop="role" label="邀请角色" width="120">
+                        <template #default="scope">
+                            <div>{{ scope.row.role == "owner" ? "空间所有者" : scope.row.role == "admin" ? "空间管理员" :
+                                "尊享会员"
                                 }}
                             </div>
                         </template>
                     </el-table-column>
-
                     <el-table-column prop="created_at" label="创建时间" width="120">
                         <template #default="scope">
                             <div>{{ formatTime(scope.row.created_at, "") }}</div>
@@ -62,7 +66,8 @@
         </el-row>
         <el-row v-if="roles.some(item => item !== 'superAdmin')" style="margin-bottom: 20px;">
             <el-select v-model="workspaceRole">
-                <el-option v-for="item in rolesList" :key="item.key" :label="item.value" :value="item.key" />
+                <el-option v-for="item in rolesList" :key="item.key" :label="item.value" :value="item.key"
+                    :disabled="(roles[0] != 'owner' && item.key == 'admin')" />
             </el-select>
         </el-row>
         <el-row>
@@ -93,7 +98,7 @@
         <template #footer>
             <div class="dialog-footer">
                 <el-button @click="centerDialogVisible">取消</el-button>
-                <el-button type="primary" @click="sendInvite">
+                <el-button type="primary" @click="sendInvite" :disabled="buttonStatus">
                     发出邀请
                 </el-button>
             </div>
@@ -129,6 +134,7 @@ const PageInfo = ref({
     "limit": 10,
     "total": 0
 })
+const buttonStatus = ref(false)
 const handleCopy = (text, event) => {
     clip(text, event)
 }
@@ -139,6 +145,8 @@ function handleCurrentChange() {
 
 function openInvite() {
     inviteDialog.value = true
+    buttonStatus.value = false
+    invitUrl.value = ""
 }
 function centerDialogVisible() {
     invitText.value = ""
@@ -186,9 +194,7 @@ function getMemberInvites() {
 }
 function sendInvite() {
 
-    if (roles == "superAdmin") {
-        workspaceRole.value = "owner"
-    } else if (workspaceRole.value == "") {
+    if (workspaceRole.value == "") {
         ElMessage({
             message: "请选择邀请角色!",
             type: "error",
@@ -209,6 +215,7 @@ function sendInvite() {
             let { code, data, msg } = res.data
             if (code == 0) {
                 invitUrl.value = data.url
+                buttonStatus.value = true
             } else {
                 ElMessage({
                     message: msg,
@@ -224,15 +231,24 @@ function sendInvite() {
                 duration: 3000,
             })
         })
+        .finally(() => {
+            getMemberInvites()
+        })
 }
 onMounted(async () => {
 
     getMemberInvites()
+
+    if (roles[0] == "owner") {
+        workspaceRole.value = "admin"
+    } else {
+        workspaceRole.value = "normal"
+    }
 })
 </script>
 <style lang="scss" scoped>
 .home-container {
-    width: 90%;
+    width: 98%;
     margin: 32px;
 }
 

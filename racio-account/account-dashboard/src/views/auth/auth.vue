@@ -38,7 +38,7 @@ import { useRouter } from "vue-router"
 import { onMounted } from "vue"
 const router = useRouter()
 const platform = ref("")
-const source = ref("index")
+const source = ref("auth")
 
 const { tokens } = ref(getQueryObject(null))
 
@@ -59,7 +59,7 @@ function isPlatform() {
 function GotoGZH() {
     const appid = import.meta.env.VITE_APP_GZHAPPID ? import.meta.env.VITE_APP_GZHAPPID : window.globalVariable.GZHAPPID
     const redirect_uri = encodeURIComponent(import.meta.env.VITE_APP_WEBSITE ? `${import.meta.env.VITE_APP_WEBSITE}/auth/gzhcheck` : `${window.globalVariable.WEBSITE}/auth/gzhcheck`)
-    const uri = `https://open.weixin.qq.com/connect/oauth2/authorize?appid=${appid}&redirect_uri=${redirect_uri}&response_type=code&scope=snsapi_userinfo&state=index#wechat_redirect`
+    const uri = `https://open.weixin.qq.com/connect/oauth2/authorize?appid=${appid}&redirect_uri=${redirect_uri}&response_type=code&scope=snsapi_userinfo&state=auth#wechat_redirect`
 
     location.href = uri
 }
@@ -87,15 +87,4 @@ onMounted(() => {
 </script>
 <style lang="scss" scoped>
 @import "./index";
-
-.agreement-tips {
-    margin-top: 5px;
-    font-size: 12px;
-    text-align: center;
-}
-</style>
-<style>
-#snsapi_login .impowerBox .loginPanel .title {
-    display: none;
-}
 </style>

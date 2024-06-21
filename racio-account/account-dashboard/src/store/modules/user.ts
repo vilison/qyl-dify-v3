@@ -14,22 +14,29 @@ export const useUserStore = defineStore({
         roles: localStorage.roles ? JSON.parse(localStorage.roles) : [],
         tenantId: localStorage.tenant_id || "",
         accessToken: localStorage.access_token || "",
+        workspace_name: localStorage.workspace_name || "",
+        workspace_id: localStorage.workspace_id || "",
     }),
     getters: {},
     // 可以同步 也可以异步
     actions: {
         // 登录
         login(userInfo) {
+            console.log(userInfo, "userInfo");
+
             return new Promise(async (resolve, reject) => {
                 this.userInfo = userInfo
                 this.token = userInfo.token
-                localStorage.setItem("token", userInfo.token)
+                this.workspace_name = userInfo.workspace_name
                 this.isLogin = true
                 this.roles = userInfo.roles
-                localStorage.setItem("roles", userInfo.roles)
                 this.accessToken = userInfo.access_token
-                localStorage.setItem("access_token", userInfo.access_token || "")
                 this.tenantId = userInfo.tenant_id
+
+                localStorage.setItem("token", userInfo.token)
+                localStorage.setItem("workspace_name", userInfo.workspace_name)
+                localStorage.setItem("roles", userInfo.roles)
+                localStorage.setItem("access_token", userInfo.access_token || "")
                 localStorage.setItem("tenant_id", userInfo.tenant_id || "")
                 await this.getRoles(userInfo.roles)
                 resolve(userInfo)

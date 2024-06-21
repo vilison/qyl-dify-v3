@@ -1,23 +1,48 @@
 <template>
     <div class="login-container">
         <div class="login-box">
-            <SwitchDark class="login-dark" />
+            <div class="login-text view_wechat">
+                <h2 class="title">
+                    <div>
+                        <span>&#127881; 邀请您</span>
+                        <div>作为【{{ role == "owner" ? "全新" : workspace_name }}】的</div>
+                        <div>AI数字员工</div>
+                        <div>办公空间的{{ role == "owner" ?
+                            "所有者" : role == "admin" ? "管理员" : "尊享会员" }}</div>
+                    </div>
 
+
+                </h2>
+            </div>
             <div class="login-form">
-                <div>
-                    <h2 class="title">
-                        <span>邀请您体验{{ role == "owner" ? "新" : workspace_name }}的AI数字员工{{ role == "owner" ? "空间所有者" :
-                            role
-                                ==
-                                "admin" ? "空间管理员" : "尊享会员" }}</span>
+                <div class="view_pc">
+                    <div class="login-text ">
+                        <h2 class="title">
+                            <div>
+                                <span>&#127881; 邀请您</span>
+                                <div>作为【{{ role == "owner" ? "全新" : workspace_name }}】的</div>
+                                <div>AI数字员工</div>
+                                <div>办公空间的{{ role == "owner" ?
+                                    "所有者" : role == "admin" ? "管理员" : "尊享会员" }}</div>
+                            </div>
 
-                    </h2>
+
+                        </h2>
+                    </div>
                 </div>
                 <LoginQrcode v-if="platform == 'pc'" :token="token" :role="role" :workspace_name="workspace_name" />
-                <div style="text-align: center;" v-else>
-                    <h3>请通过授权微信公众号关联，方便后续使用</h3>
-                    <el-button type="success" @click="GotoGZH">微信公众号授权关联</el-button>
+                <div style="text-align: center; margin:40px 0 100px;" v-else>
+
+                    <el-button v-if="role == 'owner'" class="gzh-button" type="success"
+                        @click="GotoGZH">立即进驻</el-button>
+                    <el-button v-else class="gzh-button" type="success" @click="GotoGZH">微信授权登录</el-button>
+                    <div class="agreement-tips">
+                        授权即同意“<a href="https://www.racio.chat/privacy" target="_blank">隐私政策</a>”和“<a
+                            href=" https://www.racio.chat/terms" target="_blank">服务协议</a>”
+                    </div>
                 </div>
+            </div>
+            <div class="login-footer">
                 <Footer />
             </div>
         </div>
@@ -53,8 +78,9 @@ function checkToekn() {
                     showQrcode.value = true
 
                 } else {
-                    ElMessageBox.alert("<h2>此邀请链接已经失效<br />请联系管理员（微信：dukexls）<br />获得新的邀请链接</h2>", '提示', {
+                    ElMessageBox.alert(`此邀请链接已经失效，请联系${workspace_name.value == "" ? "管理员（微信：dukexls）" : workspace_name.value + '的[管理员]'}获得新的邀请链接`, '提示', {
                         confirmButtonText: '知道了',
+                        dangerouslyUseHTMLString: true,
                         callback: () => {
                             router.back()
                         },
@@ -62,6 +88,15 @@ function checkToekn() {
                 }
 
             }
+        })
+        .catch(() => {
+            ElMessageBox.alert(`此邀请链接已经失效，请联系${workspace_name.value == "" ? "管理员（微信：dukexls）" : workspace_name.value + '的[管理员]'}获得新的邀请链接`, '提示', {
+                confirmButtonText: '知道了',
+                dangerouslyUseHTMLString: true,
+                callback: () => {
+                    router.back()
+                },
+            })
         })
 
 }
@@ -79,7 +114,7 @@ function isPlatform() {
 function GotoGZH() {
     const uri = import.meta.env.VITE_APP_WEBSITE ? import.meta.env.VITE_APP_WEBSITE : window.globalVariable.WEBSITE
     const appid = import.meta.env.VITE_APP_GZHAPPID ? import.meta.env.VITE_APP_GZHAPPID : window.globalVariable.GZHAPPID
-    const redirect_uri = encodeURIComponent(`${uri}/activate/phone?token=${token}`)
+    const redirect_uri = encodeURIComponent(`${uri}/activate/gzhphone?token=${token}`)
     const url = `https://open.weixin.qq.com/connect/oauth2/authorize?appid=${appid}&redirect_uri=${redirect_uri}&response_type=code&scope=snsapi_userinfo&state=STATE#wechat_redirect`
 
     location.href = url
@@ -94,9 +129,8 @@ onMounted(async () => {
 <style lang="scss" scoped>
 @import "./index";
 
-.title {
-    text-align: center;
-    padding: 0;
-    margin: 0;
+.agreement-tips {
+    margin-top: 5px;
+    font-size: 12px;
 }
 </style>

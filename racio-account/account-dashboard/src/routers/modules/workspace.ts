@@ -2,30 +2,30 @@
 
 import Layout from "@/layout/index.vue"
 
-const accountRouter = [
+const workspaceRouter = [
     {
-        path: "/account",
-        name: "account",
-        redirect: "/account/my",
+        path: "/workspace",
+        name: "workspace",
+        redirect: "/workspace/my",
         hidden: false,
         component: Layout,
         meta: { title: "管理后台", roles: ["owner", "admin"], icon: "House", requireAuth: true, },
         children: [
             {
-                path: "/account/my",
-                component: () => import("@/views/account/my.vue"),
+                path: "/workspace/my",
+                component: () => import("@/views/workspace/my.vue"),
                 name: "my",
                 meta: { title: "我的工作空间", icon: "House", requireAuth: true, roles: ["owner", "admin"] },
             },
             {
-                path: "/account/list",
-                component: () => import("@/views/account/list.vue"),
+                path: "/workspace/list",
+                component: () => import("@/views/workspace/list.vue"),
                 name: "Userlist",
                 meta: { title: "用户管理", icon: "House", requireAuth: true, roles: ["owner", "admin"] },
             },
             {
-                path: "/account/invites",
-                component: () => import("@/views/account/invitesList.vue"),
+                path: "/workspace/invites",
+                component: () => import("@/views/workspace/invitesList.vue"),
                 name: "invites",
                 meta: { title: "邀请管理", icon: "Reading", requireAuth: true, roles: ["owner", "admin"] },
 
@@ -34,4 +34,4 @@ const accountRouter = [
     },
 ]
 
-export default accountRouter
+export default workspaceRouter

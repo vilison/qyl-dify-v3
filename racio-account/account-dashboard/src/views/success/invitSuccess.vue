@@ -1,7 +1,13 @@
 <template>
   <div class="app-container">
     <div class="app-container-inner">
-      <div class="wscn-http403-container">
+      <div class="wscn-http403-container ">
+        <div class="bullshit__oops view_mobile"><span>&#127881; 欢迎 {{ name }}</span>
+          <div class="success_tips_txt">
+            进入<span>{{ workspace_name }}</span>
+            <div>的数字员工空间</div>
+          </div>
+        </div>
         <div class="wscn-http403">
           <div class="pic-403">
             <img class="pic-403__parent" src="@/assets/success/success.png" alt="403" />
@@ -9,37 +15,84 @@
             <img class="pic-403__child mid" src="@/assets/403_images/403_cloud.png" alt="403" />
             <img class="pic-403__child right" src="@/assets/403_images/403_cloud.png" alt="403" />
           </div>
+        </div>
+        <div class="button-box">
+          <div class="bullshit__oops view_pc"><span>&#127881; 欢迎 {{ name }}</span>
+            <div class="success_tips_txt">
+              进入<span>{{ workspace_name }}</span>
+              <div>的数字员工空间</div>
+            </div>
+          </div>
           <div class="bullshit">
-            <div class="bullshit__oops">激活成功！</div>
-            <el-button type="primary" @click="goToAI">体验Ai应用</el-button>
-            <el-button @click="$router.push('/account')" v-if="roleTypes != 'normal'">进入管理后台</el-button>
+            <el-button class="button-ai" type="primary" size="large" @click="goToAI">立即体验</el-button>
+
+            <el-button class="button-admin" size="large" @click="$router.push('/workspace')"
+              v-if="roleTypes != 'normal' && platform == 'pc'">进入管理后台</el-button>
+          </div>
+          <div v-if="roleTypes != 'normal'" class="tips_pc">
+            <div>打造数字员工请在PC端访问</div>
+            <div>{{ websiteUrl }}</div>
           </div>
         </div>
+        <div class="view_pc">
+
+        </div>
       </div>
+
     </div>
   </div>
 </template>
 
 <script lang="ts" setup>
-import { onMounted } from 'vue';
+import { onMounted, ref } from 'vue';
 import { getQueryObject } from "@/utils/index"
 const urlQuery = getQueryObject(null)
-
-const { roleTypes } = urlQuery
+const websiteUrl = import.meta.env.VITE_APP_WEBSITE ? import.meta.env.VITE_APP_WEBSITE : window.globalVariable.WEBSITE
+const { roleTypes, workspace_name, name } = urlQuery
 const goToAI = () => {
   const uri = import.meta.env.VITE_APP_DIFY_URL ? import.meta.env.VITE_APP_DIFY_URL : window.globalVariable.DIFY_URL
+  console.log(`${uri}?console_token=${localStorage.token}`)
   window.open(`${uri}?console_token=${localStorage.token}`, '_blank')
 }
+import { useUserStore } from '@/store/modules/user'
+const platform = ref("")
+function isPlatform() {
+  var ua = navigator.userAgent.toLowerCase();
+  if (ua.match(/MicroMessenger/i) == "micromessenger") {
+    platform.value = "wechat"
+  } else {
+    platform.value = "pc"
+  }
+}
+onMounted(() => {
+  isPlatform()
+})
 
 </script>
 
 <style lang="scss" scoped>
+.tips_pc {
+  background: rgba(184, 184, 184, .23);
+  padding: 10px;
+  margin-top: 10px;
+  width: 250px;
+}
+
 .wscn-http403-container {
   width: 100%;
   height: 100%;
   display: flex;
   align-items: center;
+  flex-direction: row;
   justify-content: center;
+}
+
+.view_pc {
+  display: block;
+}
+
+.view_mobile {
+  display: none;
 }
 
 a {
@@ -52,8 +105,9 @@ a {
   display: flex;
   justify-content: center;
   align-items: center;
-  padding: 0 50px;
+
   overflow: hidden;
+  flex: 10;
 
   .pic-403 {
     position: relative;
@@ -258,6 +312,109 @@ a {
         opacity: 1;
       }
     }
+  }
+}
+
+.bullshit__oops {
+  font-size: 22px;
+  font-weight: 800;
+  color: #3999f8;
+  text-align: center;
+}
+
+.bullshit__oops span {
+  font-size: 24px;
+  margin: 0 2px;
+  color: #1482f0
+}
+
+.button-box {
+  flex: 5;
+  text-align: left;
+
+  .bullshit__oops {
+    text-align: left;
+    margin-bottom: 20px;
+
+  }
+}
+
+
+
+
+
+
+@media screen and (max-width: 768px) {
+  .button-box {
+    flex: 0
+  }
+
+  .view_mobile {
+    display: block;
+  }
+
+  .view_pc {
+    display: none;
+  }
+
+  .wscn-http403-container {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    flex-direction: column;
+    justify-content: center;
+  }
+
+  .success_tips_txt {
+    display: table;
+    text-align: left;
+    margin: auto;
+    margin-top: 100px;
+    margin-bottom: 20px;
+    font-size: 26px;
+
+  }
+
+
+  .bullshit__oops {
+    font-size: 20px;
+  }
+
+  .bullshit__oops span {
+    font-size: 24px;
+  }
+
+  .bullshit {
+    padding-top: 100px;
+    text-align: center;
+    margin-bottom: 20px;
+  }
+
+  .wscn-http403 {
+    display: none;
+  }
+
+  .wscn-http403 {
+    width: 100%;
+    padding: 0px;
+    margin: 0px
+  }
+
+
+  .success_tips_txt span {
+    font-size: 26px;
+  }
+
+
+  .button-admin {
+    display: none;
+  }
+
+  .button-ai {
+    width: 248px;
+    height: 50px;
+    font-size: 28px;
   }
 }
 </style>

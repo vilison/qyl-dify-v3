@@ -71,7 +71,7 @@
         <template #footer>
             <div class="dialog-footer">
                 <el-button @click="centerDialogVisible">取消</el-button>
-                <el-button type="primary" @click="sendInvite">
+                <el-button type="primary" @click="sendInvite" :disabled="buttonStatus">
                     发出邀请
                 </el-button>
             </div>
@@ -174,13 +174,13 @@ function sendInvite() {
         })
 }
 onMounted(async () => {
-    AuthList()
+    // AuthList()
     // getMemberInvites()
 })
 </script>
 <style lang="scss" scoped>
 .home-container {
-    width: 90%;
+    width: 98%;
     margin: 32px;
 }
 
