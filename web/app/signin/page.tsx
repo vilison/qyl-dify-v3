@@ -1,33 +1,38 @@
 'use client'
 import React, { useEffect, useState } from 'react'
 import cn from 'classnames'
-import Script from 'next/script'
 import Loading from '../components/base/loading'
 import Forms from './forms'
 import Header from './_header'
 import style from './page.module.css'
 import UserSSOForm from './userSSOForm'
-import { IS_CE_EDITION } from '@/config'
 
 import type { SystemFeatures } from '@/types/feature'
 import { defaultSystemFeatures } from '@/types/feature'
-import { getSystemFeatures } from '@/service/common'
 
 const SignIn = () => {
   const [loading, setLoading] = useState<boolean>(true)
   const [systemFeatures, setSystemFeatures] = useState<SystemFeatures>(defaultSystemFeatures)
-
   useEffect(() => {
-    getSystemFeatures().then((res) => {
-      setSystemFeatures(res)
-    }).finally(() => {
-      setLoading(false)
-    })
+    let authUrl = ''
+    if (process.env.NEXT_PUBLIC_AUTH_URL)
+      authUrl = process.env.NEXT_PUBLIC_AUTH_URL
+    else if (process.env.AUTH_URL)
+      authUrl = process.env.AUTH_URL
+    else
+      authUrl = globalThis.document?.body?.getAttribute('data-public-auth-account') as string
+
+    location.href = authUrl
+    // getSystemFeatures().then((res) => {
+    //   setSystemFeatures(res)
+    // }).finally(() => {
+    //   setLoading(false)
+    // })
   }, [])
 
   return (
     <>
-      {!IS_CE_EDITION && (
+      {/* {!IS_CE_EDITION && (
         <>
           <Script strategy="beforeInteractive" async src={'https://www.googletagmanager.com/gtag/js?id=AW-11217955271'}></Script>
           <Script
@@ -43,7 +48,7 @@ gtag('config', 'AW-11217955271"');
           >
           </Script>
         </>
-      )}
+      )} */}
       <div className={cn(
         style.background,
         'flex w-full min-h-screen',
@@ -75,7 +80,7 @@ gtag('config', 'AW-11217955271"');
             <>
               <Forms />
               <div className='px-8 py-6 text-sm font-normal text-gray-500'>
-                © {new Date().getFullYear()} LangGenius, Inc. All rights reserved.
+                © {new Date().getFullYear()} Racio, Inc. All rights reserved.
               </div>
             </>
           )}

@@ -19,6 +19,7 @@ account_fields = {
     'timezone': fields.String,
     'last_login_at': TimestampField,
     'last_login_ip': fields.String,
+    'status': fields.String,
     'created_at': TimestampField
 }
 
@@ -30,7 +31,7 @@ account_with_role_fields = {
     'last_login_at': TimestampField,
     'created_at': TimestampField,
     'role': fields.String,
-    'status': fields.String,
+    'status': fields.String
 }
 
 account_with_role_list_fields = {

@@ -1,0 +1,148 @@
+基于postgreSQL 的DDL 使用mermider 生成ER图
+
+----------------------------------------------------------------
+-- public.account_integrates definition
+
+-- Drop table
+
+-- DROP TABLE public.account_integrates;
+
+CREATE TABLE public.account_integrates (
+	id uuid DEFAULT uuid_generate_v4() NOT NULL,
+	account_id uuid NOT NULL,
+	provider varchar(16) NOT NULL,
+	open_id varchar(255) NOT NULL,
+	encrypted_token varchar(255) NOT NULL,
+	created_at timestamp DEFAULT CURRENT_TIMESTAMP(0) NOT NULL,
+	updated_at timestamp DEFAULT CURRENT_TIMESTAMP(0) NOT NULL,
+	CONSTRAINT account_integrate_pkey PRIMARY KEY (id),
+	CONSTRAINT unique_account_provider UNIQUE (account_id, provider),
+	CONSTRAINT unique_provider_open_id UNIQUE (provider, open_id)
+);
+
+----------------------------------------------------------------
+-- public.accounts definition
+
+-- Drop table
+
+-- DROP TABLE public.accounts;
+
+CREATE TABLE public.accounts (
+	id uuid DEFAULT uuid_generate_v4() NOT NULL,
+	"name" varchar(255) NOT NULL,
+	email varchar(255) NOT NULL,
+	phone varchar(11) NULL,
+	account_role varchar(16) NULL,
+	"password" varchar(255) NULL,
+	password_salt varchar(255) NULL,
+	avatar varchar(255) NULL,
+	interface_language varchar(255) NULL,
+	interface_theme varchar(255) NULL,
+	timezone varchar(255) NULL,
+	last_login_at timestamp NULL,
+	last_login_ip varchar(255) NULL,
+	last_active_at timestamp DEFAULT CURRENT_TIMESTAMP(0) NOT NULL,
+	status varchar(16) DEFAULT 'active'::character varying NOT NULL,
+	initialized_at timestamp DEFAULT CURRENT_TIMESTAMP(0) NOT NULL,
+	created_at timestamp DEFAULT CURRENT_TIMESTAMP(0) NOT NULL,
+	updated_at timestamp DEFAULT CURRENT_TIMESTAMP(0) NOT NULL,
+	CONSTRAINT account_pkey PRIMARY KEY (id)
+);
+CREATE INDEX account_email_idx ON public.accounts USING btree (email);
+
+----------------------------------------------------------------
+-- public.member_invite definition
+
+-- Drop table
+
+-- DROP TABLE public.member_invite;
+
+CREATE TABLE public.member_invite (
+	id uuid DEFAULT uuid_generate_v4() NOT NULL,
+	tenant_id uuid NULL,
+	"role" varchar(16) NOT NULL,
+	invited_by uuid NOT NULL,
+	remark varchar(255) DEFAULT ''::character varying NULL,
+	"domain" varchar(255) DEFAULT ''::character varying NULL,
+	created_at timestamp DEFAULT CURRENT_TIMESTAMP(0) NOT NULL,
+	CONSTRAINT member_invite_pkey PRIMARY KEY (id)
+);
+
+----------------------------------------------------------------
+-- public.alembic_version definition
+
+-- Drop table
+
+-- DROP TABLE public.alembic_version;
+
+CREATE TABLE public.alembic_version (
+	version_num varchar(32) NOT NULL,
+	CONSTRAINT alembic_version_pkc PRIMARY KEY (version_num)
+);
+
+----------------------------------------------------------------
+ER Diagram table
+----------------------------------------------------------------
+以下是根据您提供的 DDL 定义的实体和它们之间的关系：
+
+account_integrates 表：
+
+实体：account_integrates
+属性：
+id (UUID, 主键)
+account_id (UUID, 外键)
+provider (VARCHAR)
+open_id (VARCHAR)
+encrypted_token (VARCHAR)
+created_at (TIMESTAMP)
+updated_at (TIMESTAMP)
+约束：
+UNIQUE (account_id, provider)
+UNIQUE (provider, open_id)
+accounts 表：
+
+实体：accounts
+属性：
+id (UUID, 主键)
+name (VARCHAR)
+email (VARCHAR)
+phone (VARCHAR, 可为空)
+account_role (VARCHAR, 可为空)
+password (VARCHAR, 可为空)
+password_salt (VARCHAR, 可为空)
+avatar (VARCHAR, 可为空)
+interface_language (VARCHAR, 可为空)
+interface_theme (VARCHAR, 可为空)
+timezone (VARCHAR, 可为空)
+last_login_at (TIMESTAMP, 可为空)
+last_login_ip (VARCHAR, 可为空)
+last_active_at (TIMESTAMP)
+status (VARCHAR, 默认 'active')
+initialized_at (TIMESTAMP)
+created_at (TIMESTAMP)
+updated_at (TIMESTAMP)
+索引：
+account_email_idx (email)
+member_invite 表：
+
+实体：member_invite
+属性：
+id (UUID, 主键)
+tenant_id (UUID, 可为空)
+role (VARCHAR)
+invited_by (UUID, 外键)
+remark (VARCHAR, 可为空)
+domain (VARCHAR, 可为空)
+created_at (TIMESTAMP)
+alembic_version 表：
+
+实体：alembic_version
+属性：
+version_num (VARCHAR, 主键)
+实体之间的关系：
+
+account_integrates 与 accounts 之间存在一个关系，其中 account_integrates 的 account_id 是 accounts 的外键。
+member_invite 与 accounts 之间存在一个关系，其中 member_invite 的 invited_by 是 accounts 的外键。
+
+
+

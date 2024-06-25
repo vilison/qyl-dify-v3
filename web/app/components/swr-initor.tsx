@@ -23,7 +23,7 @@ const SwrInitor = ({
 
     if (consoleToken) {
       localStorage?.setItem('console_token', consoleToken!)
-      router.replace('/apps', { forceOptimisticNavigation: false } as any)
+      router.replace('/office', { forceOptimisticNavigation: false } as any)
     }
     setInit(true)
   }, [])

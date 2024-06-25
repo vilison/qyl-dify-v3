@@ -79,6 +79,7 @@ DEFAULTS = {
     'KEYWORD_DATA_SOURCE_TYPE': 'database',
     'INNER_API': 'False',
     'ENTERPRISE_ENABLED': 'False',
+    'RACIO_ACCOUNT_ENABLED': 'False',
 }
 
 
@@ -326,6 +327,8 @@ class Config:
         # ------------------------
         # Platform Configurations.
         # ------------------------
+        self.WECHAT_CLIENT_ID = get_env('WECHAT_CLIENT_ID')
+        self.WECHAT_CLIENT_SECRET = get_env('WECHAT_CLIENT_SECRET')
         self.GITHUB_CLIENT_ID = get_env('GITHUB_CLIENT_ID')
         self.GITHUB_CLIENT_SECRET = get_env('GITHUB_CLIENT_SECRET')
         self.GOOGLE_CLIENT_ID = get_env('GOOGLE_CLIENT_ID')
@@ -378,3 +381,21 @@ class Config:
 
         self.KEYWORD_DATA_SOURCE_TYPE = get_env('KEYWORD_DATA_SOURCE_TYPE')
         self.ENTERPRISE_ENABLED = get_bool_env('ENTERPRISE_ENABLED')
+
+        self.RACIO_ACCOUNT_ENABLED = get_bool_env('RACIO_ACCOUNT_ENABLED')
+
+
+class CloudEditionConfig(Config):
+
+    def __init__(self):
+        super().__init__()
+
+        self.EDITION = "CLOUD"
+
+        self.WECHAT_CLIENT_ID = get_env('WECHAT_CLIENT_ID')
+        self.WECHAT_CLIENT_SECRET = get_env('WECHAT_CLIENT_SECRET')
+        self.GITHUB_CLIENT_ID = get_env('GITHUB_CLIENT_ID')
+        self.GITHUB_CLIENT_SECRET = get_env('GITHUB_CLIENT_SECRET')
+        self.GOOGLE_CLIENT_ID = get_env('GOOGLE_CLIENT_ID')
+        self.GOOGLE_CLIENT_SECRET = get_env('GOOGLE_CLIENT_SECRET')
+        self.OAUTH_REDIRECT_PATH = get_env('OAUTH_REDIRECT_PATH')

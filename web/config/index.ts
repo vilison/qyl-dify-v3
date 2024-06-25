@@ -33,6 +33,12 @@ export const PUBLIC_API_PREFIX: string = publicApiPrefix
 const EDITION = process.env.NEXT_PUBLIC_EDITION || globalThis.document?.body?.getAttribute('data-public-edition') || 'SELF_HOSTED'
 export const IS_CE_EDITION = EDITION === 'SELF_HOSTED'
 
+const DEPLOY_REGION = process.env.NEXT_PUBLIC_DEPLOY_REGION || globalThis.document?.body?.getAttribute('data-public-deploy-region') || 'CHINA'
+export const IS_CN_REGION = DEPLOY_REGION === 'CHINA'
+
+const AUTH_URL = process.env.NEXT_PUBLIC_AUTH_URL || globalThis.document?.body?.getAttribute('data-public-auth-account') || ''
+export const IS_AUTH_URL = AUTH_URL !== ''
+
 export const TONE_LIST = [
   {
     id: 1,
@@ -156,28 +162,28 @@ export const DEFAULT_AGENT_SETTING = {
 }
 
 export const DEFAULT_AGENT_PROMPT = {
-  chat: `Respond to the human as helpfully and accurately as possible. 
+  chat: `Respond to the human as helpfully and accurately as possible.
 
   {{instruction}}
-  
+
   You have access to the following tools:
-  
+
   {{tools}}
-  
+
   Use a json blob to specify a tool by providing an {{TOOL_NAME_KEY}} key (tool name) and an {{ACTION_INPUT_KEY}} key (tool input).
   Valid "{{TOOL_NAME_KEY}}" values: "Final Answer" or {{tool_names}}
-  
+
   Provide only ONE action per $JSON_BLOB, as shown:
-  
+
   \`\`\`
   {
     "{{TOOL_NAME_KEY}}": $TOOL_NAME,
     "{{ACTION_INPUT_KEY}}": $ACTION_INPUT
   }
   \`\`\`
-  
+
   Follow this format:
-  
+
   Question: input question to answer
   Thought: consider previous and subsequent steps
   Action:
@@ -194,10 +200,10 @@ export const DEFAULT_AGENT_PROMPT = {
     "{{ACTION_INPUT_KEY}}": "Final response to human"
   }
   \`\`\`
-  
+
   Begin! Reminder to ALWAYS respond with a valid json blob of a single action. Use tools if necessary. Respond directly if appropriate. Format is Action:\`\`\`$JSON_BLOB\`\`\`then Observation:.`,
   completion: `
-  Respond to the human as helpfully and accurately as possible. 
+  Respond to the human as helpfully and accurately as possible.
 
 {{instruction}}
 

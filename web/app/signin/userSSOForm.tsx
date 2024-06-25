@@ -27,7 +27,7 @@ const UserSSOForm: FC<UserSSOFormProps> = ({
   useEffect(() => {
     if (consoleToken) {
       localStorage.setItem('console_token', consoleToken)
-      router.replace('/apps')
+      router.replace('/office')
     }
 
     if (message) {

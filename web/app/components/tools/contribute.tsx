@@ -3,7 +3,6 @@ import type { FC } from 'react'
 import React from 'react'
 import { useTranslation } from 'react-i18next'
 import { Heart02 } from '../base/icons/src/vender/solid/education'
-import { BookOpen01 } from '../base/icons/src/vender/line/education'
 
 const Contribute: FC = () => {
   const { t } = useTranslation()
@@ -21,10 +20,10 @@ const Contribute: FC = () => {
           {t('tools.contribute.line2')}
         </div>
       </div>
-      <a href='https://github.com/langgenius/dify/blob/main/CONTRIBUTING.md' target='_blank' rel='noopener noreferrer' className='mt-1 flex items-center space-x-1 text-[#155EEF]'>
+      {/* <a href='https://github.com/langgenius/dify/blob/main/CONTRIBUTING.md' target='_blank' rel='noopener noreferrer' className='mt-1 flex items-center space-x-1 text-[#155EEF]'>
         <BookOpen01 className='w-3 h-3' />
         <div className='leading-[18px] text-xs font-normal'>{t('tools.contribute.viewGuide')}</div>
-      </a>
+      </a> */}
     </div>
   )
 }

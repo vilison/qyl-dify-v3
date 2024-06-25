@@ -10,7 +10,7 @@ import type { Collection, CustomCollectionBackend, Tool } from './types'
 import { CollectionType, LOC } from './types'
 import ToolNavList from './tool-nav-list'
 import Search from './search'
-import Contribute from './contribute'
+// import Contribute from './contribute'
 import ToolList from './tool-list'
 import EditCustomToolModal from './edit-custom-collection-modal'
 import NoCustomTool from './info/no-custom-tool'
@@ -217,7 +217,7 @@ const Tools: FC<Props> = ({
             )}
 
           {loc === LOC.tools && (
-            <Contribute />
+            <></>
           )}
         </div>
 

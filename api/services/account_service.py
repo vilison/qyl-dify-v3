@@ -440,7 +440,7 @@ class RegisterService:
 
             if open_id is not None or provider is not None:
                 AccountService.link_account_integrate(provider, open_id, account)
-            if current_app.config['EDITION'] != 'SELF_HOSTED':
+            if current_app.config['EDITION'] != 'SELF_HOSTED' and current_app.config.get('RACIO_ACCOUNT_ENABLED') != True:
                 tenant = TenantService.create_tenant(f"{account.name}'s Workspace")
 
                 TenantService.create_tenant_member(tenant, account, role='owner')
@@ -490,7 +490,7 @@ class RegisterService:
             language=account.interface_language,
             to=email,
             token=token,
-            inviter_name=inviter.name if inviter else 'Dify',
+            inviter_name=inviter.name if inviter else 'Racio',
             workspace_name=tenant.name,
         )
 

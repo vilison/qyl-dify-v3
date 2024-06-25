@@ -23,6 +23,10 @@ export default function IntegrationsPage() {
       name: t('common.integrations.github'),
       description: t('common.integrations.githubAccount'),
     },
+    wechat: {
+      name: t('common.integrations.wechat'),
+      description: t('common.integrations.wechatAccount'),
+    },
   }
 
   const { data } = useSWR({ url: '/account/integrates' }, fetchAccountIntegrates)

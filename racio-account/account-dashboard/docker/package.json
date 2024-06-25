@@ -1,0 +1,24 @@
+{
+    "name": "Racio",
+    "private": true,
+    "version": "0.0.0",
+    "scripts": {
+        "preview": "vite preview"
+    },
+    "dependencies": {
+        "vite": "^3.0.0"
+    },
+    "devDependencies": {
+        "@vitejs/plugin-vue": "^3.0.0",
+        "vite-plugin-compression": "^0.5.1",
+        "vite-plugin-style-import": "^2.0.0",
+        "vite-plugin-svg-icons": "^2.0.1",
+        "dart-sass": "^1.25.0",
+        "eslint": "^8.21.0",
+        "eslint-config-prettier": "^8.5.0",
+        "eslint-plugin-prettier": "^4.2.1",
+        "eslint-plugin-vue": "^9.3.0",
+        "fast-glob": "^3.2.11",
+        "vite-plugin-vue-setup-extend": "^0.4.0"
+    }
+}
