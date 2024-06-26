@@ -18,7 +18,7 @@ import AppTypeSelector from '@/app/components/app/type-selector'
 import Loading from '@/app/components/base/loading'
 import { fetchInstalledAppList as doFetchInstalledAppList } from '@/service/explore'
 import useBreakpoints, { MediaType } from '@/hooks/use-breakpoints'
-
+import { useAppContext } from '@/context/app-context'
 type AppsProps = {
   pageType?: PageType
   onSuccess?: () => void
@@ -41,6 +41,7 @@ const Apps = ({
   const isMobile = media === MediaType.mobile
   const [currentType, setCurrentType] = useState<string>('')
   const [currTagId, setCurrTagId] = useState('')
+  const { currentWorkspace } = useAppContext()
   const [currCategory, setCurrCategory] = useTabSearchParams({
     defaultTab: allCategoriesEn,
     disableSearchParams: pageType !== PageType.EXPLORE,
@@ -82,13 +83,29 @@ const Apps = ({
   }, [])
 
   const filteredList = useMemo(() => {
-    installedApps.forEach((item) => {
-      for (const v in allList) {
-        if (item.app.id === allList[v].id)
-          allList[v].id = item.id
-      }
-    })
-    return allList
+    const newList = []
+    if (currCategory === '' || currCategory === '推荐') {
+      installedApps.forEach((item) => {
+        console.log(item, 'itemitem', allList)
+
+        newList.push({ ...item.app, id: item.id })
+      })
+      return newList
+    }
+    else {
+      installedApps.forEach((item) => {
+        for (const v in allList) {
+          if (item.app.id === allList[v].id) {
+            console.log(allList, 'allList')
+
+            allList[v].id = item.id
+            newList.push(allList[v])
+          }
+        }
+      })
+
+      return newList
+    }
   }, [installedApps, allList])
   useMemo(() => {
     // setMobileAllList([])
@@ -144,12 +161,12 @@ const Apps = ({
       'flex flex-col',
       pageType === PageType.EXPLORE ? 'h-full border-l border-gray-200' : 'h-[calc(100%-56px)]',
     )}>
-      {/* {pageType === PageType.EXPLORE && (
+      {pageType === PageType.EXPLORE && (
         <div className='shrink-0 pt-6 px-12'>
-          <div className={`mb-1 ${s.textGradient} text-xl font-semibold`}>{t('racio.apps.title')}</div>
-          <div className='text-gray-500 text-sm'>{t('racio.apps.description')}</div>
+          <div className={`mb-1 ${s.textGradient} text-xl font-semibold`}>{currentWorkspace.name}</div>
+          <div className='text-gray-500 text-sm'>&#128075; {t('racio.apps.description')} &#128640; </div>
         </div>
-      )} */}
+      )}
       <div className={cn(
         'flex items-center mt-6',
         pageType === PageType.EXPLORE ? 'px-12' : 'px-8',
