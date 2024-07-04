@@ -22,7 +22,7 @@ from fields.conversation_fields import (
 )
 from libs.helper import datetime_string
 from libs.login import login_required
-from models.model import AppMode, Conversation, Message, MessageAnnotation
+from models.model import Account, AppMode, Conversation, Message, MessageAnnotation
 
 
 class CompletionConversationApi(Resource):
@@ -148,7 +148,8 @@ class ChatConversationApi(Resource):
         parser.add_argument('limit', type=int_range(1, 100), required=False, default=20, location='args')
         args = parser.parse_args()
 
-        query = db.select(Conversation).where(Conversation.app_id == app_model.id)
+        # query = db.select(Conversation, Account).join(Account, Account.id == Conversation.from_account_id).where(Conversation.app_id == app_model.id)
+        query = db.select(Conversation, Account.email).where(Conversation.app_id == app_model.id)
 
         if args['keyword']:
             query = query.join(
@@ -160,7 +161,6 @@ class ChatConversationApi(Resource):
                     Conversation.name.ilike('%{}%'.format(args['keyword'])),
                     Conversation.introduction.ilike('%{}%'.format(args['keyword'])),
                 ),
-
             )
 
         account = current_user
@@ -207,12 +207,21 @@ class ChatConversationApi(Resource):
 
         query = query.order_by(Conversation.created_at.desc())
 
+        # fill account name via account_id
+        query = query.join(
+            Account, Account.id == Conversation.from_account_id
+        ).add_columns(Account.name.label('from_account_name'))
+        print(f'add new: {query}')
+
         conversations = db.paginate(
             query,
             page=args['page'],
             per_page=args['limit'],
             error_out=False
         )
+
+        for item in conversations.items:
+            print(f'conversation: {item}')
 
         return conversations
 
