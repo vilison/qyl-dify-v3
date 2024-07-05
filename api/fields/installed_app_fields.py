@@ -33,6 +33,7 @@ tag_fields = {
 app_with_tags_fields = {
     'id': fields.String,
     'name': fields.String,
+    'description': fields.String,
     'mode': fields.String,
     'icon': fields.String,
     'icon_background': fields.String,
