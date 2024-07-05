@@ -478,7 +478,6 @@ class InstalledApp(db.Model):
         return tenant
 
 
-
 class Conversation(db.Model):
     __tablename__ = 'conversations'
     __table_args__ = (
@@ -553,6 +552,16 @@ class Conversation(db.Model):
                 return first_message.query
             else:
                 return ''
+
+    @property
+    def account_name(self):
+        account = db.session.query(Account).filter(Account.id == self.from_account_id).first()
+        return account.name
+
+    @property
+    def account_email(self):
+        account = db.session.query(Account).filter(Account.id == self.from_account_id).first()
+        return account.email
 
     @property
     def annotated(self):
