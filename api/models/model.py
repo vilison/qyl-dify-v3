@@ -477,6 +477,11 @@ class InstalledApp(db.Model):
         tenant = db.session.query(Tenant).filter(Tenant.id == self.tenant_id).first()
         return tenant
 
+    @property
+    def uninstallable(self):
+        uninstallable = self.tenant_id == self.app_owner_tenant_id
+        return uninstallable
+
 
 class Conversation(db.Model):
     __tablename__ = 'conversations'

@@ -1,18 +1,20 @@
+import uuid
 from datetime import datetime, timezone
 
 from flask_login import current_user
-from flask_restful import Resource, inputs, marshal_with, reqparse
+from flask_restful import Resource, inputs, marshal, marshal_with, reqparse
 from sqlalchemy import and_
-from werkzeug.exceptions import BadRequest, Forbidden, NotFound
+from werkzeug.exceptions import BadRequest, Forbidden, NotFound, abort
 
 from controllers.console import api
 from controllers.console.explore.wraps import InstalledAppResource
 from controllers.console.wraps import account_initialization_required, cloud_edition_billing_resource_check
 from extensions.ext_database import db
-from fields.installed_app_fields import installed_app_list_fields
+from fields.installed_app_fields import installed_app_list_fields, installed_app_pagination_fields
 from libs.login import login_required
 from models.model import App, InstalledApp, RecommendedApp
 from services.account_service import TenantService
+from services.installed_app_service import InstalledAppService
 
 
 class InstalledAppsListApi(Resource):
@@ -89,6 +91,32 @@ class InstalledAppsListApi(Resource):
         return {'message': 'App installed successfully'}
 
 
+class InstalledAppsTagsListApi(Resource):
+    @login_required
+    @account_initialization_required
+    def get(self):
+        """Get installed apps with tags"""
+        def uuid_list(value):
+            try:
+                return [str(uuid.UUID(v)) for v in value.split(',')]
+            except ValueError:
+                abort(400, message="Invalid UUID format in tag_ids.")
+        parser = reqparse.RequestParser()
+        parser.add_argument('page', type=inputs.int_range(1, 99999), required=False, default=1, location='args')
+        parser.add_argument('limit', type=inputs.int_range(1, 100), required=False, default=20, location='args')
+        parser.add_argument('tag_ids', type=uuid_list, location='args', required=False)
+
+        args = parser.parse_args()
+
+        # get installed apps list with tags
+        installed_app_service = InstalledAppService()
+        installed_app_pagination = installed_app_service.get_paginate_installed_apps(current_user.current_tenant_id, args)
+        if not installed_app_pagination:
+            return {'data': [], 'total': 0, 'page': 1, 'limit': 20, 'has_more': False}
+
+        return marshal(installed_app_pagination, installed_app_pagination_fields)
+
+
 class InstalledAppApi(InstalledAppResource):
     """
     update and delete an installed app
@@ -120,4 +148,5 @@ class InstalledAppApi(InstalledAppResource):
 
 
 api.add_resource(InstalledAppsListApi, '/installed-apps')
+api.add_resource(InstalledAppsTagsListApi, '/installed-apps/tags')
 api.add_resource(InstalledAppApi, '/installed-apps/<uuid:installed_app_id>')
