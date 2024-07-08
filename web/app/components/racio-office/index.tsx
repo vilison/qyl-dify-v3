@@ -25,7 +25,7 @@ const Explore: FC<IExploreProps> = ({
   const isMobile = media === MediaType.mobile
 
   useEffect(() => {
-    document.title = `${currentWorkspace.name} -By Racio`;
+    document.title = `${currentWorkspace.name || '办公室'} -By Racio`;
     (async () => {
       const { accounts } = await fetchMembers({ url: '/workspaces/current/members', params: {} })
       if (!accounts)
@@ -33,7 +33,7 @@ const Explore: FC<IExploreProps> = ({
       const currUser = accounts.find(account => account.id === userProfile.id)
       setHasEditPermission(currUser?.role !== 'normal')
     })()
-  }, [])
+  }, [currentWorkspace])
 
   return (
     <div className={cn('flex h-full', isMobile ? 'bg-sky-50' : 'bg-gray-100 ', 'border-t border-gray-200 overflow-hidden')}>

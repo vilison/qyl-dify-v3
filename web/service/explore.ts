@@ -39,3 +39,8 @@ export const updatePinStatus = (id: string, isPinned: boolean) => {
 export const getToolProviders = () => {
   return get('/workspaces/current/tool-providers')
 }
+
+// 新增 installed-apps ，
+export const getInstalledTags = (tag_ids: string) => {
+  return get(`/installed-apps/tags?tag_ids=${tag_ids}`)
+}

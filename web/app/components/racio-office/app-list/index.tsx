@@ -86,8 +86,6 @@ const Apps = ({
     const newList = []
     if (currCategory === '' || currCategory === '推荐') {
       installedApps.forEach((item) => {
-        console.log(item, 'itemitem', allList)
-
         newList.push({ ...item.app, id: item.id })
       })
       return newList
@@ -107,27 +105,23 @@ const Apps = ({
       return newList
     }
   }, [installedApps, allList])
-  useMemo(() => {
+
+  const mobileList = useMemo(() => {
     // setMobileAllList([])
     // 使用 .map 方法而不是直接修改 mobileAllList
+    const List = []
     if (isMobile) {
-      tagList.forEach(async (item: any) => {
-        console.log(item)
-
-        fetchAppList({ url: '/apps', params: { tag_ids: item.id } }).then((result: any) => {
-          const rdata = result.data.map((items) => {
-            for (const v of installedApps) {
-              if (v.app.id === items.id)
-                items.id = v.id
-            }
-
-            return { name: item.name, data: items, tag_id: item.id }
-          })
-
-          setMobileAllList(prevList => [...prevList, { name: item.name, data: rdata, tag_id: item.id }])
-        }).catch((err) => {
-          console.log(err)
-        })
+      const fetchLists = tagList.map(item =>
+        fetchAppList({ url: 'installed-apps/tags', params: { tag_ids: item.id } }),
+      )
+      Promise.all(fetchLists).then((results) => {
+        const List = results.map((data, index) => ({
+          name: tagList[index].name,
+          data: data.data,
+          tag_id: tagList[index].id,
+        }))
+        setMobileAllList(List)
+        return List
       })
     }
     else {
@@ -138,7 +132,7 @@ const Apps = ({
         })
       }
     }
-  }, [installedApps, tagList])
+  }, [tagList])
 
   const [currApp, setCurrApp] = React.useState<App | null>(null)
   const [isShowCreateModal, setIsShowCreateModal] = React.useState(false)
@@ -160,13 +154,15 @@ const Apps = ({
     <div className={cn(
       'flex flex-col',
       pageType === PageType.EXPLORE ? 'h-full border-l border-gray-200' : 'h-[calc(100%-56px)]',
+      isMobile && 'overflow-auto',
     )}>
       {pageType === PageType.EXPLORE && (
-        <div className='shrink-0 pt-6 px-12'>
+        <div className={cn('shrink-0 pt-6', isMobile === true ? 'px-8' : 'px-12')}>
           <div className={`mb-1 ${s.textGradient} text-xl font-semibold`}>{currentWorkspace.name}</div>
           <div className='text-gray-500 text-sm'>&#128075; {t('racio.apps.description')} &#128640; </div>
         </div>
-      )}
+      )
+      }
       <div className={cn(
         'flex items-center mt-6',
         pageType === PageType.EXPLORE ? 'px-12' : 'px-8',
@@ -185,55 +181,65 @@ const Apps = ({
             allCategoriesEn={allCategoriesEn}
           />)}
       </div>
-      {!isMobile && (
-        <div className={cn(
-          'relative flex flex-1 pb-6 flex-col overflow-auto bg-gray-100 shrink-0 grow',
-          pageType === PageType.EXPLORE ? 'mt-6' : 'mt-0 pt-2',
-        )}>
-          <nav
-            className={cn(
-              s.appList,
-              'grid content-start shrink-0',
-              pageType === PageType.EXPLORE ? 'gap-4 px-6 sm:px-12' : 'gap-3 px-8  sm:!grid-cols-2 md:!grid-cols-3 lg:!grid-cols-4',
-            )}>
-            {filteredList.map(app => (
-              <AppCard
-                key={app.id}
-                isExplore={pageType === PageType.EXPLORE}
-                app={app}
-                canCreate={hasEditPermission}
-                onOpen={(id) => {
-                  onOpen(id)
-                }}
-              />
+      {
+
+        isMobile && (
+
+          <div className='relative flex flex-1 p-6 flex-col bg-sky-50 shrink-0 grow gap-4'>
+            {mobileAllList.map((item, index) => (
+              <React.Fragment key={index}>
+                {item.data.length > 0 && (
+                  <>
+                    <div className='text-black text-l font-bold'>{item.name === 'rma' ? '推荐' : item.name}</div>
+                    {item.data.map((items, idx) => (
+                      <MappCard
+                        key={items.id + idx}
+                        isExplore={pageType === PageType.EXPLORE}
+                        app={items.app}
+                        appId={items.id}
+                        canCreate={hasEditPermission}
+                        onOpen={(id) => {
+                          onOpen(id)
+                        }}
+                      />
+                    ))}
+                  </>
+                )}
+              </React.Fragment>
             ))}
-          </nav>
-        </div>)}
-      {isMobile && (
-        <div className='relative flex flex-1 p-6 flex-col overflow-auto bg-sky-50 shrink-0 grow gap-4'>
-          {mobileAllList.map((app, index) => (
-            <React.Fragment key={index}>
-              {app.data.length > 0 && (
-                <>
-                  <div className='text-black text-l font-bold'>{app.name === 'rma' ? '推荐' : app.name}</div>
-                  {app.data.map((item, idx) => (
-                    <MappCard
-                      key={item.data.id + idx}
-                      isExplore={pageType === PageType.EXPLORE}
-                      app={item.data}
-                      canCreate={hasEditPermission}
-                      onOpen={(id) => {
-                        onOpen(id)
-                      }}
-                    />
-                  ))}
-                </>
-              )}
-            </React.Fragment>
-          ))}
-        </div>
-      )}
-    </div>
+          </div>
+
+        )
+
+      }
+      {
+        !isMobile && (
+          <div className={cn(
+            'relative flex flex-1 pb-6 flex-col overflow-auto bg-gray-100 shrink-0 grow',
+            pageType === PageType.EXPLORE ? 'mt-6' : 'mt-0 pt-2',
+          )}>
+            <nav
+              className={cn(
+                s.appList,
+                'grid content-start shrink-0',
+                pageType === PageType.EXPLORE ? 'gap-4 px-6 sm:px-12' : 'gap-3 px-8  sm:!grid-cols-2 md:!grid-cols-3 lg:!grid-cols-4',
+              )}>
+              {filteredList.map(app => (
+                <AppCard
+                  key={app.id}
+                  isExplore={pageType === PageType.EXPLORE}
+                  app={app}
+                  canCreate={hasEditPermission}
+                  onOpen={(id) => {
+                    onOpen(id)
+                  }}
+                />
+              ))}
+            </nav>
+          </div>)
+      }
+
+    </div >
   )
 }
 
