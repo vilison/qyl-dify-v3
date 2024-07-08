@@ -9,6 +9,7 @@ export type AppCardProps = {
   app: App
   canCreate: boolean
   onOpen: () => void
+  appId: string
   isExplore: boolean
 }
 
@@ -16,12 +17,13 @@ const AppCard = ({
   app,
   canCreate,
   onOpen,
+  appId,
   isExplore,
 }: AppCardProps) => {
   const { t } = useTranslation()
   const { app: appBasicInfo } = app
   return (
-    <div className={cn('group flex col-span-1 bg-white border-2 border-solid border-transparent rounded-lg shadow-sm min-h-[100px] flex flex-col transition-all duration-200 ease-in-out cursor-pointer hover:shadow-lg')} onClick={() => onOpen(app.id)}>
+    <div className={cn('group flex col-span-1 bg-white border-2 border-solid border-transparent rounded-lg shadow-sm min-h-[100px] flex flex-col transition-all duration-200 ease-in-out cursor-pointer hover:shadow-lg')} onClick={() => onOpen(appId)}>
       <div className='flex pt-[14px] px-[14px] pb-3 h-[66px] items-center gap-3 grow-0 shrink-0'>
         <div className='relative shrink-0'>
           <AppIcon size='xslarge' icon={app.icon} background={app.icon_background} />

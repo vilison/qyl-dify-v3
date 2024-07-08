@@ -82,10 +82,6 @@ const Apps = ({
     getTagList()
   }, [])
 
-  useEffect(() => {
-    console.log(mobileAllList, 'mobileAllListmobileAllListmobileAllList')
-  }, [mobileAllList])
-
   const filteredList = useMemo(() => {
     const newList = []
     if (currCategory === '' || currCategory === '推荐') {
@@ -109,20 +105,24 @@ const Apps = ({
       return newList
     }
   }, [installedApps, allList])
-  useMemo(() => {
+
+  const mobileList = useMemo(() => {
     // setMobileAllList([])
     // 使用 .map 方法而不是直接修改 mobileAllList
+    const List = []
     if (isMobile) {
-      const List = []
-      tagList.forEach(async (item: any) => {
-        const { data } = await fetchAppList({ url: 'installed-apps/tags', params: { tag_ids: item.id } })
-
-        List.push({ name: item.name, data, tag_id: item.id })
+      const fetchLists = tagList.map(item =>
+        fetchAppList({ url: 'installed-apps/tags', params: { tag_ids: item.id } }),
+      )
+      Promise.all(fetchLists).then((results) => {
+        const List = results.map((data, index) => ({
+          name: tagList[index].name,
+          data: data.data,
+          tag_id: tagList[index].id,
+        }))
+        setMobileAllList(List)
+        return List
       })
-
-      console.log(List, 'dfd')
-
-      setMobileAllList(List)
     }
     else {
       if (currCategory !== '推荐' && currCategory !== '') {
@@ -182,6 +182,36 @@ const Apps = ({
           />)}
       </div>
       {
+
+        isMobile && (
+
+          <div className='relative flex flex-1 p-6 flex-col bg-sky-50 shrink-0 grow gap-4'>
+            {mobileAllList.map((item, index) => (
+              <React.Fragment key={index}>
+                {item.data.length > 0 && (
+                  <>
+                    <div className='text-black text-l font-bold'>{item.name === 'rma' ? '推荐' : item.name}</div>
+                    {item.data.map((items, idx) => (
+                      <MappCard
+                        key={items.id + idx}
+                        isExplore={pageType === PageType.EXPLORE}
+                        app={items.app}
+                        canCreate={hasEditPermission}
+                        onOpen={(id) => {
+                          onOpen(id)
+                        }}
+                      />
+                    ))}
+                  </>
+                )}
+              </React.Fragment>
+            ))}
+          </div>
+
+        )
+
+      }
+      {
         !isMobile && (
           <div className={cn(
             'relative flex flex-1 pb-6 flex-col overflow-auto bg-gray-100 shrink-0 grow',
@@ -207,32 +237,7 @@ const Apps = ({
             </nav>
           </div>)
       }
-      {
-        isMobile && (
-          <div className='relative flex flex-1 p-6 flex-col bg-sky-50 shrink-0 grow gap-4'>
-            {mobileAllList.map((item, index) => (
-              <React.Fragment key={index}>
-                {item.data.length > 0 && (
-                  <>
-                    <div className='text-black text-l font-bold'>{item.name === 'rma' ? '推荐' : item.name}</div>
-                    {item.data.map((items, idx) => (
-                      <MappCard
-                        key={items.id + idx}
-                        isExplore={pageType === PageType.EXPLORE}
-                        app={items.app}
-                        canCreate={hasEditPermission}
-                        onOpen={(id) => {
-                          onOpen(id)
-                        }}
-                      />
-                    ))}
-                  </>
-                )}
-              </React.Fragment>
-            ))}
-          </div>
-        )
-      }
+
     </div >
   )
 }
