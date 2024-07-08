@@ -196,6 +196,7 @@ const Apps = ({
                         key={items.id + idx}
                         isExplore={pageType === PageType.EXPLORE}
                         app={items.app}
+                        appId={items.id}
                         canCreate={hasEditPermission}
                         onOpen={(id) => {
                           onOpen(id)
