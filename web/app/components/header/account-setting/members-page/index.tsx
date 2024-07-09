@@ -37,9 +37,9 @@ const MembersPage = () => {
   const baseUrl = process.env.NEXT_PUBLIC_AUTH_URL ? process.env.NEXT_PUBLIC_AUTH_URL : globalThis.document?.body?.getAttribute('data-public-auth-account') as string
   return (
     <>
-      <div>请进入
-        <Link href={`${baseUrl}/workspace/list`} target='_blank'><span style={{ color: 'blue' }}>【帐号管理平台】</span></Link>
-        操作</div>
+      <div>{t('racio.setting.pleaseEnter')}
+        <Link href={`${baseUrl}/workspace/list`} target='_blank'><span style={{ color: 'blue' }}>【{t('racio.setting.accountManage')}】</span></Link>
+        {t('racio.setting.operation')}</div>
 
       {/* <div className='flex flex-col'>
         <div className='flex items-center mb-4 p-3 bg-gray-50 rounded-2xl'>

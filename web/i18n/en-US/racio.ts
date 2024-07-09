@@ -41,6 +41,11 @@ const translation = {
     Programming: '编程',
     HR: '人力资源',
   },
+  setting: {
+    pleaseEnter: 'please enter',
+    accountManage: 'accountManage',
+    operation: 'operation',
+  },
 }
 
 export default translation
