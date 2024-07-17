@@ -59,8 +59,8 @@ const rules = reactive({
 
 // 表单数据
 const ruleForm = reactive({
-    username: "Racio",
-    password: "sa20240519",
+    username: "",
+    password: "",
 })
 
 // 显示密码图标

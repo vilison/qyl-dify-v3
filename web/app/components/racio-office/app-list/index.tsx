@@ -56,7 +56,7 @@ const Apps = ({
     const res = await fetchTagList('app')
     setTagList(res)
     res.filter(item => item.name === 'rma').forEach((item) => {
-      if (currCategory === '' || currCategory === '推荐')
+      if (currCategory === '' || currCategory === `${allCategoriesEn}`)
         getApplist(item.id)
     })
   }
@@ -83,8 +83,8 @@ const Apps = ({
   }, [])
 
   const filteredList = useMemo(() => {
-    const newList = []
-    if (currCategory === '' || currCategory === '推荐') {
+    const newList: any[] = []
+    if (currCategory === '' || currCategory === `${allCategoriesEn}`) {
       installedApps.forEach((item) => {
         newList.push({ ...item.app, id: item.id })
       })
@@ -125,7 +125,7 @@ const Apps = ({
       })
     }
     else {
-      if (currCategory !== '推荐' && currCategory !== '') {
+      if (currCategory !== `${allCategoriesEn}` && currCategory !== '') {
         tagList.filter(item => item.name === currCategory).forEach((item) => {
           setCurrTagId(item.id)
           getApplist(item.id)
@@ -190,7 +190,7 @@ const Apps = ({
               <React.Fragment key={index}>
                 {item.data.length > 0 && (
                   <>
-                    <div className='text-black text-l font-bold'>{item.name === 'rma' ? '推荐' : item.name}</div>
+                    <div className='text-black text-l font-bold'>{item.name === 'rma' ? `${allCategoriesEn}` : item.name}</div>
                     {item.data.map((items, idx) => (
                       <MappCard
                         key={items.id + idx}

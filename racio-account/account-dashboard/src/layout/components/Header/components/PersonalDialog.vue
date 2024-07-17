@@ -2,9 +2,6 @@
     <el-dialog v-model="dialogVisible" title="修改密码" width="40%">
         <el-form ref="ruleFormRef" :model="ruleForm" :rules="rules" label-width="120px" class="demo-ruleForm"
             :size="formSize">
-            <el-form-item label="姓名">
-                <el-input v-model="ruleForm.name" disabled></el-input>
-            </el-form-item>
             <el-form-item label="旧的密码" prop="password">
                 <el-input v-model="ruleForm.password" type="password"></el-input>
             </el-form-item>
