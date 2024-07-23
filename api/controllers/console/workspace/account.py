@@ -56,10 +56,13 @@ class AccountsListApi(Resource):
 
         has_more = False
         if len(accounts.items) == args['limit']:
-            current_page_first_tenant = accounts[-1]
+            # current_page_first_account = accounts[-1] # TypeError: 'QueryPagination' object is not subscriptable
+            # print(type(accounts)) # <class 'flask_sqlalchemy.pagination.QueryPagination'>
+            # print(type(accounts.items)) # <class 'list'>
+            current_page_first_account = accounts.items[-1]
             rest_count = db.session.query(Account).filter(
-                Account.created_at < current_page_first_tenant.created_at,
-                Account.id != current_page_first_tenant.id
+                Account.created_at < current_page_first_account.created_at,
+                Account.id != current_page_first_account.id
             ).count()
 
             if rest_count > 0:
