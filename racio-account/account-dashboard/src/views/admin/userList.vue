@@ -18,6 +18,7 @@
                     <el-button type="primary" :icon="Plus" @click="openInvite">
                         邀请开通工作空间
                     </el-button>
+                    <MassInvite @callFun="authList" />
                 </div>
             </el-col>
         </el-row>
@@ -180,6 +181,7 @@ import { ElMessage, ElMessageBox } from "element-plus"
 import { useRouter } from "vue-router"
 import { inviteUser, members, memberChangeRole, memberRemove, getAuthList } from "@/api/api"
 import clip from "@/utils/clipboard"
+import MassInvite from "@/components/MassInvite/index.vue"
 import { formatTime } from "@/utils"
 import { useUserStore } from "@/store/modules/user"
 const rolesList = ref([

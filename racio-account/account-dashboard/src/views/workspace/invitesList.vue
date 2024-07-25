@@ -7,6 +7,7 @@
                     <el-button type="primary" :icon="Plus" @click="openInvite">
                         邀请进入空间
                     </el-button>
+                    <MassInvite @callFun="getMemberInvites" />
                 </div>
             </el-col>
             <el-col :span="24">
@@ -20,6 +21,7 @@
                     </el-table-column>
                     <el-table-column prop="remark" label="备注" width="120" />
                     <el-table-column prop="invited_by" label="邀请人" width="120" />
+                    <el-table-column prop="quota" label="限额" width="120" />
                     <el-table-column prop="role" label="邀请角色" width="120">
                         <template #default="scope">
                             <div>{{ scope.row.role == "owner" ? "空间所有者" : scope.row.role == "admin" ? "空间管理员" :
@@ -110,7 +112,7 @@
 <script lang="ts" setup>
 import { ref, onMounted } from "vue"
 import { Plus } from '@element-plus/icons-vue'
-
+import MassInvite from "@/components/MassInvite/index.vue"
 import { ElMessage } from "element-plus"
 import { useRouter } from "vue-router"
 import { getAuthList, inviteUser, memberInvites } from "@/api/api"

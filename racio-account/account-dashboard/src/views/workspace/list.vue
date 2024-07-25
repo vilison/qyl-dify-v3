@@ -18,6 +18,7 @@
                     <el-button type="primary" :icon="Plus" @click="openInvite">
                         邀请进入空间
                     </el-button>
+                    <MassInvite @callFun="membersList" />
                 </div>
             </el-col>
         </el-row>
@@ -172,6 +173,7 @@ import { getAuthList, inviteUser, members, memberChangeRole, memberRemove } from
 import clip from "@/utils/clipboard"
 import { formatTime } from "@/utils"
 import { useUserStore } from "@/store/modules/user"
+import MassInvite from "@/components/MassInvite/index.vue"
 const rolesList = ref([
     { key: "admin", value: "空间管理员" },
     { key: "normal", value: "尊享会员" }
