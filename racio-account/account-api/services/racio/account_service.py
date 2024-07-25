@@ -366,9 +366,14 @@ class AccountService:
     @staticmethod
     def delete_member_invite(id: str) -> None:
         member_invite = MemberInvite.query.filter_by(id=id).first()
-        if member_invite and member_invite.quota <= 0:
-            db.session.delete(member_invite)
-            db.session.commit()
+        if member_invite:
+            if member_invite.quota <= 0:
+                db.session.delete(member_invite)
+                db.session.commit()
+                logging.info(f'AccountService.delete_member_invite - id: {id}, quota: {member_invite.quota}.')
+            else:
+                AccountService.decrement_member_invite_quota(id)
+        
     
     @staticmethod
     def decrement_member_invite_quota(member_invite_id: str):
@@ -376,6 +381,7 @@ class AccountService:
         if member_invite and member_invite.quota > 0:
             member_invite.quota -= 1
             db.session.commit()
+            logging.info(f'AccountService.decrement_member_invite_quota - id: {member_invite_id}, quota: {member_invite.quota}.')
             return {'message': 'Quota decremented', 'new_quota': member_invite.quota}
         elif member_invite is None:
             return {'error': 'Member not found'}, 404

@@ -43,6 +43,6 @@ member_invites_fields = {
     'invite_link': fields.String,
     'email': fields.String,
     'invited_by': fields.String,
-    'qutoa': fields.Integer,
+    'quota': fields.Integer,
     'expiration': TimestampField
 }
