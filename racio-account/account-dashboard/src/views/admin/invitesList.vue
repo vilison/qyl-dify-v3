@@ -28,7 +28,7 @@
                         </template>
                     </el-table-column>
                     <el-table-column prop="remark" label="备注" min-width="90" />
-                    <el-table-column prop="qutoa" label="限额" min-width="90" />
+                    <el-table-column prop="quota" label="限额" min-width="90" />
                     <el-table-column prop="created_at" label="创建时间" width="160">
                         <template #default="scope">
                             <div>{{ formatTime(scope.row.created_at, "") }}</div>
