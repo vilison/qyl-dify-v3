@@ -7,6 +7,7 @@
                     <el-button type="primary" :icon="Plus" @click="openInvite">
                         邀请进入空间
                     </el-button>
+                    <MassInvite @callFun="getMemberInvites" />
                 </div>
             </el-col>
             <el-col :span="24">
@@ -110,7 +111,7 @@
 <script lang="ts" setup>
 import { ref, onMounted } from "vue"
 import { Plus } from '@element-plus/icons-vue'
-
+import MassInvite from "@/components/MassInvite/index.vue"
 import { ElMessage } from "element-plus"
 import { useRouter } from "vue-router"
 import { getAuthList, inviteUser, memberInvites } from "@/api/api"

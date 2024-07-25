@@ -7,6 +7,7 @@
                     <el-button type="primary" :icon="Plus" @click="openInvite">
                         邀请开通工作空间
                     </el-button>
+                    <MassInvite @callFun="getMemberInvites" />
                 </div>
             </el-col>
             <el-col :span="24">
@@ -27,6 +28,7 @@
                         </template>
                     </el-table-column>
                     <el-table-column prop="remark" label="备注" min-width="90" />
+                    <el-table-column prop="qutoa" label="限额" min-width="90" />
                     <el-table-column prop="created_at" label="创建时间" width="160">
                         <template #default="scope">
                             <div>{{ formatTime(scope.row.created_at, "") }}</div>
@@ -103,15 +105,19 @@
             </div>
         </template>
     </el-dialog>
+
+
+
 </template>
 
 <script lang="ts" setup>
 import { ref, onMounted } from "vue"
-import { Plus } from '@element-plus/icons-vue'
+import { Plus, CirclePlus } from '@element-plus/icons-vue'
 
 import { ElMessage } from "element-plus"
 import { useRouter } from "vue-router"
 import { getAuthList, inviteUser, memberInvites } from "@/api/api"
+import MassInvite from "@/components/MassInvite/index.vue"
 import clip from "@/utils/clipboard"
 import { formatTime } from "@/utils"
 import { useUserStore } from "@/store/modules/user"
@@ -125,15 +131,18 @@ const workspaceRole = ref("")
 const router = useRouter()
 const tableData = ref([])
 const inviteDialog = ref(false)
+
 const invitText = ref("")
 const remarkText = ref("")
 const invitUrl = ref("")
+
 const PageInfo = ref({
     "page": 1,
     "limit": 10,
     "total": 0
 })
 const buttonStatus = ref(false)
+
 
 const handleCopy = (text, event) => {
     clip(text, event)
@@ -148,6 +157,8 @@ function openInvite() {
     buttonStatus.value = false
     invitUrl.value = ""
 }
+
+
 function centerDialogVisible() {
     invitText.value = ""
     inviteDialog.value = false
