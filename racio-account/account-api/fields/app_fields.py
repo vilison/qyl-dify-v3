@@ -31,7 +31,7 @@ tenants_fields = {
     'plan': fields.String,
     'status': fields.String,
     'created_at': fields.Integer,
-    "role": fields.String,
+    'role': fields.String,
 }
 
 member_invites_fields = {
@@ -42,5 +42,7 @@ member_invites_fields = {
     'created_at': TimestampField,
     'invite_link': fields.String,
     'email': fields.String,
-    "invited_by": fields.String
+    'invited_by': fields.String,
+    'qutoa': fields.Integer,
+    'expiration': TimestampField
 }

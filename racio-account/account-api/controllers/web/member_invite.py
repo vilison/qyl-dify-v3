@@ -36,7 +36,6 @@ class MemberInviteListApi(Resource):
         elif user_data['account_role'] == AccountRole.ADMIN:
             member_invites = AccountService.get_member_invites(tenant_id, current_user.id)
 
-
         console_web_url = current_app.config.get("CONSOLE_WEB_URL")
         apiService = ApiService()
         for member_invite in member_invites:
@@ -61,6 +60,7 @@ class MemberInviteEmailApi(Resource):
         parser.add_argument('role', type=str, required=True, location='json', default='')
         # parser.add_argument('tenant_id', type=str, required=True, location='json', default='')
         parser.add_argument('remark', type=str, location='json', default='')
+        parser.add_argument('quota', type=int, required=False, location='json', default=10)
         args = parser.parse_args()
 
         user_data = AccountService.get_user_data(current_user.id)
@@ -94,7 +94,7 @@ class MemberInviteEmailApi(Resource):
         console_web_url = current_app.config.get("CONSOLE_WEB_URL")
         try:
             member_invite = AccountService.create_member_invite(tenant_id, args['role'], current_user.id,
-                                                                args['remark'], args['domain'], args['email'])
+                                                                args['remark'], args['quota'], args['domain'], args['email'])
             if send_flag:
                 # send email
                 tenant_name = ''
@@ -114,6 +114,7 @@ class MemberInviteEmailApi(Resource):
             invitation_result = {
                 'status': 'success',
                 'email': invitee_email,
+                'quota': member_invite.quota,
                 'url': f'{console_web_url}/account/activate?token={member_invite.id}'
             }
         except AccountAlreadyInTenantError:

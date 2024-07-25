@@ -326,13 +326,14 @@ class AccountService:
             return account_integrate
 
     @staticmethod
-    def create_member_invite(tenant_id: str, role: str, invited_by: str, remark: str, domain: str, email: str) -> MemberInvite:
+    def create_member_invite(tenant_id: str, role: str, invited_by: str, remark: str, quota: int, domain: str, email: str) -> MemberInvite:
         """create member_invite"""
         memberInvite = MemberInvite()
         memberInvite.tenant_id = tenant_id
         memberInvite.role = role
         memberInvite.invited_by = invited_by
         memberInvite.remark = remark
+        memberInvite.quota = quota
         memberInvite.domain = domain
         memberInvite.email = email
         db.session.add(memberInvite)
@@ -342,7 +343,7 @@ class AccountService:
     @staticmethod
     def get_member_invite(id: str) -> MemberInvite:
         member_invite = MemberInvite.query.filter_by(id=id).first()
-        if member_invite:
+        if member_invite and member_invite.quota > 0:
             return member_invite
         else:
             return None
@@ -365,9 +366,33 @@ class AccountService:
     @staticmethod
     def delete_member_invite(id: str) -> None:
         member_invite = MemberInvite.query.filter_by(id=id).first()
-        if member_invite:
+        if member_invite and member_invite.quota <= 0:
             db.session.delete(member_invite)
             db.session.commit()
+    
+    @staticmethod
+    def decrement_member_invite_quota(member_invite_id: str):
+        member_invite = MemberInvite.query.filter_by(id=member_invite_id).first()
+        if member_invite and member_invite.quota > 0:
+            member_invite.quota -= 1
+            db.session.commit()
+            return {'message': 'Quota decremented', 'new_quota': member_invite.quota}
+        elif member_invite is None:
+            return {'error': 'Member not found'}, 404
+        else:
+            return {'error': 'Quota cannot be negative'}, 400
+
+    @staticmethod
+    def increment_member_invite_quota(member_invite_id: str):
+        member_invite = MemberInvite.query.filter_by(id=member_invite_id).first()
+        if member_invite and member_invite.quota > 0:
+            member_invite.quota += 1
+            db.session.commit()
+            return {'message': 'Quota incremented', 'new_quota': member_invite.quota}
+        elif member_invite is None:
+            return {'error': 'Member not found'}, 404
+        else:
+            return {'error': 'Quota cannot be negative'}, 400
 
     @classmethod
     def get_invitation_if_token_valid(cls, token: str) -> Optional[dict[str, Any]]:

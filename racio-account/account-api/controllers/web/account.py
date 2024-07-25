@@ -172,5 +172,4 @@ class UpdatePwdApi(Resource):
 
 
 api.add_resource(AccountListApi, '/accounts')
-# api.add_resource(AccountInviteEmailApi, '/accounts/invite-email')
 api.add_resource(UpdatePwdApi, '/accounts/update_pwd')
