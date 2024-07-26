@@ -244,7 +244,7 @@ export const useChat = (
     hasStopResponded.current = false
 
     const bodyParams = {
-      response_mode: 'blocking',
+      response_mode: 'streaming',
       conversation_id: connversationId.current,
       user: `${userProfile?.name}@${userProfile?.id}`,
       ...data,
