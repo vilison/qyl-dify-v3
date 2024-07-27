@@ -67,6 +67,7 @@ const invitMassUrl = ref("")
 const inviteMassDialog = ref(false)
 const buttonMassStatus = ref(false)
 const { roles } = useUserStore()
+const workspaceRole = ref("")
 const rolesList = ref([
     { key: "admin", value: "空间管理员" },
     { key: "normal", value: "尊享会员" }
@@ -89,13 +90,21 @@ function openMassInvite() {
 
 
 function sendMassInvite() {
+    if (workspaceRole.value == "") {
+        ElMessage({
+            message: "请选择邀请角色!",
+            type: "error",
+            duration: 3000,
+        })
+        return
+    }
     if (invitMassQuota.value < 2) {
         ElMessage.error("批量邀请数量不能小于2")
         return
     }
     inviteUser({
         domain: "racio.chat",
-        role: "owner",
+        role: roles.includes("owner") ? "owner" : workspaceRole.value,
         quota: invitMassQuota.value,
         tenant_id: localStorage.getItem("tenant_id") || "",
         remark: remarkMassText.value
