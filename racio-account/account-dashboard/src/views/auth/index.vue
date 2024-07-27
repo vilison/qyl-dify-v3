@@ -66,9 +66,12 @@ function GotoGZH() {
 onMounted(() => {
     isPlatform() // 判断平台
     let us = localStorage.userState ? JSON.parse(localStorage.userState) : {}
-    const uri = import.meta.env.VITE_APP_DIFY_URL ? import.meta.env.VITE_APP_DIFY_URL : window.globalVariable.DIFY_URL
-    window.location.href = `${uri}?console_token=${us.token}`
-    location.href = uri
+
+    if (isLogin) {
+        const uri = import.meta.env.VITE_APP_DIFY_URL ? import.meta.env.VITE_APP_DIFY_URL : window.globalVariable.DIFY_URL
+        window.location.href = `${uri}?console_token=${us.token}`
+    }
+
 
 
 
