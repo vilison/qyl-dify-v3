@@ -90,7 +90,7 @@ function openMassInvite() {
 
 
 function sendMassInvite() {
-    if (workspaceRole.value == "") {
+    if (workspaceRole.value == "" && roles.includes("owner")) {
         ElMessage({
             message: "请选择邀请角色!",
             type: "error",
