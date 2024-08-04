@@ -106,7 +106,7 @@ function sendMassInvite() {
     }
     inviteUser({
         domain: "racio.chat",
-        role: roles.includes("owner") ? "owner" : workspaceRole.value,
+        role: roles.includes("superAdmin") ? "owner" : workspaceRole.value,
         quota: invitMassQuota.value,
         tenant_id: UserStore.tenantId || localStorage.getItem("tenant_id"),
         remark: remarkMassText.value
