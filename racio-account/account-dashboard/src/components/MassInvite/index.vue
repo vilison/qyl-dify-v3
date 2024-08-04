@@ -1,10 +1,11 @@
 <template>
     <el-button type="primary" :icon="CirclePlus" @click="openMassInvite">
-        批量邀请开通工作空间
+        {{ roles.includes("superAdmin") ? "批量邀请开通工作空间" : "批量邀请成员" }}
     </el-button>
 
 
-    <el-dialog v-model="inviteMassDialog" title="批量邀请开通空间" width="500" align-center>
+    <el-dialog v-model="inviteMassDialog" :title="roles.includes('superAdmin') ? '批量邀请开通工作空间' : '批量邀请成员'" width="500"
+        align-center>
         <el-row>
             <el-col style="margin-bottom:20px">
                 <span>输入被邀请人邮箱，如空则只生成邀请链接</span>
@@ -67,6 +68,7 @@ const invitMassUrl = ref("")
 const inviteMassDialog = ref(false)
 const buttonMassStatus = ref(false)
 const { roles } = useUserStore()
+const UserStore = useUserStore()
 const workspaceRole = ref("")
 const rolesList = ref([
     { key: "admin", value: "空间管理员" },
@@ -106,7 +108,7 @@ function sendMassInvite() {
         domain: "racio.chat",
         role: roles.includes("owner") ? "owner" : workspaceRole.value,
         quota: invitMassQuota.value,
-        tenant_id: localStorage.getItem("tenant_id") || "",
+        tenant_id: UserStore.tenantId || localStorage.getItem("tenant_id"),
         remark: remarkMassText.value
 
     })

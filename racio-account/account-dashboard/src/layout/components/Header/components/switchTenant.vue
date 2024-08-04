@@ -95,7 +95,8 @@ function JwtToken() {
             if (code == 0) {
                 workspace.value.name = data.tenant_name
                 workspace.value.id = data.tenant_id
-                UserStore.userInfo.username
+                UserStore.tenantId = data.tenant_id
+                localStorage.setItem("tenant_id", data.tenant_id)
 
             }
         })
