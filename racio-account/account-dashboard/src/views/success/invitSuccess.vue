@@ -2,10 +2,11 @@
   <div class="app-container">
     <div class="app-container-inner">
       <div class="wscn-http403-container ">
-        <div class="bullshit__oops view_mobile"><span>&#127881; 欢迎 {{ name }}</span>
+        <div class="bullshit__oops view_mobile"><span>&#127881; 欢迎您</span>
+          <div> {{ name }}</div>
           <div class="success_tips_txt">
             进入<span>{{ workspace_name }}</span>
-            <div>的数字员工空间</div>
+            的数字员工空间
           </div>
         </div>
         <div class="wscn-http403">
@@ -377,6 +378,8 @@ a {
   }
 
 
+
+
   .bullshit__oops {
     font-size: 20px;
   }
@@ -402,8 +405,12 @@ a {
   }
 
 
+  .success_tips_txt {
+    font-size: 18px;
+  }
+
   .success_tips_txt span {
-    font-size: 26px;
+    font-size: 18px;
   }
 
 
@@ -412,9 +419,9 @@ a {
   }
 
   .button-ai {
-    width: 248px;
-    height: 50px;
-    font-size: 28px;
+    width: 300px;
+    height: 70px;
+    font-size: 26px;
   }
 }
 </style>

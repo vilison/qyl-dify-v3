@@ -77,10 +77,13 @@
                 </el-table>
             </el-col>
             <el-col>
-                <!-- <div style="padding: 15px; background-color: #fff;">
+                <div style="padding: 15px; background-color: #fff;">
+
                     <el-pagination v-model:current-page="PageInfo.page" v-model:page-size="PageInfo.limit" background
-                        :total="PageInfo.total" @current-change="handleCurrentChange" />
-                </div> -->
+                        :total="PageInfo.total" :page-sizes="[20, 50, 100]"
+                        layout="total,sizes,prev, pager, next, jumper" @current-change="handleCurrentChange"
+                        @size-change="handleSizeChange" />
+                </div>
             </el-col>
         </el-row>
 
@@ -189,7 +192,7 @@ const invitUrl = ref("")
 const newRole = ref("")
 const PageInfo = ref({
     "page": 1,
-    "limit": 10,
+    "limit": 20,
     "total": 0,
     "keyword": ""
 
@@ -244,7 +247,9 @@ const currEditRoleInfo = ref({})
 function handleCurrentChange() {
     membersList()
 }
-
+function handleSizeChange() {
+    membersList()
+}
 function openInvite() {
     inviteDialog.value = true
     buttonStatus.value = false
