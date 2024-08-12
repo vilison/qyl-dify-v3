@@ -91,10 +91,13 @@
                 </el-table>
             </el-col>
             <el-col>
-                <!-- <div style="padding: 15px; background-color: #fff;">
+                <div style="padding: 15px; background-color: #fff;">
+
                     <el-pagination v-model:current-page="PageInfo.page" v-model:page-size="PageInfo.limit" background
-                        :total="PageInfo.total" @current-change="handleCurrentChange" />
-                </div> -->
+                        :total="PageInfo.total" :page-sizes="[20, 50, 100]"
+                        layout="total,sizes,prev, pager, next, jumper" @current-change="handleCurrentChange"
+                        @size-change="handleSizeChange" />
+                </div>
             </el-col>
         </el-row>
 
@@ -198,7 +201,7 @@ const remarkText = ref("")
 const invitUrl = ref("")
 const PageInfo = ref({
     "page": 1,
-    "limit": 10,
+    "limit": 20,
     "total": 0,
     "keyword": ""
 
@@ -212,6 +215,9 @@ const handleCopy = (text, event) => {
 }
 
 function handleCurrentChange() {
+    authList()
+}
+function handleSizeChange() {
     authList()
 }
 
@@ -300,9 +306,9 @@ function authList() {
 
         if (code == 0) {
             tableData.value = data.data
-            // PageInfo.value.total = data.total
-            // PageInfo.value.page = data.page
-            // PageInfo.value.limit = data.limit
+            PageInfo.value.total = data.total
+            PageInfo.value.page = data.page
+            PageInfo.value.limit = data.limit
         } else {
 
             ElMessage({
