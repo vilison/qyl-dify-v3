@@ -173,8 +173,8 @@ class AccountService:
         :return:
         """
         query = db.select(Account).order_by(Account.created_at.desc())
-        if args['keyword'] != '':
-            query = db.session.query(Account).filter(Account.phone.like("%" + str(args['keyword']) + "%")).order_by(
+        if args['phone'] != '':
+            query = db.session.query(Account).filter(Account.phone.like("%" + str(args['phone']) + "%")).order_by(
                 Account.created_at.desc())
         account_models = db.paginate(
             query,
