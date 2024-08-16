@@ -15,41 +15,92 @@ from fields.app_fields import (
 class MemberListApi(Resource):
     @login_required
     def post(self):
+        parser = reqparse.RequestParser()
+        parser.add_argument('page', type=inputs.int_range(1, 99999), required=True, default=1, location='json')
+        parser.add_argument('limit', type=inputs.int_range(1, 100), required=True, default=20, location='json')
+        parser.add_argument('name', type=str, required=False, location='json')
+        parser.add_argument('phone', type=str, required=False, location='json')
+        args = parser.parse_args()
         apiService = ApiService()
-        datas = apiService.get_members()
-        if not datas:
-            return response_json(-1, '暂无数据')
-        members = []
-        for member in datas:
-            if member['role'] == AccountRole.OWNER:
-                continue
-            nickname = ''
-            status = ''
-            phone = ''
-            headimgurl = ''
-            last_login_at = ''
-            last_login_ip = ''
-            racio_account = AccountService.get_account(member['id'])
-            if racio_account:
-                phone = racio_account.phone
-                status = racio_account.status
-                last_login_at = int(racio_account.last_login_at.timestamp())
-                last_login_ip = racio_account.last_login_ip
-                account_integrate = AccountService.get_account_integrate_by_account_id(provider='wx',
-                                                                                       account_id=member['id'])
-                if account_integrate:
-                    nickname = account_integrate.nickname
-                    headimgurl = account_integrate.headimgurl
-                member['phone'] = phone
-                member['status'] = status
-                member['account_role'] = member['role']
-                del member['role']
-                member['nickname'] = nickname
-                member['headimgurl'] = headimgurl
-                member['last_login_at'] = last_login_at
-                member['last_login_ip'] = last_login_ip
-            members.append(member)
-        return response_json(0, 'success', members)
+        if args['phone'] != '':
+            account_ids = []
+            racio_account_pagination = AccountService.get_accounts(args)
+            for racio_account in racio_account_pagination.items:
+                account_ids.append(racio_account.id)
+            account_id_str = ','.join(map(str, account_ids))
+            account_pagination = apiService.get_page_members(1, 20, '', account_id_str)
+            if not account_pagination:
+                data = {'data': [], 'total': 0, 'page': 1, 'limit': 20, 'has_more': False}
+                return response_json(0, 'success', data)
+            members = []
+            for member in account_pagination['data']:
+                if member['role'] == AccountRole.OWNER:
+                    continue
+                nickname = ''
+                status = ''
+                phone = ''
+                headimgurl = ''
+                last_login_at = ''
+                last_login_ip = ''
+                racio_account = AccountService.get_account(member['id'])
+                if racio_account:
+                    phone = racio_account.phone
+                    status = racio_account.status
+                    last_login_at = int(racio_account.last_login_at.timestamp())
+                    last_login_ip = racio_account.last_login_ip
+                    account_integrate = AccountService.get_account_integrate_by_account_id(provider='wx',
+                                                                                           account_id=member['id'])
+                    if account_integrate:
+                        nickname = account_integrate.nickname
+                        headimgurl = account_integrate.headimgurl
+                    member['phone'] = phone
+                    member['status'] = status
+                    member['account_role'] = member['role']
+                    del member['role']
+                    member['nickname'] = nickname
+                    member['headimgurl'] = headimgurl
+                    member['last_login_at'] = last_login_at
+                    member['last_login_ip'] = last_login_ip
+                members.append(member)
+                account_pagination['data'] = members
+            return response_json(0, 'success', account_pagination)
+        else:
+            account_pagination = apiService.get_page_members(1, 20, args['name'], '')
+            if not account_pagination:
+                data = {'data': [], 'total': 0, 'page': 1, 'limit': 20, 'has_more': False}
+                return response_json(0, 'success', data)
+            members = []
+            for member in account_pagination['data']:
+                if member['role'] == AccountRole.OWNER:
+                    continue
+                nickname = ''
+                status = ''
+                phone = ''
+                headimgurl = ''
+                last_login_at = ''
+                last_login_ip = ''
+                racio_account = AccountService.get_account(member['id'])
+                if racio_account:
+                    phone = racio_account.phone
+                    status = racio_account.status
+                    last_login_at = int(racio_account.last_login_at.timestamp())
+                    last_login_ip = racio_account.last_login_ip
+                    account_integrate = AccountService.get_account_integrate_by_account_id(provider='wx',
+                                                                                           account_id=member['id'])
+                    if account_integrate:
+                        nickname = account_integrate.nickname
+                        headimgurl = account_integrate.headimgurl
+                    member['phone'] = phone
+                    member['status'] = status
+                    member['account_role'] = member['role']
+                    del member['role']
+                    member['nickname'] = nickname
+                    member['headimgurl'] = headimgurl
+                    member['last_login_at'] = last_login_at
+                    member['last_login_ip'] = last_login_ip
+                members.append(member)
+                account_pagination['data'] = members
+            return response_json(0, 'success', account_pagination)
 
 
 class MemberRemoveApi(Resource):
