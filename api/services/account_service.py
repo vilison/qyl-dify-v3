@@ -7,6 +7,7 @@ from hashlib import sha256
 from typing import Any, Optional
 
 from flask import current_app
+from flask_sqlalchemy.pagination import Pagination
 from sqlalchemy import func
 from werkzeug.exceptions import Unauthorized
 
@@ -314,6 +315,49 @@ class TenantService:
             updated_accounts.append(account)
 
         return updated_accounts
+
+    @staticmethod
+    def get_paginate_tenant_members(tenant_id: str, args: dict) -> Pagination | None:
+        """
+        Get tenant member list with pagination
+        :param tenant_id: tenant id
+        :param args: request args
+        :return:
+        """
+        filters = [ TenantAccountJoin.tenant_id == tenant_id ]
+        
+        if 'name' in args and args['name']:
+            name = args['name'][:30]
+            filters.append(Account.name.ilike(f'%{name}%'))
+ 
+        if 'account_ids' in args and args['account_ids']:
+            account_ids = args['account_ids']
+            filters.append(Account.id.in_(account_ids))
+        
+        app_models = db.paginate(
+            # db.select(App).where(*filters).order_by(App.created_at.desc()),
+            db.session.query(Account, TenantAccountJoin.role)
+            .select_from(Account)
+            .join(TenantAccountJoin, Account.id == TenantAccountJoin.account_id)
+            .where(*filters)
+            .order_by(Account.created_at.desc()),
+            page=args['page'],
+            per_page=args['limit'],
+            error_out=False
+        )
+        
+        # TODO: Implement the pagination logic via role, if needed
+        # # Initialize an empty list to store the updated accounts
+        # updated_accounts = []
+
+        # for account, role in query:
+        #     account.role = role
+        #     updated_accounts.append(account)
+
+        # return updated_accounts
+
+        return app_models
+
 
     @staticmethod
     def has_roles(tenant: Tenant, roles: list[TenantAccountJoinRole]) -> bool:

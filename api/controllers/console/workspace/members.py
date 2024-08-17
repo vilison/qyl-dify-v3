@@ -1,13 +1,15 @@
+import uuid
+
 from flask import current_app
 from flask_login import current_user
-from flask_restful import Resource, abort, marshal_with, reqparse
+from flask_restful import Resource, abort, inputs, marshal, marshal_with, reqparse
 
 import services
 from controllers.console import api
 from controllers.console.setup import setup_required
 from controllers.console.wraps import account_initialization_required, cloud_edition_billing_resource_check
 from extensions.ext_database import db
-from fields.member_fields import account_with_role_list_fields
+from fields.member_fields import account_pagination_fields, account_with_role_list_fields
 from libs.login import login_required
 from models.account import Account, TenantAccountRole
 from services.account_service import RegisterService, TenantService
@@ -24,6 +26,35 @@ class MemberListApi(Resource):
     def get(self):
         members = TenantService.get_tenant_members(current_user.current_tenant)
         return {'result': 'success', 'accounts': members}, 200
+
+class MemberListAdvancedApi(Resource):
+    """List all members of current tenant with advanced function."""
+
+    @setup_required
+    @login_required
+    @account_initialization_required
+    def get(self):
+        def uuid_list(value):
+            try:
+                return [str(uuid.UUID(v)) for v in value.split(',')]
+            except ValueError:
+                abort(400, message="Invalid UUID format in account_ids.")
+        parser = reqparse.RequestParser()
+        parser.add_argument('page', type=inputs.int_range(1, 99999), required=False, default=1, location='args')
+        parser.add_argument('limit', type=inputs.int_range(1, 100), required=False, default=20, location='args')
+        # parser.add_argument('nickname', type=str, location='args', required=False)
+        # parser.add_argument('phone', type=str, location='args', required=False)
+        parser.add_argument('name', type=str, location='args', required=False)
+        parser.add_argument('account_ids', type=uuid_list, location='args', required=False)
+
+        args = parser.parse_args()
+        
+        # get member list   
+        member_pagination = TenantService.get_paginate_tenant_members(current_user.current_tenant_id, args)
+        if not member_pagination:
+            return {'data': [], 'total': 0, 'page': 1, 'limit': 20, 'has_more': False}
+
+        return marshal(member_pagination, account_pagination_fields)
 
 
 class MemberInviteEmailApi(Resource):
@@ -132,6 +163,7 @@ class MemberUpdateRoleApi(Resource):
 
 
 api.add_resource(MemberListApi, '/workspaces/current/members')
+api.add_resource(MemberListAdvancedApi, '/workspaces/current/members/advanced')
 api.add_resource(MemberInviteEmailApi, '/workspaces/current/members/invite-email')
 api.add_resource(MemberCancelInviteApi, '/workspaces/current/members/<uuid:member_id>')
 api.add_resource(MemberUpdateRoleApi, '/workspaces/current/members/<uuid:member_id>/update-role')
