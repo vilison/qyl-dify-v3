@@ -441,6 +441,38 @@ class ApiService:
             return None
 
     '''
+    {'data': [], 'total': 0, 'page': 1, 'limit': 20, 'has_more': False}
+    data
+    {
+        'id': fields.String,
+        'name': fields.String,
+        'avatar': fields.String,
+        'email': fields.String,
+        'last_login_at': TimestampField,
+        'created_at': TimestampField,
+        'role': fields.String,
+        'status': fields.String
+    }
+    '''
+    def get_page_members(self, page, limit, name, account_ids):
+        params = {
+            "page": page,
+            "limit": limit,
+            "name": name,
+            "account_ids": account_ids
+        }
+        response = requests.get(self.DIFY_API_URL + "/console/api/workspaces/current/members/advanced", params=params,
+                                headers=self.user_request_headers)
+        if response.status_code == 200:
+            result = response.json()
+            if result:
+                return result
+            return None
+        else:
+            self.response_error_log("get_page_members", params, self.user_request_headers, response)
+            return None
+
+    '''
     根据账号ID，角色获取该用户加入的空间
     响应
     {
