@@ -65,7 +65,7 @@ class MemberListApi(Resource):
                 account_pagination['data'] = members
             return response_json(0, 'success', account_pagination)
         else:
-            account_pagination = apiService.get_page_members(1, 20, args['name'], '')
+            account_pagination = apiService.get_page_members(args['page'], args['limit'], args['name'], '')
             if not account_pagination:
                 data = {'data': [], 'total': 0, 'page': 1, 'limit': 20, 'has_more': False}
                 return response_json(0, 'success', data)
