@@ -8,6 +8,7 @@ import type { ToolDefaultValue } from '@/app/components/workflow/block-selector/
 import type { VarType as VarKindType } from '@/app/components/workflow/nodes/tool/types'
 import type { NodeTracing } from '@/types/workflow'
 import type { Collection, Tool } from '@/app/components/tools/types'
+import type { ChatVarType } from '@/app/components/workflow/panel/chat-variable-panel/type'
 
 export enum BlockEnum {
   Start = 'start',
@@ -21,7 +22,11 @@ export enum BlockEnum {
   TemplateTransform = 'template-transform',
   HttpRequest = 'http-request',
   VariableAssigner = 'variable-assigner',
+  VariableAggregator = 'variable-aggregator',
   Tool = 'tool',
+  ParameterExtractor = 'parameter-extractor',
+  Iteration = 'iteration',
+  Assigner = 'assigner', // is now named as VariableAssigner
 }
 
 export type Branch = {
@@ -30,7 +35,6 @@ export type Branch = {
 }
 
 export type CommonNodeType<T = {}> = {
-  _isInvalidConnection?: boolean
   _connectedSourceHandleIds?: string[]
   _connectedTargetHandleIds?: string[]
   _targetBranches?: Branch[]
@@ -39,10 +43,21 @@ export type CommonNodeType<T = {}> = {
   _singleRunningStatus?: NodeRunningStatus
   _isCandidate?: boolean
   _isBundled?: boolean
+  _children?: string[]
+  _isEntering?: boolean
+  _showAddVariablePopup?: boolean
+  _holdAddVariablePopup?: boolean
+  _iterationLength?: number
+  _iterationIndex?: number
+  isIterationStart?: boolean
+  isInIteration?: boolean
+  iteration_id?: string
   selected?: boolean
   title: string
   desc: string
   type: BlockEnum
+  width?: number
+  height?: number
 } & T & Partial<Pick<ToolDefaultValue, 'provider_id' | 'provider_type' | 'provider_name' | 'tool_name'>>
 
 export type CommonEdgeType = {
@@ -51,6 +66,8 @@ export type CommonEdgeType = {
   _connectedNodeIsSelected?: boolean
   _runned?: boolean
   _isBundled?: boolean
+  isInIteration?: boolean
+  iteration_id?: string
   sourceType: BlockEnum
   targetType: BlockEnum
 }
@@ -87,6 +104,21 @@ export type Variable = {
   isParagraph?: boolean
 }
 
+export type EnvironmentVariable = {
+  id: string
+  name: string
+  value: any
+  value_type: 'string' | 'number' | 'secret'
+}
+
+export type ConversationVariable = {
+  id: string
+  name: string
+  value_type: ChatVarType
+  value: any
+  description: string
+}
+
 export type VariableWithValue = {
   key: string
   value: string
@@ -101,6 +133,7 @@ export enum InputVarType {
   files = 'files',
   json = 'json', // obj, array
   contexts = 'contexts', // knowledge retrieval
+  iterator = 'iterator', // iteration input
 }
 
 export type InputVar = {
@@ -109,6 +142,7 @@ export type InputVar = {
     nodeType: BlockEnum
     nodeName: string
     variable: string
+    isChatVar?: boolean
   }
   variable: string
   max_length?: number
@@ -116,6 +150,7 @@ export type InputVar = {
   required: boolean
   hint?: string
   options?: string[]
+  value_selector?: ValueSelector
 }
 
 export type ModelConfig = {
@@ -166,13 +201,16 @@ export type Memory = {
 export enum VarType {
   string = 'string',
   number = 'number',
+  secret = 'secret',
   boolean = 'boolean',
   object = 'object',
   array = 'array',
+  file = 'file',
   arrayString = 'array[string]',
   arrayNumber = 'array[number]',
   arrayObject = 'array[object]',
   arrayFile = 'array[file]',
+  any = 'any',
 }
 
 export type Var = {
@@ -183,6 +221,7 @@ export type Var = {
   isSelect?: boolean
   options?: string[]
   required?: boolean
+  des?: string
 }
 
 export type NodeOutPutVar = {

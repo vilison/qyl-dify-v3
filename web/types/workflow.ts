@@ -1,7 +1,9 @@
 import type { Viewport } from 'reactflow'
 import type {
   BlockEnum,
+  ConversationVariable,
   Edge,
+  EnvironmentVariable,
   Node,
 } from '@/app/components/workflow/types'
 
@@ -22,6 +24,11 @@ export type NodeTracing = {
     total_tokens: number
     total_price: number
     currency: string
+    iteration_id?: string
+    iteration_index?: number
+  }
+  metadata: {
+    iterator_length: number
   }
   created_at: number
   created_by: {
@@ -32,6 +39,7 @@ export type NodeTracing = {
   finished_at: number
   extras?: any
   expand?: boolean // for UI
+  details?: NodeTracing[][] // iteration detail
 }
 
 export type FetchWorkflowDraftResponse = {
@@ -50,6 +58,9 @@ export type FetchWorkflowDraftResponse = {
   }
   hash: string
   updated_at: number
+  tool_published: boolean
+  environment_variables?: EnvironmentVariable[]
+  conversation_variables?: ConversationVariable[]
 }
 
 export type NodeTracingListResponse = {
@@ -82,6 +93,11 @@ export type WorkflowFinishedResponse = {
     total_tokens: number
     total_steps: number
     created_at: number
+    created_by: {
+      id: string
+      name: string
+      email: string
+    }
     finished_at: number
   }
 }
@@ -124,6 +140,50 @@ export type NodeFinishedResponse = {
       currency: string
     }
     created_at: number
+  }
+}
+
+export type IterationStartedResponse = {
+  task_id: string
+  workflow_run_id: string
+  event: string
+  data: {
+    id: string
+    node_id: string
+    metadata: {
+      iterator_length: number
+    }
+    created_at: number
+    extras?: any
+  }
+}
+
+export type IterationNextedResponse = {
+  task_id: string
+  workflow_run_id: string
+  event: string
+  data: {
+    id: string
+    node_id: string
+    index: number
+    output: any
+    extras?: any
+    created_at: number
+  }
+}
+
+export type IterationFinishedResponse = {
+  task_id: string
+  workflow_run_id: string
+  event: string
+  data: {
+    id: string
+    node_id: string
+    outputs: any
+    extras?: any
+    status: string
+    created_at: number
+    error: string
   }
 }
 
@@ -183,3 +243,11 @@ export type NodesDefaultConfigsResponse = {
   type: string
   config: any
 }[]
+
+export type ConversationVariableResponse = {
+  data: (ConversationVariable & { updated_at: number; created_at: number })[]
+  has_more: boolean
+  limit: number
+  total: number
+  page: number
+}

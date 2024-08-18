@@ -1,11 +1,14 @@
 - google
 - bing
 - duckduckgo
+- searchapi
+- serper
 - searxng
 - dalle
 - azuredalle
 - stability
 - wikipedia
+- nominatim
 - yahoo
 - arxiv
 - pubmed
@@ -26,4 +29,6 @@
 - qrcode
 - dingtalk
 - feishu
+- feishu_base
 - slack
+- tianditu

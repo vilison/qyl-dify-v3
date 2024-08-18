@@ -3,8 +3,9 @@ from typing import Any, Optional
 
 from pydantic import BaseModel
 
+from core.file.file_obj import FileExtraConfig
 from core.model_runtime.entities.message_entities import PromptMessageRole
-from models.model import AppMode
+from models import AppMode
 
 
 class ModelConfigEntity(BaseModel):
@@ -114,6 +115,10 @@ class VariableEntity(BaseModel):
     default: Optional[str] = None
     hint: Optional[str] = None
 
+    @property
+    def name(self) -> str:
+        return self.variable
+
 
 class ExternalDataVariableEntity(BaseModel):
     """
@@ -154,8 +159,13 @@ class DatasetRetrieveConfigEntity(BaseModel):
 
     retrieve_strategy: RetrieveStrategy
     top_k: Optional[int] = None
-    score_threshold: Optional[float] = None
+    score_threshold: Optional[float] = .0
+    rerank_mode: Optional[str] = 'reranking_model'
     reranking_model: Optional[dict] = None
+    weights: Optional[dict] = None
+    reranking_enabled: Optional[bool] = True
+
+
 
 
 class DatasetEntity(BaseModel):
@@ -183,11 +193,14 @@ class TextToSpeechEntity(BaseModel):
     language: Optional[str] = None
 
 
-class FileExtraConfig(BaseModel):
+class TracingConfigEntity(BaseModel):
     """
-    File Upload Entity.
+    Tracing Config Entity.
     """
-    image_config: Optional[dict[str, Any]] = None
+    enabled: bool
+    tracing_provider: str
+
+
 
 
 class AppAdditionalFeatures(BaseModel):
@@ -199,7 +212,7 @@ class AppAdditionalFeatures(BaseModel):
     more_like_this: bool = False
     speech_to_text: bool = False
     text_to_speech: Optional[TextToSpeechEntity] = None
-
+    trace_config: Optional[TracingConfigEntity] = None
 
 class AppConfig(BaseModel):
     """

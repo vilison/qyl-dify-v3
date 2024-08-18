@@ -1,11 +1,10 @@
 import enum
 import json
 import os
-from typing import Optional
+from typing import TYPE_CHECKING, Optional
 
 from core.app.app_config.entities import PromptTemplateEntity
 from core.app.entities.app_invoke_entities import ModelConfigWithCredentialsEntity
-from core.file.file_obj import FileVar
 from core.memory.token_buffer_memory import TokenBufferMemory
 from core.model_runtime.entities.message_entities import (
     PromptMessage,
@@ -17,6 +16,9 @@ from core.prompt.entities.advanced_prompt_entities import MemoryConfig
 from core.prompt.prompt_transform import PromptTransform
 from core.prompt.utils.prompt_template_parser import PromptTemplateParser
 from models.model import AppMode
+
+if TYPE_CHECKING:
+    from core.file.file_obj import FileVar
 
 
 class ModelMode(enum.Enum):
@@ -50,7 +52,7 @@ class SimplePromptTransform(PromptTransform):
                    prompt_template_entity: PromptTemplateEntity,
                    inputs: dict,
                    query: str,
-                   files: list[FileVar],
+                   files: list["FileVar"],
                    context: Optional[str],
                    memory: Optional[TokenBufferMemory],
                    model_config: ModelConfigWithCredentialsEntity) -> \
@@ -148,7 +150,7 @@ class SimplePromptTransform(PromptTransform):
                 special_variable_keys.append('#histories#')
 
         if query_in_prompt:
-            prompt += prompt_rules['query_prompt'] if 'query_prompt' in prompt_rules else '{{#query#}}'
+            prompt += prompt_rules.get('query_prompt', '{{#query#}}')
             special_variable_keys.append('#query#')
 
         return {
@@ -163,7 +165,7 @@ class SimplePromptTransform(PromptTransform):
                                         inputs: dict,
                                         query: str,
                                         context: Optional[str],
-                                        files: list[FileVar],
+                                        files: list["FileVar"],
                                         memory: Optional[TokenBufferMemory],
                                         model_config: ModelConfigWithCredentialsEntity) \
             -> tuple[list[PromptMessage], Optional[list[str]]]:
@@ -206,7 +208,7 @@ class SimplePromptTransform(PromptTransform):
                                               inputs: dict,
                                               query: str,
                                               context: Optional[str],
-                                              files: list[FileVar],
+                                              files: list["FileVar"],
                                               memory: Optional[TokenBufferMemory],
                                               model_config: ModelConfigWithCredentialsEntity) \
             -> tuple[list[PromptMessage], Optional[list[str]]]:
@@ -234,8 +236,8 @@ class SimplePromptTransform(PromptTransform):
                     )
                 ),
                 max_token_limit=rest_tokens,
-                human_prefix=prompt_rules['human_prefix'] if 'human_prefix' in prompt_rules else 'Human',
-                ai_prefix=prompt_rules['assistant_prefix'] if 'assistant_prefix' in prompt_rules else 'Assistant'
+                human_prefix=prompt_rules.get('human_prefix', 'Human'),
+                ai_prefix=prompt_rules.get('assistant_prefix', 'Assistant')
             )
 
             # get prompt
@@ -255,7 +257,7 @@ class SimplePromptTransform(PromptTransform):
 
         return [self.get_last_user_message(prompt, files)], stops
 
-    def get_last_user_message(self, prompt: str, files: list[FileVar]) -> UserPromptMessage:
+    def get_last_user_message(self, prompt: str, files: list["FileVar"]) -> UserPromptMessage:
         if files:
             prompt_message_contents = [TextPromptMessageContent(data=prompt)]
             for file in files:

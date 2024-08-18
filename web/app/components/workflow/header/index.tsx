@@ -2,7 +2,10 @@ import type { FC } from 'react'
 import {
   memo,
   useCallback,
+  useMemo,
 } from 'react'
+import { RiApps2AddLine } from '@remixicon/react'
+import { useNodes } from 'reactflow'
 import { useTranslation } from 'react-i18next'
 import { useContext } from 'use-context-selector'
 import {
@@ -10,7 +13,13 @@ import {
   useWorkflowStore,
 } from '../store'
 import {
+  BlockEnum,
+  InputVarType,
+} from '../types'
+import type { StartNodeType } from '../nodes/start/types'
+import {
   useChecklistBeforePublish,
+  useIsChatMode,
   useNodesReadOnly,
   useNodesSyncDraft,
   useWorkflowMode,
@@ -23,12 +32,13 @@ import EditingTitle from './editing-title'
 import RunningTitle from './running-title'
 import RestoringTitle from './restoring-title'
 import ViewHistory from './view-history'
-import Checklist from './checklist'
-import { Grid01 } from '@/app/components/base/icons/src/vender/line/layout'
+import ChatVariableButton from './chat-variable-button'
+import EnvButton from './env-button'
 import Button from '@/app/components/base/button'
 import { useStore as useAppStore } from '@/app/components/app/store'
 import { publishWorkflow } from '@/service/workflow'
 import { ArrowNarrowLeft } from '@/app/components/base/icons/src/vender/line/arrows'
+import { useFeatures } from '@/app/components/base/features/hooks'
 
 const Header: FC = () => {
   const { t } = useTranslation()
@@ -36,12 +46,32 @@ const Header: FC = () => {
   const appDetail = useAppStore(s => s.appDetail)
   const appSidebarExpand = useAppStore(s => s.appSidebarExpand)
   const appID = appDetail?.id
-  const {
-    nodesReadOnly,
-    getNodesReadOnly,
-  } = useNodesReadOnly()
+  const isChatMode = useIsChatMode()
+  const { nodesReadOnly, getNodesReadOnly } = useNodesReadOnly()
   const publishedAt = useStore(s => s.publishedAt)
   const draftUpdatedAt = useStore(s => s.draftUpdatedAt)
+  const toolPublished = useStore(s => s.toolPublished)
+  const nodes = useNodes<StartNodeType>()
+  const startNode = nodes.find(node => node.data.type === BlockEnum.Start)
+  const startVariables = startNode?.data.variables
+  const fileSettings = useFeatures(s => s.features.file)
+  const variables = useMemo(() => {
+    const data = startVariables || []
+    if (fileSettings?.image?.enabled) {
+      return [
+        ...data,
+        {
+          type: InputVarType.files,
+          variable: '__image',
+          required: false,
+          label: 'files',
+        },
+      ]
+    }
+
+    return data
+  }, [fileSettings?.image?.enabled, startVariables])
+
   const {
     handleLoadBackupDraft,
     handleBackupDraft,
@@ -58,13 +88,13 @@ const Header: FC = () => {
 
   const handleShowFeatures = useCallback(() => {
     const {
+      showFeaturesPanel,
       isRestoring,
       setShowFeaturesPanel,
     } = workflowStore.getState()
     if (getNodesReadOnly() && !isRestoring)
       return
-
-    setShowFeaturesPanel(true)
+    setShowFeaturesPanel(!showFeaturesPanel)
   }, [workflowStore, getNodesReadOnly])
 
   const handleCancelRestore = useCallback(() => {
@@ -108,6 +138,10 @@ const Header: FC = () => {
     workflowStore.setState({ historyWorkflowData: undefined })
   }, [workflowStore, handleLoadBackupDraft])
 
+  const handleToolConfigureUpdate = useCallback(() => {
+    workflowStore.setState({ toolPublished: true })
+  }, [workflowStore])
+
   return (
     <div
       className='absolute top-0 left-0 z-10 flex items-center justify-between w-full px-3 h-14'
@@ -133,33 +167,29 @@ const Header: FC = () => {
       </div>
       {
         normal && (
-          <div className='flex items-center'>
+          <div className='flex items-center gap-2'>
+            {isChatMode && <ChatVariableButton disabled={nodesReadOnly} />}
+            <EnvButton disabled={nodesReadOnly} />
+            <div className='w-[1px] h-3.5 bg-gray-200'></div>
             <RunAndHistory />
-            <div className='mx-2 w-[1px] h-3.5 bg-gray-200'></div>
-            <Button
-              className={`
-                mr-2 px-3 py-0 h-8 bg-white text-[13px] font-medium text-gray-700
-                border-[0.5px] border-gray-200 shadow-xs
-                ${nodesReadOnly && 'opacity-50 !cursor-not-allowed'}
-              `}
-              onClick={handleShowFeatures}
-            >
-              <Grid01 className='w-4 h-4 mr-1 text-gray-500' />
+            <Button className='text-components-button-secondary-text' onClick={handleShowFeatures}>
+              <RiApps2AddLine className='w-4 h-4 mr-1 text-components-button-secondary-text' />
               {t('workflow.common.features')}
             </Button>
             <AppPublisher
               {...{
                 publishedAt,
                 draftUpdatedAt,
-                disabled: Boolean(getNodesReadOnly()),
+                disabled: nodesReadOnly,
+                toolPublished,
+                inputs: variables,
+                onRefreshData: handleToolConfigureUpdate,
                 onPublish,
                 onRestore: onStartRestoring,
                 onToggle: onPublisherToggle,
-                crossAxisOffset: 53,
+                crossAxisOffset: 4,
               }}
             />
-            <div className='mx-2 w-[1px] h-3.5 bg-gray-200'></div>
-            <Checklist disabled={nodesReadOnly} />
           </div>
         )
       }
@@ -169,11 +199,8 @@ const Header: FC = () => {
             <ViewHistory withText />
             <div className='mx-2 w-[1px] h-3.5 bg-gray-200'></div>
             <Button
-              type='primary'
-              className={`
-                mr-2 px-3 py-0 h-8 text-[13px] font-medium
-                border-[0.5px] border-gray-200 shadow-xs
-              `}
+              variant='primary'
+              className='mr-2'
               onClick={handleGoBackToEdit}
             >
               <ArrowNarrowLeft className='w-4 h-4 mr-1' />
@@ -185,27 +212,20 @@ const Header: FC = () => {
       {
         restoring && (
           <div className='flex items-center'>
-            <Button
-              className={`
-                px-3 py-0 h-8 bg-white text-[13px] font-medium text-gray-700
-                border-[0.5px] border-gray-200 shadow-xs
-              `}
-              onClick={handleShowFeatures}
-            >
-              <Grid01 className='w-4 h-4 mr-1 text-gray-500' />
+            <Button className='text-components-button-secondary-text' onClick={handleShowFeatures}>
+              <RiApps2AddLine className='w-4 h-4 mr-1 text-components-button-secondary-text' />
               {t('workflow.common.features')}
             </Button>
             <div className='mx-2 w-[1px] h-3.5 bg-gray-200'></div>
             <Button
-              className='mr-2 px-3 py-0 h-8 bg-white text-[13px] text-gray-700 font-medium border-[0.5px] border-gray-200 shadow-xs'
+              className='mr-2'
               onClick={handleCancelRestore}
             >
               {t('common.operation.cancel')}
             </Button>
             <Button
-              className='px-3 py-0 h-8 text-[13px] font-medium shadow-xs'
               onClick={handleRestore}
-              type='primary'
+              variant='primary'
             >
               {t('workflow.common.restore')}
             </Button>

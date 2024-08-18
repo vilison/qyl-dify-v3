@@ -84,16 +84,17 @@ class MoonshotLargeLanguageModel(OAIAPICompatLargeLanguageModel):
 
     def _add_custom_parameters(self, credentials: dict) -> None:
         credentials['mode'] = 'chat'
-        credentials['endpoint_url'] = 'https://api.moonshot.cn/v1'
+        if 'endpoint_url' not in credentials or credentials['endpoint_url'] == "":
+            credentials['endpoint_url'] = 'https://api.moonshot.cn/v1'
 
     def _add_function_call(self, model: str, credentials: dict) -> None:
         model_schema = self.get_model_schema(model, credentials)
-        if model_schema and set([
+        if model_schema and {
             ModelFeature.TOOL_CALL, ModelFeature.MULTI_TOOL_CALL
-        ]).intersection(model_schema.features or []):
+        }.intersection(model_schema.features or []):
             credentials['function_calling_type'] = 'tool_call'
 
-    def _convert_prompt_message_to_dict(self, message: PromptMessage) -> dict:
+    def _convert_prompt_message_to_dict(self, message: PromptMessage, credentials: Optional[dict] = None) -> dict:
         """
         Convert PromptMessage to dict for OpenAI API format
         """

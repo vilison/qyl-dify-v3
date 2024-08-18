@@ -8,31 +8,33 @@ from httpx import get, post
 from pydantic import BaseModel
 from yarl import URL
 
-from config import get_env
+from configs import dify_config
 from core.helper.code_executor.entities import CodeDependency
-from core.helper.code_executor.javascript_transformer import NodeJsTemplateTransformer
-from core.helper.code_executor.jinja2_transformer import Jinja2TemplateTransformer
-from core.helper.code_executor.python_transformer import PYTHON_STANDARD_PACKAGES, PythonTemplateTransformer
+from core.helper.code_executor.javascript.javascript_transformer import NodeJsTemplateTransformer
+from core.helper.code_executor.jinja2.jinja2_transformer import Jinja2TemplateTransformer
+from core.helper.code_executor.python3.python3_transformer import Python3TemplateTransformer
+from core.helper.code_executor.template_transformer import TemplateTransformer
 
 logger = logging.getLogger(__name__)
 
 # Code Executor
-CODE_EXECUTION_ENDPOINT = get_env('CODE_EXECUTION_ENDPOINT')
-CODE_EXECUTION_API_KEY = get_env('CODE_EXECUTION_API_KEY')
+CODE_EXECUTION_ENDPOINT = dify_config.CODE_EXECUTION_ENDPOINT
+CODE_EXECUTION_API_KEY = dify_config.CODE_EXECUTION_API_KEY
 
-CODE_EXECUTION_TIMEOUT= (10, 60)
+CODE_EXECUTION_TIMEOUT = (10, 60)
 
 class CodeExecutionException(Exception):
     pass
 
 class CodeExecutionResponse(BaseModel):
     class Data(BaseModel):
-        stdout: Optional[str]
-        error: Optional[str]
+        stdout: Optional[str] = None
+        error: Optional[str] = None
 
     code: int
     message: str
     data: Data
+
 
 class CodeLanguage(str, Enum):
     PYTHON3 = 'python3'
@@ -44,8 +46,8 @@ class CodeExecutor:
     dependencies_cache = {}
     dependencies_cache_lock = Lock()
 
-    code_template_transformers = {
-        CodeLanguage.PYTHON3: PythonTemplateTransformer,
+    code_template_transformers: dict[CodeLanguage, type[TemplateTransformer]] = {
+        CodeLanguage.PYTHON3: Python3TemplateTransformer,
         CodeLanguage.JINJA2: Jinja2TemplateTransformer,
         CodeLanguage.JAVASCRIPT: NodeJsTemplateTransformer,
     }
@@ -56,9 +58,13 @@ class CodeExecutor:
         CodeLanguage.PYTHON3: CodeLanguage.PYTHON3,
     }
 
+    supported_dependencies_languages: set[CodeLanguage] = {
+        CodeLanguage.PYTHON3
+    }
+
     @classmethod
     def execute_code(cls, 
-                     language: Literal['python3', 'javascript', 'jinja2'], 
+                     language: CodeLanguage, 
                      preload: str, 
                      code: str, 
                      dependencies: Optional[list[CodeDependency]] = None) -> str:
@@ -82,7 +88,7 @@ class CodeExecutor:
         }
 
         if dependencies:
-            data['dependencies'] = [dependency.dict() for dependency in dependencies]
+            data['dependencies'] = [dependency.model_dump() for dependency in dependencies]
 
         try:
             response = post(str(url), json=data, headers=headers, timeout=CODE_EXECUTION_TIMEOUT)
@@ -93,17 +99,19 @@ class CodeExecutor:
         except CodeExecutionException as e:
             raise e
         except Exception as e:
-            raise CodeExecutionException('Failed to execute code, this is likely a network issue, please check if the sandbox service is running')
+            raise CodeExecutionException('Failed to execute code, which is likely a network issue,'
+                                         ' please check if the sandbox service is running.'
+                                         f' ( Error: {str(e)} )')
         
         try:
             response = response.json()
         except:
             raise CodeExecutionException('Failed to parse response')
+
+        if (code := response.get('code')) != 0:
+            raise CodeExecutionException(f"Got error code: {code}. Got error msg: {response.get('message')}")
         
         response = CodeExecutionResponse(**response)
-
-        if response.code != 0:
-            raise CodeExecutionException(response.message)
         
         if response.data.error:
             raise CodeExecutionException(response.data.error)
@@ -111,7 +119,7 @@ class CodeExecutor:
         return response.data.stdout
 
     @classmethod
-    def execute_workflow_code_template(cls, language: Literal['python3', 'javascript', 'jinja2'], code: str, inputs: dict, dependencies: Optional[list[CodeDependency]] = None) -> dict:
+    def execute_workflow_code_template(cls, language: CodeLanguage, code: str, inputs: dict, dependencies: Optional[list[CodeDependency]] = None) -> dict:
         """
         Execute code
         :param language: code language
@@ -133,7 +141,10 @@ class CodeExecutor:
         return template_transformer.transform_response(response)
     
     @classmethod
-    def list_dependencies(cls, language: Literal['python3']) -> list[CodeDependency]:
+    def list_dependencies(cls, language: str) -> list[CodeDependency]:
+        if language not in cls.supported_dependencies_languages:
+            return []
+
         with cls.dependencies_cache_lock:
             if language in cls.dependencies_cache:
                 # check expiration
@@ -178,7 +189,8 @@ class CodeExecutor:
             response = response.json()
             dependencies = response.get('data', {}).get('dependencies', [])
             return [
-                CodeDependency(**dependency) for dependency in dependencies if dependency.get('name') not in PYTHON_STANDARD_PACKAGES
+                CodeDependency(**dependency) for dependency in dependencies
+                if dependency.get('name') not in Python3TemplateTransformer.get_standard_packages()
             ]
         except Exception as e:
             logger.exception(f'Failed to list dependencies: {e}')
