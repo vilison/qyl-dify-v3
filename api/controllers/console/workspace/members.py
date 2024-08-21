@@ -27,6 +27,7 @@ class MemberListApi(Resource):
         members = TenantService.get_tenant_members(current_user.current_tenant)
         return {'result': 'success', 'accounts': members}, 200
 
+
 class MemberListAdvancedApi(Resource):
     """List all members of current tenant with advanced function."""
 

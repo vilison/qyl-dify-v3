@@ -345,10 +345,14 @@ class TenantService:
         #          .where(*filters)
         #          .order_by(Account.created_at.desc()))
 
+        # print(query)
+
+        # build account id and role mapping
+        key_value_map = {}
         for account, role in query:
             # print(account.__dict__)
-            account.role = role
-            # print(account.__dict__)
+            # print(role)
+            key_value_map[account.id] = role
 
         # using paginate
         account_models = db.paginate(
@@ -358,8 +362,11 @@ class TenantService:
             error_out=False
         )
 
-        return account_models
+        # set role value for account object
+        for item in account_models.items:
+            item.role = key_value_map[item.id]
 
+        return account_models
 
     @staticmethod
     def has_roles(tenant: Tenant, roles: list[TenantAccountJoinRole]) -> bool:
