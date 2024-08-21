@@ -457,10 +457,13 @@ class ApiService:
     def get_page_members(self, page, limit, name, account_ids):
         params = {
             "page": page,
-            "limit": limit,
-            "name": name,
-            "account_ids": account_ids
+            "limit": limit
         }
+        if name != '':
+            params['name'] = name
+
+        if account_ids != '':
+            params['account_ids'] = account_ids
         response = requests.get(self.DIFY_API_URL + "/console/api/workspaces/current/members/advanced", params=params,
                                 headers=self.user_request_headers)
         if response.status_code == 200:
